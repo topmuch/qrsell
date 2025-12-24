@@ -1,192 +1,283 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { createPageUrl } from '../utils';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Package, QrCode, Store, ExternalLink, Loader2, LogOut } from 'lucide-react';
-import { motion } from 'framer-motion';
-import ProductCard from '../components/dashboard/ProductCard';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Plus, 
+  Package, 
+  BookOpen, 
+  Settings, 
+  Store, 
+  Copy, 
+  Check,
+  ExternalLink,
+  Loader2
+} from 'lucide-react';
+import Logo from '@/components/ui/Logo';
+import SellerProfileForm from '@/components/dashboard/SellerProfileForm';
+import ProductForm from '@/components/dashboard/ProductForm';
+import ProductCard from '@/components/dashboard/ProductCard';
+import TikTokGuide from '@/components/dashboard/TikTokGuide';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Dashboard() {
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [seller, setSeller] = useState(null);
-  const [products, setProducts] = useState([]);
+  const [user, setUser] = useState(null);
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [editProduct, setEditProduct] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    loadDashboard();
+    const loadUser = async () => {
+      const currentUser = await base44.auth.me();
+      setUser(currentUser);
+    };
+    loadUser();
   }, []);
 
-  const loadDashboard = async () => {
-    try {
-      const user = await base44.auth.me();
-      const sellers = await base44.entities.Seller.filter({ created_by: user.email });
-      
-      if (sellers.length === 0) {
-        navigate(createPageUrl('ProfileSetup'));
-        return;
-      }
+  // Get seller profile
+  const { data: sellers = [], isLoading: loadingSeller, refetch: refetchSeller } = useQuery({
+    queryKey: ['seller', user?.email],
+    queryFn: () => base44.entities.Seller.filter({ created_by: user?.email }),
+    enabled: !!user?.email
+  });
 
-      setSeller(sellers[0]);
-      
-      const sellerProducts = await base44.entities.Product.filter(
-        { seller_email: user.email },
-        '-created_date'
-      );
-      setProducts(sellerProducts);
-    } catch (err) {
-      console.error('Error loading dashboard:', err);
-    } finally {
-      setLoading(false);
+  const seller = sellers[0];
+
+  // Get products
+  const { data: products = [], isLoading: loadingProducts, refetch: refetchProducts } = useQuery({
+    queryKey: ['products', seller?.id],
+    queryFn: () => base44.entities.Product.filter({ seller_id: seller?.id }),
+    enabled: !!seller?.id
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (productId) => base44.entities.Product.delete(productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['products']);
     }
+  });
+
+  const handleProfileComplete = () => {
+    refetchSeller();
+  };
+
+  const handleProductSuccess = () => {
+    refetchProducts();
+    setEditProduct(null);
+  };
+
+  const handleEditProduct = (product) => {
+    setEditProduct(product);
+    setShowProductForm(true);
+  };
+
+  const handleDeleteProduct = async (product) => {
+    if (confirm(`Supprimer "${product.name}" ?`)) {
+      deleteMutation.mutate(product.id);
+    }
+  };
+
+  const shopUrl = seller ? `${window.location.origin}/Shop?slug=${seller.shop_slug}` : '';
+
+  const copyShopLink = () => {
+    navigator.clipboard.writeText(shopUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleLogout = () => {
     base44.auth.logout();
   };
 
-  if (loading) {
+  if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <Loader2 className="w-8 h-8 animate-spin text-[#ed477c]" />
       </div>
     );
   }
 
-  const shopUrl = `${window.location.origin}/shop/${seller?.shop_slug}`;
+  // Show profile form if seller profile not completed
+  if (!loadingSeller && !seller) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50/50 to-white py-12 px-4">
+        <div className="max-w-lg mx-auto">
+          <div className="flex justify-center mb-8">
+            <Logo size="lg" />
+          </div>
+          <SellerProfileForm user={user} onProfileComplete={handleProfileComplete} />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#ed477c] rounded-xl flex items-center justify-center">
-                <Store className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold">{seller?.full_name}</h1>
-                <p className="text-sm text-gray-500">@{seller?.shop_slug}</p>
-              </div>
+      <header className="bg-white border-b sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <Logo size="md" />
+            
+            <div className="flex items-center gap-4">
+              {seller && (
+                <div className="hidden md:flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2">
+                  <Store className="w-4 h-4 text-gray-500" />
+                  <span className="text-sm text-gray-600 truncate max-w-[150px]">
+                    {seller.shop_name}
+                  </span>
+                  <Button 
+                    size="icon" 
+                    variant="ghost" 
+                    className="h-6 w-6"
+                    onClick={copyShopLink}
+                  >
+                    {copied ? (
+                      <Check className="w-3 h-3 text-green-500" />
+                    ) : (
+                      <Copy className="w-3 h-3" />
+                    )}
+                  </Button>
+                  <a href={shopUrl} target="_blank" rel="noopener noreferrer">
+                    <Button size="icon" variant="ghost" className="h-6 w-6">
+                      <ExternalLink className="w-3 h-3" />
+                    </Button>
+                  </a>
+                </div>
+              )}
+              <Button variant="outline" size="sm" onClick={handleLogout}>
+                Déconnexion
+              </Button>
             </div>
-            <Button variant="ghost" onClick={handleLogout} className="text-gray-600">
-              <LogOut className="w-4 h-4 mr-2" />
-              Déconnexion
-            </Button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            <Card className="bg-gradient-to-br from-[#ed477c] to-[#c93b63] text-white">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Produits actifs</span>
-                  <Package className="w-6 h-6" />
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-4xl font-bold">{products.length}</p>
-              </CardContent>
-            </Card>
-          </motion.div>
+      {/* Main content */}
+      <main className="container mx-auto px-4 py-8">
+        <Tabs defaultValue="products" className="space-y-6">
+          <TabsList className="bg-white border p-1 rounded-xl">
+            <TabsTrigger value="products" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ed477c] data-[state=active]:to-[#ff6b9d] data-[state=active]:text-white rounded-lg">
+              <Package className="w-4 h-4" />
+              Mes produits
+            </TabsTrigger>
+            <TabsTrigger value="guide" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ed477c] data-[state=active]:to-[#ff6b9d] data-[state=active]:text-white rounded-lg">
+              <BookOpen className="w-4 h-4" />
+              Guide TikTok
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ed477c] data-[state=active]:to-[#ff6b9d] data-[state=active]:text-white rounded-lg">
+              <Settings className="w-4 h-4" />
+              Paramètres
+            </TabsTrigger>
+          </TabsList>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Boutique</span>
-                  <Store className="w-6 h-6 text-[#ed477c]" />
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <a 
-                  href={shopUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-[#ed477c] hover:underline flex items-center gap-2"
+          <TabsContent value="products">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Mes produits</h1>
+                <p className="text-gray-500">{products.length} produit{products.length > 1 ? 's' : ''}</p>
+              </div>
+              <Button 
+                onClick={() => {
+                  setEditProduct(null);
+                  setShowProductForm(true);
+                }}
+                className="bg-gradient-to-r from-[#ed477c] to-[#ff6b9d] hover:opacity-90 text-white"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Ajouter un produit
+              </Button>
+            </div>
+
+            {loadingProducts ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="w-8 h-8 animate-spin text-[#ed477c]" />
+              </div>
+            ) : products.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-200"
+              >
+                <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Aucun produit</h3>
+                <p className="text-gray-500 mb-6">Commencez par ajouter votre premier produit</p>
+                <Button 
+                  onClick={() => setShowProductForm(true)}
+                  className="bg-gradient-to-r from-[#ed477c] to-[#ff6b9d] hover:opacity-90 text-white"
                 >
-                  Voir ma vitrine
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Guide TikTok</span>
-                  <QrCode className="w-6 h-6 text-[#ed477c]" />
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Link to={createPageUrl('TikTokGuide')}>
-                  <Button variant="outline" className="w-full border-[#ed477c] text-[#ed477c] hover:bg-[#ed477c] hover:text-white">
-                    Voir le guide
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* Products Section */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Mes produits</h2>
-          <Link to={createPageUrl('AddProduct')}>
-            <Button className="bg-[#ed477c] hover:bg-[#d63d6c] text-white">
-              <Plus className="w-5 h-5 mr-2" />
-              Ajouter un produit
-            </Button>
-          </Link>
-        </div>
-
-        {products.length === 0 ? (
-          <Card className="text-center py-16">
-            <CardContent>
-              <Package className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-xl font-semibold mb-2">Aucun produit pour le moment</h3>
-              <p className="text-gray-600 mb-6">Ajoutez votre premier produit pour commencer à vendre</p>
-              <Link to={createPageUrl('AddProduct')}>
-                <Button className="bg-[#ed477c] hover:bg-[#d63d6c] text-white">
-                  <Plus className="w-5 h-5 mr-2" />
+                  <Plus className="w-4 h-4 mr-2" />
                   Ajouter un produit
                 </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product, index) => (
-              <ProductCard 
-                key={product.id} 
-                product={product} 
-                index={index}
-                onRefresh={loadDashboard}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+              </motion.div>
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <AnimatePresence>
+                  {products.map((product) => (
+                    <ProductCard 
+                      key={product.id}
+                      product={product}
+                      seller={seller}
+                      onEdit={handleEditProduct}
+                      onDelete={handleDeleteProduct}
+                    />
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="guide">
+            <TikTokGuide shopUrl={shopUrl} />
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <div className="max-w-2xl">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">Paramètres de la boutique</h2>
+              
+              <div className="bg-white rounded-xl p-6 space-y-6">
+                <div>
+                  <label className="text-sm font-medium text-gray-700">Nom de la boutique</label>
+                  <p className="text-lg text-gray-900">{seller?.shop_name}</p>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium text-gray-700">Numéro WhatsApp</label>
+                  <p className="text-lg text-gray-900">{seller?.whatsapp_number}</p>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium text-gray-700">URL de la boutique</label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <code className="flex-1 p-3 bg-gray-50 rounded-lg text-sm">
+                      {shopUrl}
+                    </code>
+                    <Button variant="outline" onClick={copyShopLink}>
+                      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </main>
+
+      {/* Product form modal */}
+      {showProductForm && seller && (
+        <ProductForm 
+          open={showProductForm}
+          onClose={() => {
+            setShowProductForm(false);
+            setEditProduct(null);
+          }}
+          seller={seller}
+          editProduct={editProduct}
+          onSuccess={handleProductSuccess}
+        />
+      )}
     </div>
   );
 }
