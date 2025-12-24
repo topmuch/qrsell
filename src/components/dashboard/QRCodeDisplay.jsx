@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Download, Copy, Check, Smartphone, Video } from 'lucide-react';
+import QRCode from 'qrcode';
 
 export default function QRCodeDisplay({ product, seller, onClose }) {
   const canvasRef = useRef(null);
@@ -11,68 +12,48 @@ export default function QRCodeDisplay({ product, seller, onClose }) {
   
   const productUrl = `${window.location.origin}/ProductPage?id=${product.public_id}`;
 
-  // Generate QR code using canvas
-  const generateQRCode = (canvas, size, withBranding = false) => {
+  // Generate real QR code using qrcode library
+  const generateQRCode = async (canvas, size, withBranding = false) => {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
-    const qrData = productUrl;
     
-    // Simple QR-like pattern (in production, use a real QR library)
-    const moduleCount = 25;
-    const moduleSize = size / moduleCount;
-    
-    canvas.width = withBranding ? size : size;
-    canvas.height = withBranding ? size + 80 : size;
+    // Set canvas dimensions
+    const padding = 20;
+    const brandingHeight = withBranding ? 80 : 0;
+    canvas.width = size + (padding * 2);
+    canvas.height = size + (padding * 2) + brandingHeight;
     
     // White background
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Generate QR pattern based on URL hash
-    const hash = qrData.split('').reduce((acc, char, i) => {
-      return acc + char.charCodeAt(0) * (i + 1);
-    }, 0);
-    
-    ctx.fillStyle = '#1f2937';
-    
-    // Position patterns (corners)
-    const drawPositionPattern = (x, y, size) => {
-      ctx.fillRect(x, y, size * 7, size * 7);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(x + size, y + size, size * 5, size * 5);
-      ctx.fillStyle = '#1f2937';
-      ctx.fillRect(x + size * 2, y + size * 2, size * 3, size * 3);
-    };
-    
-    drawPositionPattern(0, 0, moduleSize);
-    drawPositionPattern(moduleSize * 18, 0, moduleSize);
-    drawPositionPattern(0, moduleSize * 18, moduleSize);
-    
-    // Data modules
-    for (let row = 0; row < moduleCount; row++) {
-      for (let col = 0; col < moduleCount; col++) {
-        // Skip position patterns
-        if ((row < 9 && col < 9) || (row < 9 && col > 15) || (row > 15 && col < 9)) continue;
-        
-        const seed = (hash + row * 31 + col * 17) % 100;
-        if (seed > 45) {
-          ctx.fillStyle = '#1f2937';
-          ctx.fillRect(col * moduleSize, row * moduleSize, moduleSize - 1, moduleSize - 1);
-        }
+    // Generate QR code
+    const tempCanvas = document.createElement('canvas');
+    await QRCode.toCanvas(tempCanvas, productUrl, {
+      width: size,
+      margin: 0,
+      color: {
+        dark: '#1f2937',
+        light: '#ffffff'
       }
-    }
+    });
+    
+    // Draw QR code on main canvas
+    ctx.drawImage(tempCanvas, padding, padding);
     
     if (withBranding) {
       // Add branding below QR
+      const textY = size + padding + 20;
+      
       ctx.fillStyle = '#ed477c';
-      ctx.font = 'bold 14px Inter, sans-serif';
+      ctx.font = 'bold 18px Inter, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('Scannez pour commander !', size / 2, size + 30);
+      ctx.fillText('Scan pour acheter sur WhatsApp !', canvas.width / 2, textY);
       
       ctx.fillStyle = '#6b7280';
-      ctx.font = '12px Inter, sans-serif';
-      ctx.fillText('TiktocQR', size / 2, size + 55);
+      ctx.font = '14px Inter, sans-serif';
+      ctx.fillText('TiktocQR', canvas.width / 2, textY + 30);
     }
   };
 
