@@ -9,7 +9,7 @@ import CTASection from '@/components/landing/CTASection';
 import Footer from '@/components/landing/Footer';
 import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
+import { createPageUrl } from '@/utils/index';
 
 export default function Home() {
   return (

@@ -8,7 +8,7 @@ import { MessageCircle, Store, Loader2, ArrowLeft, Share2, Check } from 'lucide-
 import Logo from '@/components/ui/Logo';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
+import { createPageUrl } from '@/utils/index';
 
 export default function ProductPage() {
   const urlParams = new URLSearchParams(window.location.search);
