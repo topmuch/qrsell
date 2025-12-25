@@ -12,7 +12,10 @@ import {
   Copy, 
   Check,
   ExternalLink,
-  Loader2
+  Loader2,
+  QrCode,
+  Eye,
+  MessageCircle
 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import SellerProfileForm from '@/components/dashboard/SellerProfileForm';
@@ -197,25 +200,25 @@ export default function Dashboard() {
               <AnalyticsCard 
                 title="Scans QR Code"
                 value={stats.totalScans}
-                icon={require('lucide-react').QrCode}
+                icon={QrCode}
                 color="text-[#ed477c]"
               />
               <AnalyticsCard 
                 title="Vues produits"
                 value={stats.totalViews}
-                icon={require('lucide-react').Eye}
+                icon={Eye}
                 color="text-blue-500"
               />
               <AnalyticsCard 
                 title="Clics WhatsApp"
                 value={stats.whatsappClicks}
-                icon={require('lucide-react').MessageCircle}
+                icon={MessageCircle}
                 color="text-green-500"
               />
               <AnalyticsCard 
                 title="Vues boutique"
                 value={stats.shopViews}
-                icon={require('lucide-react').Store}
+                icon={Store}
                 color="text-purple-500"
               />
             </div>
