@@ -19,6 +19,9 @@ import SellerProfileForm from '@/components/dashboard/SellerProfileForm';
 import ProductForm from '@/components/dashboard/ProductForm';
 import ProductCard from '@/components/dashboard/ProductCard';
 import TikTokGuide from '@/components/dashboard/TikTokGuide';
+import AnalyticsCard from '@/components/dashboard/AnalyticsCard';
+import ShopCustomization from '@/components/dashboard/ShopCustomization';
+import ProductImportExport from '@/components/dashboard/ProductImportExport';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Dashboard() {
@@ -51,6 +54,21 @@ export default function Dashboard() {
     queryFn: () => base44.entities.Product.filter({ seller_id: seller?.id }),
     enabled: !!seller?.id
   });
+
+  // Get analytics
+  const { data: analytics = [] } = useQuery({
+    queryKey: ['analytics', seller?.id],
+    queryFn: () => base44.entities.Analytics.filter({ seller_id: seller?.id }),
+    enabled: !!seller?.id
+  });
+
+  // Calculate stats
+  const stats = {
+    totalScans: analytics.filter(a => a.event_type === 'scan').length,
+    totalViews: analytics.filter(a => a.event_type === 'view_product').length,
+    whatsappClicks: analytics.filter(a => a.event_type === 'whatsapp_click').length,
+    shopViews: analytics.filter(a => a.event_type === 'view_shop').length
+  };
 
   const deleteMutation = useMutation({
     mutationFn: (productId) => base44.entities.Product.delete(productId),
@@ -169,11 +187,48 @@ export default function Dashboard() {
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ed477c] data-[state=active]:to-[#ff6b9d] data-[state=active]:text-white rounded-lg">
               <Settings className="w-4 h-4" />
-              Paramètres
+              Boutique
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="products">
+            {/* Analytics Overview */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <AnalyticsCard 
+                title="Scans QR Code"
+                value={stats.totalScans}
+                icon={require('lucide-react').QrCode}
+                color="text-[#ed477c]"
+              />
+              <AnalyticsCard 
+                title="Vues produits"
+                value={stats.totalViews}
+                icon={require('lucide-react').Eye}
+                color="text-blue-500"
+              />
+              <AnalyticsCard 
+                title="Clics WhatsApp"
+                value={stats.whatsappClicks}
+                icon={require('lucide-react').MessageCircle}
+                color="text-green-500"
+              />
+              <AnalyticsCard 
+                title="Vues boutique"
+                value={stats.shopViews}
+                icon={require('lucide-react').Store}
+                color="text-purple-500"
+              />
+            </div>
+
+            {/* Import/Export */}
+            <div className="mb-6">
+              <ProductImportExport 
+                seller={seller}
+                products={products}
+                onImportComplete={refetchProducts}
+              />
+            </div>
+
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Mes produits</h1>
@@ -234,29 +289,38 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="settings">
-            <div className="max-w-2xl">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">Paramètres de la boutique</h2>
-              
-              <div className="bg-white rounded-xl p-6 space-y-6">
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Nom de la boutique</label>
-                  <p className="text-lg text-gray-900">{seller?.shop_name}</p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Numéro WhatsApp</label>
-                  <p className="text-lg text-gray-900">{seller?.whatsapp_number}</p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-700">URL de la boutique</label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <code className="flex-1 p-3 bg-gray-50 rounded-lg text-sm">
-                      {shopUrl}
-                    </code>
-                    <Button variant="outline" onClick={copyShopLink}>
-                      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    </Button>
+            <div className="max-w-4xl space-y-6">
+              <h2 className="text-xl font-bold text-gray-900">Personnalisation de la boutique</h2>
+
+              <div className="grid lg:grid-cols-2 gap-6">
+                {/* Shop Customization */}
+                <ShopCustomization seller={seller} />
+
+                {/* Basic Info */}
+                <div className="space-y-6">
+                  <div className="bg-white rounded-xl p-6 space-y-4">
+                    <h3 className="font-semibold text-gray-900">Informations</h3>
+                    <div>
+                      <label className="text-sm font-medium text-gray-700">Nom de la boutique</label>
+                      <p className="text-lg text-gray-900">{seller?.shop_name}</p>
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium text-gray-700">Numéro WhatsApp</label>
+                      <p className="text-lg text-gray-900">{seller?.whatsapp_number}</p>
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium text-gray-700">URL de la boutique</label>
+                      <div className="flex items-center gap-2 mt-1">
+                        <code className="flex-1 p-3 bg-gray-50 rounded-lg text-sm truncate">
+                          {shopUrl}
+                        </code>
+                        <Button variant="outline" onClick={copyShopLink}>
+                          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

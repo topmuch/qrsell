@@ -1,16 +1,22 @@
-import Home from './pages/Home';
-import ProfileSetup from './pages/ProfileSetup';
+import AddProduct from './pages/AddProduct';
 import Dashboard from './pages/Dashboard';
-import Shop from './pages/Shop';
+import Home from './pages/Home';
 import ProductPage from './pages/ProductPage';
+import ProfileSetup from './pages/ProfileSetup';
+import Shop from './pages/Shop';
+import ShopPage from './pages/ShopPage';
+import TikTokGuide from './pages/TikTokGuide';
 
 
 export const PAGES = {
-    "Home": Home,
-    "ProfileSetup": ProfileSetup,
+    "AddProduct": AddProduct,
     "Dashboard": Dashboard,
-    "Shop": Shop,
+    "Home": Home,
     "ProductPage": ProductPage,
+    "ProfileSetup": ProfileSetup,
+    "Shop": Shop,
+    "ShopPage": ShopPage,
+    "TikTokGuide": TikTokGuide,
 }
 
 export const pagesConfig = {
