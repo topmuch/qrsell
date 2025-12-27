@@ -25,6 +25,7 @@ import TikTokGuide from '@/components/dashboard/TikTokGuide';
 import AnalyticsCard from '@/components/dashboard/AnalyticsCard';
 import ShopCustomization from '@/components/dashboard/ShopCustomization';
 import ProductImportExport from '@/components/dashboard/ProductImportExport';
+import ProductAnalytics from '@/components/dashboard/ProductAnalytics';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Dashboard() {
@@ -229,6 +230,14 @@ export default function Dashboard() {
                 seller={seller}
                 products={products}
                 onImportComplete={refetchProducts}
+              />
+            </div>
+
+            {/* Product Analytics */}
+            <div className="mb-6">
+              <ProductAnalytics 
+                products={products}
+                analytics={analytics}
               />
             </div>
 

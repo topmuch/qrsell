@@ -20,6 +20,17 @@ export default function Shop() {
 
   const seller = sellers[0];
 
+  // Track shop view
+  React.useEffect(() => {
+    if (seller) {
+      base44.entities.Analytics.create({
+        seller_id: seller.id,
+        event_type: 'view_shop',
+        user_agent: navigator.userAgent
+      }).catch(() => {});
+    }
+  }, [seller?.id]);
+
   // Get products
   const { data: products = [], isLoading: loadingProducts } = useQuery({
     queryKey: ['shop-products', slug],
@@ -40,6 +51,16 @@ export default function Shop() {
       `Réf: ${product.public_id}`
     );
     return `https://wa.me/${phone}?text=${message}`;
+  };
+
+  const handleWhatsAppClick = (product) => {
+    base44.entities.Analytics.create({
+      product_id: product.id,
+      seller_id: seller.id,
+      product_public_id: product.public_id,
+      event_type: 'whatsapp_click',
+      user_agent: navigator.userAgent
+    }).catch(() => {});
   };
 
   if (loadingSeller) {
@@ -134,6 +155,7 @@ export default function Shop() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block"
+                      onClick={() => handleWhatsAppClick(product)}
                     >
                       <Button className="w-full bg-[#25D366] hover:bg-[#1fb855] text-white">
                         <MessageCircle className="w-4 h-4 mr-2" />

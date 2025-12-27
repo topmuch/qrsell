@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Video, Radio, Link2, Download, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
+import TikTokScriptTemplates from './TikTokScriptTemplates';
 
 const methods = [
   {
@@ -108,6 +109,9 @@ export default function TikTokGuide({ shopUrl }) {
           </motion.div>
         ))}
       </div>
+
+      {/* Script Templates */}
+      <TikTokScriptTemplates />
 
       {/* Shop link */}
       {shopUrl && (

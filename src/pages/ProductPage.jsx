@@ -34,6 +34,19 @@ export default function ProductPage() {
 
   const seller = sellers[0];
 
+  // Track product view
+  useEffect(() => {
+    if (product && seller) {
+      base44.entities.Analytics.create({
+        product_id: product.id,
+        seller_id: seller.id,
+        product_public_id: product.public_id,
+        event_type: 'view_product',
+        user_agent: navigator.userAgent
+      }).catch(() => {});
+    }
+  }, [product?.id, seller?.id]);
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat('fr-FR').format(price);
   };
@@ -48,6 +61,16 @@ export default function ProductPage() {
       `Réf: ${product.public_id}`
     );
     return `https://wa.me/${phone}?text=${message}`;
+  };
+
+  const handleWhatsAppClick = () => {
+    base44.entities.Analytics.create({
+      product_id: product.id,
+      seller_id: seller.id,
+      product_public_id: product.public_id,
+      event_type: 'whatsapp_click',
+      user_agent: navigator.userAgent
+    }).catch(() => {});
   };
 
   const shareProduct = async () => {
@@ -226,6 +249,7 @@ export default function ProductPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block"
+                onClick={handleWhatsAppClick}
               >
                 <Button className="w-full h-14 bg-[#25D366] hover:bg-[#1fb855] text-white text-lg">
                   <MessageCircle className="w-5 h-5 mr-2" />
