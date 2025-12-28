@@ -88,7 +88,7 @@ export default function Shop() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#ed477c] to-[#ff6b9d] flex items-center justify-center text-white font-bold">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2563eb] to-[#3b82f6] flex items-center justify-center text-white font-bold">
                 {seller.shop_name?.[0]?.toUpperCase() || 'B'}
               </div>
               <div>
@@ -141,7 +141,7 @@ export default function Shop() {
                     <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">
                       {product.name}
                     </h3>
-                    <p className="text-xl font-bold text-[#ed477c] mb-2">
+                    <p className="text-xl font-bold text-[#2563eb] mb-2">
                       {formatPrice(product.price)} FCFA
                     </p>
                     {product.description && (

@@ -218,7 +218,7 @@ export default function Dashboard() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-[#ed477c] to-[#ff6b9d] rounded-2xl p-6 mb-8 text-white"
+          className="bg-gradient-to-r from-[#2563eb] to-[#3b82f6] rounded-2xl p-6 mb-8 text-white"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -241,19 +241,19 @@ export default function Dashboard() {
 
         <Tabs defaultValue="overview" className="space-y-8">
           <TabsList className="bg-white border p-1 rounded-xl shadow-sm">
-            <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ed477c] data-[state=active]:to-[#ff6b9d] data-[state=active]:text-white rounded-lg">
+            <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
               <Sparkles className="w-4 h-4" />
               Vue d'ensemble
             </TabsTrigger>
-            <TabsTrigger value="products" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ed477c] data-[state=active]:to-[#ff6b9d] data-[state=active]:text-white rounded-lg">
+            <TabsTrigger value="products" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
               <Package className="w-4 h-4" />
               Produits
             </TabsTrigger>
-            <TabsTrigger value="guide" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ed477c] data-[state=active]:to-[#ff6b9d] data-[state=active]:text-white rounded-lg">
+            <TabsTrigger value="guide" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
               <BookOpen className="w-4 h-4" />
               Guide TikTok
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ed477c] data-[state=active]:to-[#ff6b9d] data-[state=active]:text-white rounded-lg">
+            <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
               <Settings className="w-4 h-4" />
               Paramètres
             </TabsTrigger>
@@ -304,7 +304,7 @@ export default function Dashboard() {
                   setEditProduct(null);
                   setShowProductForm(true);
                 }}
-                className="bg-gradient-to-r from-[#ed477c] to-[#ff6b9d] hover:opacity-90 text-white shadow-lg"
+                className="bg-gradient-to-r from-[#2563eb] to-[#3b82f6] hover:opacity-90 text-white shadow-lg"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Ajouter un produit
@@ -326,7 +326,7 @@ export default function Dashboard() {
                 <p className="text-gray-500 mb-6">Commencez par ajouter votre premier produit</p>
                 <Button 
                   onClick={() => setShowProductForm(true)}
-                  className="bg-gradient-to-r from-[#ed477c] to-[#ff6b9d] hover:opacity-90 text-white"
+                  className="bg-gradient-to-r from-[#2563eb] to-[#3b82f6] hover:opacity-90 text-white"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Ajouter un produit

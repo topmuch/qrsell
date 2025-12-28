@@ -169,7 +169,7 @@ export default function ProductPage() {
               <Link to={createPageUrl(`Shop?slug=${seller.shop_slug}`)}>
                 <div className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                   <ArrowLeft className="w-5 h-5 text-gray-400" />
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#ed477c] to-[#ff6b9d] flex items-center justify-center text-white font-bold text-sm">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2563eb] to-[#3b82f6] flex items-center justify-center text-white font-bold text-sm">
                     {seller.shop_name?.[0]?.toUpperCase() || 'B'}
                   </div>
                   <span className="font-medium text-gray-900 hidden sm:inline">{seller.shop_name}</span>
@@ -233,7 +233,7 @@ export default function ProductPage() {
                 {product.name}
               </h1>
               
-              <p className="text-3xl font-bold text-[#ed477c] mb-4">
+              <p className="text-3xl font-bold text-[#2563eb] mb-4">
                 {formatPrice(product.price)} FCFA
               </p>
               

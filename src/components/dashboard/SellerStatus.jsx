@@ -22,7 +22,7 @@ export default function SellerStatus({ seller, productsCount, totalScans }) {
   const progress = (completedCriteria / 4) * 100;
 
   return (
-    <Card className="bg-gradient-to-br from-[#ed477c]/5 to-purple-50/30 border-[#ed477c]/20">
+    <Card className="bg-gradient-to-br from-[#2563eb]/5 to-blue-50/30 border-[#2563eb]/20">
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -35,7 +35,7 @@ export default function SellerStatus({ seller, productsCount, totalScans }) {
               </>
             ) : (
               <>
-                <Trophy className="w-5 h-5 text-[#ed477c]" />
+                <Trophy className="w-5 h-5 text-[#2563eb]" />
                 <span className="font-semibold text-gray-900">
                   Statut vendeur
                 </span>
@@ -51,7 +51,7 @@ export default function SellerStatus({ seller, productsCount, totalScans }) {
                 <span className="text-sm font-medium text-gray-700">
                   Progression vers la vérification
                 </span>
-                <span className="text-sm font-bold text-[#ed477c]">
+                <span className="text-sm font-bold text-[#2563eb]">
                   {completedCriteria}/4
                 </span>
               </div>
@@ -90,7 +90,7 @@ export default function SellerStatus({ seller, productsCount, totalScans }) {
           {!seller?.is_verified && (
             <Button 
               variant="outline" 
-              className="w-full mt-3 border-[#ed477c] text-[#ed477c] hover:bg-[#ed477c] hover:text-white group"
+              className="w-full mt-3 border-[#2563eb] text-[#2563eb] hover:bg-[#2563eb] hover:text-white group"
             >
               Débloquer le badge vérifié
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />

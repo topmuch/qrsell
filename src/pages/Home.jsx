@@ -20,12 +20,12 @@ export default function Home() {
           <Logo size="md" />
           <div className="flex items-center gap-4">
             <Link to={createPageUrl('Dashboard')}>
-              <Button variant="ghost" className="text-gray-600 hover:text-[#ed477c]">
+              <Button variant="ghost" className="text-gray-600 hover:text-[#2563eb]">
                 Connexion
               </Button>
             </Link>
             <Link to={createPageUrl('Dashboard')}>
-              <Button className="bg-[#ed477c] hover:bg-[#d43a6b] text-white rounded-full px-6">
+              <Button className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-6">
                 Commencer
               </Button>
             </Link>
