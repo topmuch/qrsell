@@ -8,10 +8,9 @@ export default function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-12">
           <div className="md:col-span-2">
-            <Logo size="md" showText={true} />
+            <Logo size="md" showText={true} variant="dark" />
             <p className="text-gray-400 mt-4 max-w-md">
-              La solution la plus simple pour transformer vos vues TikTok en ventes WhatsApp. 
-              Sans site web, sans paiement en ligne, sans friction.
+              Votre vitrine digitale, en un scan. Vendez plus, sans site, sans stress.
             </p>
           </div>
           
@@ -36,7 +35,7 @@ export default function Footer() {
         
         <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-400 text-sm">
-            © 2025 TiktocQR. Tous droits réservés.
+            © 2025 QRSell. Tous droits réservés.
           </p>
           <div className="flex gap-6 text-gray-400 text-sm">
             <a href="#" className="hover:text-white transition-colors">Conditions d'utilisation</a>

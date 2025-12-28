@@ -35,11 +35,11 @@ export default function WhyChooseUs() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-[#222222] mb-4">
-            Pourquoi Verdiq TikQR ?
+          <h2 className="text-4xl md:text-5xl font-bold text-[#111827] mb-4">
+            Pourquoi QRSell ?
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            La solution la plus simple pour vendre sur TikTok
+            Votre vitrine digitale, en un scan
           </p>
         </motion.div>
 
@@ -52,7 +52,7 @@ export default function WhyChooseUs() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.15 }}
             >
-              <Card className="p-8 h-full hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-[#ed477c]/20 group">
+              <Card className="p-8 h-full hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-[#2563eb]/20 group">
                 <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                   <feature.icon className="w-8 h-8 text-white" />
                 </div>
@@ -75,7 +75,7 @@ export default function WhyChooseUs() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-16 bg-gradient-to-r from-[#ed477c] to-[#ff6b9d] rounded-3xl p-8 text-white max-w-4xl mx-auto"
+          className="mt-16 bg-gradient-to-r from-[#2563eb] to-[#3b82f6] rounded-3xl p-8 text-white max-w-4xl mx-auto"
         >
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>

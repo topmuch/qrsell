@@ -10,8 +10,8 @@ export default function FinalCTA() {
     <section className="py-20 bg-gradient-to-br from-gray-900 via-[#222222] to-gray-900 relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden opacity-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#ed477c] rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#2563eb] rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#10b981] rounded-full blur-3xl" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -30,14 +30,14 @@ export default function FinalCTA() {
             transition={{ delay: 0.2 }}
             className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3"
           >
-            <Sparkles className="w-5 h-5 text-[#ed477c]" />
-            <span className="text-white font-medium">Rejoignez 500+ vendeurs qui transforment leurs vues en ventes</span>
+            <Sparkles className="w-5 h-5 text-[#10b981]" />
+            <span className="text-white font-medium">Rejoignez 500+ vendeurs qui transforment leurs produits en ventes</span>
           </motion.div>
 
           {/* Main heading */}
           <h2 className="text-4xl md:text-6xl font-bold text-white leading-tight">
             Vos produits méritent d'être{' '}
-            <span className="text-[#ed477c]">vendus</span>.{' '}
+            <span className="text-[#10b981]">vendus</span>.{' '}
             <br className="hidden md:block" />
             Pas juste vus.
           </h2>
@@ -51,7 +51,7 @@ export default function FinalCTA() {
             <Link to={createPageUrl('Dashboard')}>
               <Button 
                 size="lg" 
-                className="bg-[#ed477c] hover:bg-[#d43a6b] text-white text-xl px-12 py-8 rounded-full shadow-2xl hover:shadow-[#ed477c]/50 transition-all duration-300 group"
+                className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xl px-12 py-8 rounded-full shadow-2xl hover:shadow-[#2563eb]/50 transition-all duration-300 group"
               >
                 <Sparkles className="mr-3 w-6 h-6" />
                 Créer ma boutique — 2 minutes
@@ -88,14 +88,14 @@ export default function FinalCTA() {
               {[1, 2, 3, 4, 5].map((i) => (
                 <div 
                   key={i}
-                  className="w-10 h-10 rounded-full bg-gradient-to-br from-[#ed477c] to-[#ff6b9d] border-2 border-gray-900 flex items-center justify-center text-white font-bold text-sm"
+                  className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2563eb] to-[#3b82f6] border-2 border-gray-900 flex items-center justify-center text-white font-bold text-sm"
                 >
                   {String.fromCharCode(64 + i)}
                 </div>
               ))}
             </div>
             <p className="text-gray-400 text-sm ml-2">
-              <span className="text-white font-semibold">500+ vendeurs</span> utilisent déjà Verdiq TikQR
+              <span className="text-white font-semibold">500+ vendeurs</span> utilisent déjà QRSell
             </p>
           </motion.div>
         </motion.div>
