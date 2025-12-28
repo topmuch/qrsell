@@ -7,11 +7,11 @@ import { ArrowRight, Play, QrCode, MessageCircle } from 'lucide-react';
 
 export default function NewHeroSection() {
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-white via-pink-50/30 to-white">
+    <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-white via-blue-50/30 to-white">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 right-10 w-72 h-72 bg-[#ed477c]/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-10 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl" />
+        <div className="absolute top-20 right-10 w-72 h-72 bg-[#2563eb]/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl" />
       </div>
 
       <div className="container mx-auto px-4 py-20 relative z-10">
@@ -28,11 +28,11 @@ export default function NewHeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 bg-[#ed477c]/10 border border-[#ed477c]/20 rounded-full px-4 py-2"
+              className="inline-flex items-center gap-2 bg-[#2563eb]/10 border border-[#2563eb]/20 rounded-full px-4 py-2"
             >
-              <span className="w-2 h-2 bg-[#ed477c] rounded-full animate-pulse" />
-              <span className="text-sm font-medium text-[#ed477c]">
-                +500 vendeurs nous font confiance
+              <span className="w-2 h-2 bg-[#2563eb] rounded-full animate-pulse" />
+              <span className="text-sm font-medium text-[#2563eb]">
+                Votre vitrine digitale, en un scan
               </span>
             </motion.div>
 
@@ -40,18 +40,18 @@ export default function NewHeroSection() {
             <div className="space-y-4">
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-[#222222] leading-tight">
                 Transformez vos{' '}
-                <span className="text-[#ed477c] relative">
-                  vues TikTok
+                <span className="text-[#2563eb] relative">
+                  produits
                   <svg className="absolute -bottom-2 left-0 w-full" height="12" viewBox="0 0 200 12" fill="none">
-                    <path d="M2 10C60 4 140 4 198 10" stroke="#ed477c" strokeWidth="3" strokeLinecap="round"/>
+                    <path d="M2 10C60 4 140 4 198 10" stroke="#2563eb" strokeWidth="3" strokeLinecap="round"/>
                   </svg>
                 </span>
                 {' '}en{' '}
-                <span className="text-[#ed477c]">ventes WhatsApp</span>
+                <span className="text-[#2563eb]">ventes — en un scan</span>
               </h1>
               
               <p className="text-xl md:text-2xl text-gray-600 max-w-2xl leading-relaxed">
-                Générez un QR code par produit — vos clients scannent, vous recevez un message WhatsApp avec le prix et le nom du produit.
+                Créez votre vitrine en 2 minutes. Partagez sur TikTok, Instagram, Facebook. Vendez directement sur WhatsApp.
               </p>
             </div>
 
@@ -60,9 +60,9 @@ export default function NewHeroSection() {
               <Link to={createPageUrl('Dashboard')}>
                 <Button 
                   size="lg" 
-                  className="bg-[#ed477c] hover:bg-[#d43a6b] text-white text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
+                  className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
                 >
-                  Commencez maintenant — 5 €/mois
+                  Commencer gratuitement
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
@@ -70,7 +70,7 @@ export default function NewHeroSection() {
               <Button 
                 size="lg" 
                 variant="outline"
-                className="border-2 border-[#ed477c] text-[#ed477c] hover:bg-[#ed477c] hover:text-white text-lg px-8 py-6 rounded-full group transition-all duration-300"
+                className="border-2 border-[#2563eb] text-[#2563eb] hover:bg-[#2563eb] hover:text-white text-lg px-8 py-6 rounded-full group transition-all duration-300"
               >
                 <Play className="mr-2 w-5 h-5" />
                 Voir comment ça marche
@@ -122,8 +122,8 @@ export default function NewHeroSection() {
                 }}
                 className="absolute -left-8 top-20 z-20"
               >
-                <div className="bg-white p-4 rounded-2xl shadow-2xl border-2 border-[#ed477c]">
-                  <QrCode className="w-16 h-16 text-[#ed477c]" />
+                <div className="bg-white p-4 rounded-2xl shadow-2xl border-2 border-[#2563eb]">
+                  <QrCode className="w-16 h-16 text-[#2563eb]" />
                   <div className="text-xs text-center mt-2 font-semibold text-gray-600">Scannez-moi!</div>
                 </div>
               </motion.div>
@@ -171,15 +171,15 @@ export default function NewHeroSection() {
 
                     {/* QR overlay on video */}
                     <div className="absolute bottom-24 right-4 bg-white p-3 rounded-xl shadow-lg border-2 border-white/50">
-                      <div className="w-24 h-24 bg-[#ed477c]/20 rounded-lg flex items-center justify-center">
-                        <QrCode className="w-16 h-16 text-[#ed477c]" />
+                      <div className="w-24 h-24 bg-[#2563eb]/20 rounded-lg flex items-center justify-center">
+                        <QrCode className="w-16 h-16 text-[#2563eb]" />
                       </div>
                     </div>
 
                     {/* Video info */}
                     <div className="absolute bottom-0 left-0 right-0 p-4 space-y-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 rounded-full bg-[#ed477c] border-2 border-white" />
+                        <div className="w-10 h-10 rounded-full bg-[#2563eb] border-2 border-white" />
                         <span className="text-white font-semibold">@ma_boutique_sn</span>
                       </div>
                       <p className="text-white text-sm">
