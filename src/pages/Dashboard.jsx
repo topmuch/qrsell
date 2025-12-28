@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tantml:react-query';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -13,19 +13,19 @@ import {
   Check,
   ExternalLink,
   Loader2,
-  QrCode,
-  Eye,
-  MessageCircle
+  Sparkles
 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import SellerProfileForm from '@/components/dashboard/SellerProfileForm';
 import ProductForm from '@/components/dashboard/ProductForm';
 import ProductCard from '@/components/dashboard/ProductCard';
 import TikTokGuide from '@/components/dashboard/TikTokGuide';
-import AnalyticsCard from '@/components/dashboard/AnalyticsCard';
 import ShopCustomization from '@/components/dashboard/ShopCustomization';
 import ProductImportExport from '@/components/dashboard/ProductImportExport';
-import ProductAnalytics from '@/components/dashboard/ProductAnalytics';
+import KPICards from '@/components/dashboard/KPICards';
+import PerformanceChart from '@/components/dashboard/PerformanceChart';
+import ActionCards from '@/components/dashboard/ActionCards';
+import SellerStatus from '@/components/dashboard/SellerStatus';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Dashboard() {
@@ -67,11 +67,46 @@ export default function Dashboard() {
   });
 
   // Calculate stats
-  const stats = {
-    totalScans: analytics.filter(a => a.event_type === 'scan').length,
-    totalViews: analytics.filter(a => a.event_type === 'view_product').length,
-    whatsappClicks: analytics.filter(a => a.event_type === 'whatsapp_click').length,
-    shopViews: analytics.filter(a => a.event_type === 'view_shop').length
+  const totalScans = analytics.filter(a => a.event_type === 'scan').length;
+  
+  // Get recent activity
+  const recentActivity = analytics.length > 0 
+    ? (() => {
+        const latest = analytics.sort((a, b) => 
+          new Date(b.created_date) - new Date(a.created_date)
+        )[0];
+        const product = products.find(p => p.id === latest.product_id);
+        const timeAgo = Math.floor((new Date() - new Date(latest.created_date)) / (1000 * 60));
+        
+        if (latest.event_type === 'whatsapp_click' && product) {
+          return `Un client a cliqué sur "${product.name}" il y a ${timeAgo}min`;
+        }
+        return null;
+      })()
+    : null;
+
+  const handleExportAnalytics = () => {
+    const csvData = products.map(product => {
+      const productAnalytics = analytics.filter(a => a.product_id === product.id);
+      return {
+        Produit: product.name,
+        Prix: product.price,
+        Scans: productAnalytics.filter(a => a.event_type === 'scan').length,
+        Vues: productAnalytics.filter(a => a.event_type === 'view_product').length,
+        Clics: productAnalytics.filter(a => a.event_type === 'whatsapp_click').length
+      };
+    });
+
+    const headers = Object.keys(csvData[0] || {}).join(',');
+    const rows = csvData.map(row => Object.values(row).join(','));
+    const csv = [headers, ...rows].join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `analytics-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
   };
 
   const deleteMutation = useMutation({
@@ -178,12 +213,41 @@ export default function Dashboard() {
       </header>
 
       {/* Main content */}
-      <main className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="bg-white border p-1 rounded-xl">
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Welcome banner */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-r from-[#ed477c] to-[#ff6b9d] rounded-2xl p-6 mb-8 text-white"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold mb-2 flex items-center gap-2">
+                <Sparkles className="w-6 h-6" />
+                Bonjour, {seller?.full_name || 'Vendeur'} !
+              </h1>
+              <p className="text-white/90">
+                Voici un aperçu de vos performances cette semaine
+              </p>
+            </div>
+            {seller?.is_verified && (
+              <div className="hidden md:flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+                <Check className="w-5 h-5" />
+                <span className="font-semibold">Vérifié</span>
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        <Tabs defaultValue="overview" className="space-y-8">
+          <TabsList className="bg-white border p-1 rounded-xl shadow-sm">
+            <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ed477c] data-[state=active]:to-[#ff6b9d] data-[state=active]:text-white rounded-lg">
+              <Sparkles className="w-4 h-4" />
+              Vue d'ensemble
+            </TabsTrigger>
             <TabsTrigger value="products" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ed477c] data-[state=active]:to-[#ff6b9d] data-[state=active]:text-white rounded-lg">
               <Package className="w-4 h-4" />
-              Mes produits
+              Produits
             </TabsTrigger>
             <TabsTrigger value="guide" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ed477c] data-[state=active]:to-[#ff6b9d] data-[state=active]:text-white rounded-lg">
               <BookOpen className="w-4 h-4" />
@@ -191,59 +255,48 @@ export default function Dashboard() {
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ed477c] data-[state=active]:to-[#ff6b9d] data-[state=active]:text-white rounded-lg">
               <Settings className="w-4 h-4" />
-              Boutique
+              Paramètres
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="products">
-            {/* Analytics Overview */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <AnalyticsCard 
-                title="Scans QR Code"
-                value={stats.totalScans}
-                icon={QrCode}
-                color="text-[#ed477c]"
-              />
-              <AnalyticsCard 
-                title="Vues produits"
-                value={stats.totalViews}
-                icon={Eye}
-                color="text-blue-500"
-              />
-              <AnalyticsCard 
-                title="Clics WhatsApp"
-                value={stats.whatsappClicks}
-                icon={MessageCircle}
-                color="text-green-500"
-              />
-              <AnalyticsCard 
-                title="Vues boutique"
-                value={stats.shopViews}
-                icon={Store}
-                color="text-purple-500"
-              />
+          <TabsContent value="overview" className="space-y-8">
+            {/* KPIs */}
+            <KPICards analytics={analytics} />
+
+            {/* Two columns layout */}
+            <div className="grid lg:grid-cols-3 gap-8">
+              {/* Left: Chart + Actions */}
+              <div className="lg:col-span-2 space-y-8">
+                <PerformanceChart products={products} analytics={analytics} />
+                <ActionCards 
+                  recentActivity={recentActivity}
+                  onExport={handleExportAnalytics}
+                />
+              </div>
+
+              {/* Right: Seller Status */}
+              <div>
+                <SellerStatus 
+                  seller={seller}
+                  productsCount={products.length}
+                  totalScans={totalScans}
+                />
+              </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="products" className="space-y-6">
 
             {/* Import/Export */}
-            <div className="mb-6">
-              <ProductImportExport 
-                seller={seller}
-                products={products}
-                onImportComplete={refetchProducts}
-              />
-            </div>
+            <ProductImportExport 
+              seller={seller}
+              products={products}
+              onImportComplete={refetchProducts}
+            />
 
-            {/* Product Analytics */}
-            <div className="mb-6">
-              <ProductAnalytics 
-                products={products}
-                analytics={analytics}
-              />
-            </div>
-
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Mes produits</h1>
+                <h2 className="text-2xl font-bold text-gray-900">Mes produits</h2>
                 <p className="text-gray-500">{products.length} produit{products.length > 1 ? 's' : ''}</p>
               </div>
               <Button 
@@ -251,7 +304,7 @@ export default function Dashboard() {
                   setEditProduct(null);
                   setShowProductForm(true);
                 }}
-                className="bg-gradient-to-r from-[#ed477c] to-[#ff6b9d] hover:opacity-90 text-white"
+                className="bg-gradient-to-r from-[#ed477c] to-[#ff6b9d] hover:opacity-90 text-white shadow-lg"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Ajouter un produit
@@ -300,9 +353,9 @@ export default function Dashboard() {
             <TikTokGuide shopUrl={shopUrl} />
           </TabsContent>
 
-          <TabsContent value="settings">
+          <TabsContent value="settings" className="space-y-6">
             <div className="max-w-4xl space-y-6">
-              <h2 className="text-xl font-bold text-gray-900">Personnalisation de la boutique</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Paramètres de la boutique</h2>
 
               <div className="grid lg:grid-cols-2 gap-6">
                 {/* Shop Customization */}
