@@ -7,6 +7,7 @@ import ProfileSetup from './pages/ProfileSetup';
 import Shop from './pages/Shop';
 import ShopPage from './pages/ShopPage';
 import TikTokGuide from './pages/TikTokGuide';
+import AdminPanel from './pages/AdminPanel';
 
 
 export const PAGES = {
@@ -19,6 +20,7 @@ export const PAGES = {
     "Shop": Shop,
     "ShopPage": ShopPage,
     "TikTokGuide": TikTokGuide,
+    "AdminPanel": AdminPanel,
 }
 
 export const pagesConfig = {
