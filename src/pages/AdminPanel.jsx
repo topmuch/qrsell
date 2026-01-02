@@ -3,12 +3,15 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, Users, Package, Activity, LogOut, Loader2, Megaphone } from 'lucide-react';
+import { Shield, Users, Package, Activity, LogOut, Loader2, Megaphone, CreditCard, FileText } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import StatsOverview from '@/components/admin/StatsOverview';
 import SellerManagement from '@/components/admin/SellerManagement';
 import ProductManagement from '@/components/admin/ProductManagement';
 import ActivityLogs from '@/components/admin/ActivityLogs';
+import PlanManagement from '@/components/admin/PlanManagement';
+import SubscriptionRequestManagement from '@/components/admin/SubscriptionRequestManagement';
+import SubscriptionManagement from '@/components/admin/SubscriptionManagement';
 import { motion } from 'framer-motion';
 
 export default function AdminPanel() {
@@ -120,6 +123,18 @@ export default function AdminPanel() {
               <Package className="w-4 h-4" />
               Campagnes
             </TabsTrigger>
+            <TabsTrigger value="plans" className="flex items-center gap-2 data-[state=active]:bg-[#2563eb] data-[state=active]:text-white rounded-lg">
+              <FileText className="w-4 h-4" />
+              Forfaits
+            </TabsTrigger>
+            <TabsTrigger value="requests" className="flex items-center gap-2 data-[state=active]:bg-[#2563eb] data-[state=active]:text-white rounded-lg">
+              <CreditCard className="w-4 h-4" />
+              Demandes
+            </TabsTrigger>
+            <TabsTrigger value="subscriptions" className="flex items-center gap-2 data-[state=active]:bg-[#2563eb] data-[state=active]:text-white rounded-lg">
+              <CreditCard className="w-4 h-4" />
+              Abonnements
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -152,6 +167,18 @@ export default function AdminPanel() {
               className="w-full h-[calc(100vh-300px)] border-0 rounded-lg bg-white"
               title="Gestion des campagnes"
             />
+          </TabsContent>
+
+          <TabsContent value="plans">
+            <PlanManagement />
+          </TabsContent>
+
+          <TabsContent value="requests">
+            <SubscriptionRequestManagement />
+          </TabsContent>
+
+          <TabsContent value="subscriptions">
+            <SubscriptionManagement />
           </TabsContent>
         </Tabs>
       </main>
