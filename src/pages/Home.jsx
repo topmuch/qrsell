@@ -13,31 +13,33 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils/index';
 
 export default function Home() {
+  // Vérifier si la demande a été envoyée avec succès
+  const urlParams = new URLSearchParams(window.location.search);
+  const signupSuccess = urlParams.get('signup_success') === 'true';
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Logo size="md" />
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              className="text-gray-600 hover:text-[#2563eb]"
-              onClick={() => base44.auth.redirectToLogin()}
-            >
-              Connexion
-            </Button>
-            <Link to={createPageUrl('SubscriptionRequest')}>
-              <Button className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-6">
-                Commencer
-              </Button>
-            </Link>
+      {/* Message de confirmation */}
+      {signupSuccess && (
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 max-w-md w-full mx-4">
+          <div className="bg-green-50 border-2 border-green-400 text-green-800 px-6 py-4 rounded-xl shadow-2xl animate-in fade-in slide-in-from-top-4 duration-500">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-bold text-lg mb-1">Demande envoyée avec succès !</h3>
+                <p className="text-sm">Notre équipe validera votre demande sous 24h. Vous recevrez un email de confirmation.</p>
+              </div>
+            </div>
           </div>
         </div>
-      </nav>
+      )}
 
       {/* Main content */}
-      <main className="pt-16">
+      <main>
         <NewHeroSection />
         <HowItWorksNew />
         <ShopShowcase />

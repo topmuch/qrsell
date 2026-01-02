@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { createPageUrl } from '@/utils/index';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -34,14 +35,38 @@ export default function SubscriptionRequestForm() {
   const createRequestMutation = useMutation({
     mutationFn: async (data) => {
       try {
-        return await base44.entities.SubscriptionRequest.create(data);
+        // Créer la demande
+        const request = await base44.entities.SubscriptionRequest.create(data);
+        
+        // Envoyer l'email de confirmation
+        await base44.integrations.Core.SendEmail({
+          to: data.user_email,
+          subject: '✅ Votre demande d\'abonnement QRSell',
+          body: `
+            <h2>Bonjour ${data.full_name},</h2>
+            <p>Merci pour votre demande d'abonnement !</p>
+            <p>Notre équipe la validera manuellement sous <strong>24h maximum</strong>.</p>
+            <p>📋 <strong>Votre demande :</strong></p>
+            <ul>
+              <li>Boutique : ${data.business_name}</li>
+              <li>Forfait : ${data.plan_code}</li>
+              <li>Durée : ${data.duration_months} mois</li>
+            </ul>
+            <p>En attendant, découvrez comment utiliser QRSell sur TikTok :</p>
+            <p><a href="${window.location.origin}/TikTokGuidePublic" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">📱 Voir le guide TikTok</a></p>
+            <p>À très bientôt,<br/>L'équipe QRSell</p>
+          `
+        });
+        
+        return request;
       } catch (error) {
         console.error('Error creating subscription request:', error);
         throw error;
       }
     },
     onSuccess: () => {
-      setSubmitted(true);
+      // Redirection vers l'accueil avec message de succès
+      window.location.href = createPageUrl('Home') + '?signup_success=true';
     },
     onError: (error) => {
       alert('Erreur lors de l\'envoi de la demande. Veuillez réessayer.');
