@@ -9,6 +9,8 @@ import Shop from './pages/Shop';
 import ShopPage from './pages/ShopPage';
 import TikTokGuide from './pages/TikTokGuide';
 import AdminBanners from './pages/AdminBanners';
+import AdminCampaigns from './pages/AdminCampaigns';
+import SellerCampaigns from './pages/SellerCampaigns';
 
 
 export const PAGES = {
@@ -23,6 +25,8 @@ export const PAGES = {
     "ShopPage": ShopPage,
     "TikTokGuide": TikTokGuide,
     "AdminBanners": AdminBanners,
+    "AdminCampaigns": AdminCampaigns,
+    "SellerCampaigns": SellerCampaigns,
 }
 
 export const pagesConfig = {
