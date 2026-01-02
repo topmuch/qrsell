@@ -61,8 +61,9 @@ export default function SubscriptionRequestManagement() {
     
     const startDate = new Date();
     const endDate = new Date();
-    const durationMonths = parseInt(actionData.duration_months || request.duration_months);
-    endDate.setMonth(endDate.getMonth() + durationMonths);
+    endDate.setMonth(endDate.getMonth() + parseInt(actionData.duration_months || request.duration_months));
+
+    const plan = plans.find(p => p.code === (actionData.plan_code || request.plan_code));
 
     // Créer l'abonnement
     await createSubscriptionMutation.mutateAsync({
@@ -84,32 +85,69 @@ export default function SubscriptionRequestManagement() {
       }
     });
 
-    // Envoyer email de bienvenue
+    // Envoyer email d'activation
     try {
-      const planInfo = plans.find(p => p.code === (actionData.plan_code || request.plan_code));
       await base44.integrations.Core.SendEmail({
         to: request.user_email,
         subject: '🎉 Votre compte QRSell est activé !',
         body: `
-          <h2>Bonjour ${request.full_name},</h2>
-          <p>Excellente nouvelle ! Votre abonnement <strong>${planInfo?.name || request.plan_code}</strong> a été approuvé.</p>
-          <p>🎯 <strong>Votre accès :</strong></p>
-          <ul>
-            <li>Forfait : ${planInfo?.name || request.plan_code}</li>
-            <li>Durée : ${durationMonths} mois</li>
-            <li>Valable jusqu'au : ${endDate.toLocaleDateString('fr-FR')}</li>
-          </ul>
-          <p>🔑 <strong>Prochaine étape :</strong></p>
-          <p><a href="${window.location.origin}/Dashboard" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block; margin: 16px 0;">Accéder à mon dashboard</a></p>
-          <p>📱 Commencez par créer votre profil vendeur et ajouter vos premiers produits.</p>
-          <p>💰 <strong>Paiement :</strong> Les instructions de paiement vous seront communiquées séparément.</p>
-          <p>Bienvenue sur QRSell !<br/>L'équipe QRSell</p>
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+              <h1 style="color: white; margin: 0; font-size: 28px;">🎉 Bienvenue sur QRSell !</h1>
+            </div>
+            <div style="padding: 30px; background-color: #ffffff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
+              <p style="font-size: 16px; color: #374151;">Bonjour ${request.full_name},</p>
+              <p style="font-size: 16px; color: #374151;">Excellente nouvelle ! Votre abonnement <strong>${plan?.name || 'QRSell'}</strong> est maintenant <strong style="color: #059669;">activé</strong> ! 🚀</p>
+              
+              <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #2563eb;">
+                <p style="margin: 0 0 10px 0; font-weight: bold; color: #1e40af;">📋 Détails de votre abonnement :</p>
+                <ul style="margin: 10px 0; padding-left: 20px; color: #374151;">
+                  <li>Boutique : <strong>${request.business_name}</strong></li>
+                  <li>Forfait : <strong>${plan?.name || 'Pro'}</strong></li>
+                  <li>Valable jusqu'au : <strong>${format(endDate, 'dd/MM/yyyy', { locale: fr })}</strong></li>
+                  <li>Durée : <strong>${actionData.duration_months || request.duration_months} mois</strong></li>
+                </ul>
+              </div>
+
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${window.location.origin}${createPageUrl('Dashboard')}" 
+                   style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);">
+                  🔑 Accéder à mon Dashboard
+                </a>
+              </div>
+
+              <div style="background-color: #fef3c7; padding: 16px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #f59e0b;">
+                <p style="margin: 0; font-weight: bold; color: #92400e;">💰 Informations de paiement :</p>
+                <p style="margin: 10px 0 0 0; color: #92400e; font-size: 14px;">
+                  Veuillez effectuer votre paiement pour garantir la continuité de votre service. Les instructions détaillées sont disponibles dans votre dashboard.
+                </p>
+              </div>
+
+              <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                <p style="margin: 0 0 12px 0; font-weight: bold; color: #111827;">🚀 Prochaines étapes :</p>
+                <ol style="margin: 0; padding-left: 20px; color: #4b5563;">
+                  <li style="margin-bottom: 8px;">Connectez-vous à votre dashboard</li>
+                  <li style="margin-bottom: 8px;">Complétez votre profil vendeur</li>
+                  <li style="margin-bottom: 8px;">Ajoutez vos premiers produits</li>
+                  <li style="margin-bottom: 8px;">Téléchargez vos QR codes</li>
+                  <li>Intégrez-les dans vos vidéos TikTok !</li>
+                </ol>
+              </div>
+
+              <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
+                Besoin d'aide ? Notre équipe est là pour vous accompagner.
+              </p>
+              <p style="font-size: 14px; color: #6b7280; font-weight: bold;">
+                L'équipe QRSell 💙
+              </p>
+            </div>
+          </div>
         `
       });
-      alert(`Demande approuvée ! Email de bienvenue envoyé à ${request.user_email}`);
-    } catch (error) {
-      console.error('Erreur envoi email:', error);
-      alert(`Demande approuvée, mais erreur d'envoi d'email.`);
+      alert(`Demande approuvée ! Email d'activation envoyé à ${request.user_email}`);
+    } catch (emailError) {
+      console.error('Error sending approval email:', emailError);
+      alert(`Demande approuvée, mais erreur lors de l'envoi de l'email. Veuillez contacter ${request.user_email} manuellement.`);
     }
   };
 

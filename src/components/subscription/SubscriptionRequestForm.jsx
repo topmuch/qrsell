@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { createPageUrl } from '@/utils/index';
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CheckCircle2, Loader2 } from "lucide-react";
 
 export default function SubscriptionRequestForm() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     full_name: "",
     user_email: "",
@@ -22,7 +24,6 @@ export default function SubscriptionRequestForm() {
     duration_months: "",
     message: ""
   });
-  const [submitted, setSubmitted] = useState(false);
 
   const { data: plans = [] } = useQuery({
     queryKey: ['plans'],
@@ -35,28 +36,42 @@ export default function SubscriptionRequestForm() {
   const createRequestMutation = useMutation({
     mutationFn: async (data) => {
       try {
-        // Créer la demande
         const request = await base44.entities.SubscriptionRequest.create(data);
         
-        // Envoyer l'email de confirmation
-        await base44.integrations.Core.SendEmail({
-          to: data.user_email,
-          subject: '✅ Votre demande d\'abonnement QRSell',
-          body: `
-            <h2>Bonjour ${data.full_name},</h2>
-            <p>Merci pour votre demande d'abonnement !</p>
-            <p>Notre équipe la validera manuellement sous <strong>24h maximum</strong>.</p>
-            <p>📋 <strong>Votre demande :</strong></p>
-            <ul>
-              <li>Boutique : ${data.business_name}</li>
-              <li>Forfait : ${data.plan_code}</li>
-              <li>Durée : ${data.duration_months} mois</li>
-            </ul>
-            <p>En attendant, découvrez comment utiliser QRSell sur TikTok :</p>
-            <p><a href="${window.location.origin}/TikTokGuidePublic" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">📱 Voir le guide TikTok</a></p>
-            <p>À très bientôt,<br/>L'équipe QRSell</p>
-          `
-        });
+        // Envoyer email de confirmation
+        try {
+          await base44.integrations.Core.SendEmail({
+            to: data.user_email,
+            subject: '✅ Votre demande d\'abonnement QRSell',
+            body: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #2563eb;">Merci pour votre demande !</h2>
+                <p>Bonjour ${data.full_name},</p>
+                <p>Nous avons bien reçu votre demande d'abonnement pour <strong>${data.business_name}</strong>.</p>
+                <p>Notre équipe la validera manuellement sous <strong>24 heures</strong>.</p>
+                <div style="background-color: #f3f4f6; padding: 16px; border-radius: 8px; margin: 20px 0;">
+                  <p style="margin: 0;"><strong>📋 Récapitulatif de votre demande :</strong></p>
+                  <ul style="margin-top: 10px;">
+                    <li>Boutique : ${data.business_name}</li>
+                    <li>Durée : ${data.duration_months} mois</li>
+                    <li>Localisation : ${data.city}, ${data.country}</li>
+                  </ul>
+                </div>
+                <p>En attendant, découvrez comment utiliser QRSell avec TikTok :</p>
+                <p><a href="${window.location.origin}${createPageUrl('TikTokGuidePublic')}" style="color: #2563eb; text-decoration: none; font-weight: bold;">📖 Consulter le Guide TikTok</a></p>
+                <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+                  Vous recevrez un nouvel email dès que votre compte sera activé.
+                </p>
+                <p style="color: #6b7280; font-size: 14px;">
+                  L'équipe QRSell
+                </p>
+              </div>
+            `
+          });
+        } catch (emailError) {
+          console.error('Error sending email:', emailError);
+          // Ne pas bloquer l'inscription si l'email échoue
+        }
         
         return request;
       } catch (error) {
@@ -65,8 +80,8 @@ export default function SubscriptionRequestForm() {
       }
     },
     onSuccess: () => {
-      // Redirection vers l'accueil avec message de succès
-      window.location.href = createPageUrl('Home') + '?signup_success=true';
+      // Rediriger vers Home avec paramètre de succès
+      navigate(createPageUrl('Home') + '?signup_success=true');
     },
     onError: (error) => {
       alert('Erreur lors de l\'envoi de la demande. Veuillez réessayer.');
@@ -91,33 +106,6 @@ export default function SubscriptionRequestForm() {
   };
 
   const selectedPlan = plans.find(p => p.code === formData.plan_code);
-
-  if (submitted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-4">
-        <Card className="max-w-md w-full">
-          <CardContent className="pt-6">
-            <div className="text-center space-y-4">
-              <div className="flex justify-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                  <CheckCircle2 className="w-10 h-10 text-green-600" />
-                </div>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">Demande envoyée !</h2>
-              <p className="text-gray-600">
-                Merci ! Votre demande d'abonnement est en cours de validation par notre équipe. 
-                Vous recevrez un email sous 24h avec vos identifiants de connexion.
-              </p>
-              <div className="bg-blue-50 p-4 rounded-lg text-sm text-gray-700">
-                <p className="font-semibold mb-1">📧 Vérifiez votre email</p>
-                <p>Nous vous avons envoyé une confirmation à <span className="font-medium">{formData.user_email}</span></p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-12 px-4">
