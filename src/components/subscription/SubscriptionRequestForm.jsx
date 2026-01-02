@@ -32,14 +32,32 @@ export default function SubscriptionRequestForm() {
   });
 
   const createRequestMutation = useMutation({
-    mutationFn: (data) => base44.entities.SubscriptionRequest.create(data),
+    mutationFn: async (data) => {
+      try {
+        return await base44.entities.SubscriptionRequest.create(data);
+      } catch (error) {
+        console.error('Error creating subscription request:', error);
+        throw error;
+      }
+    },
     onSuccess: () => {
       setSubmitted(true);
+    },
+    onError: (error) => {
+      alert('Erreur lors de l\'envoi de la demande. Veuillez réessayer.');
+      console.error(error);
     }
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Validation
+    if (!formData.plan_code || !formData.duration_months) {
+      alert('Veuillez sélectionner un forfait et une durée');
+      return;
+    }
+    
     createRequestMutation.mutate({
       ...formData,
       duration_months: parseInt(formData.duration_months),
