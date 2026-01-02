@@ -13,6 +13,7 @@ import ShopPage from './pages/ShopPage';
 import SubscriptionExpired from './pages/SubscriptionExpired';
 import SubscriptionRequest from './pages/SubscriptionRequest';
 import TikTokGuide from './pages/TikTokGuide';
+import TikTokGuidePublic from './pages/TikTokGuidePublic';
 
 
 export const PAGES = {
@@ -31,6 +32,7 @@ export const PAGES = {
     "SubscriptionExpired": SubscriptionExpired,
     "SubscriptionRequest": SubscriptionRequest,
     "TikTokGuide": TikTokGuide,
+    "TikTokGuidePublic": TikTokGuidePublic,
 }
 
 export const pagesConfig = {
