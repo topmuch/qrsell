@@ -11,6 +11,8 @@ import TikTokGuide from './pages/TikTokGuide';
 import AdminBanners from './pages/AdminBanners';
 import AdminCampaigns from './pages/AdminCampaigns';
 import SellerCampaigns from './pages/SellerCampaigns';
+import SubscriptionRequest from './pages/SubscriptionRequest';
+import SubscriptionExpired from './pages/SubscriptionExpired';
 
 
 export const PAGES = {
@@ -27,6 +29,8 @@ export const PAGES = {
     "AdminBanners": AdminBanners,
     "AdminCampaigns": AdminCampaigns,
     "SellerCampaigns": SellerCampaigns,
+    "SubscriptionRequest": SubscriptionRequest,
+    "SubscriptionExpired": SubscriptionExpired,
 }
 
 export const pagesConfig = {
