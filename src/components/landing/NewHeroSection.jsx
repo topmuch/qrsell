@@ -108,7 +108,7 @@ export default function NewHeroSection() {
             className="relative"
           >
             {/* Phone mockup with content */}
-            <div className="relative mx-auto w-full max-w-md">
+            <div className="relative mx-auto w-full max-w-sm">
               {/* Floating notification badges */}
               <motion.div
                 animate={{ 
