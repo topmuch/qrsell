@@ -61,7 +61,8 @@ export default function SubscriptionRequestManagement() {
     
     const startDate = new Date();
     const endDate = new Date();
-    endDate.setMonth(endDate.getMonth() + parseInt(actionData.duration_months || request.duration_months));
+    const durationMonths = parseInt(actionData.duration_months || request.duration_months);
+    endDate.setMonth(endDate.getMonth() + durationMonths);
 
     // Créer l'abonnement
     await createSubscriptionMutation.mutateAsync({
@@ -83,8 +84,33 @@ export default function SubscriptionRequestManagement() {
       }
     });
 
-    // TODO: Envoyer email de bienvenue
-    alert(`Demande approuvée ! Email de bienvenue envoyé à ${request.user_email}`);
+    // Envoyer email de bienvenue
+    try {
+      const planInfo = plans.find(p => p.code === (actionData.plan_code || request.plan_code));
+      await base44.integrations.Core.SendEmail({
+        to: request.user_email,
+        subject: '🎉 Votre compte QRSell est activé !',
+        body: `
+          <h2>Bonjour ${request.full_name},</h2>
+          <p>Excellente nouvelle ! Votre abonnement <strong>${planInfo?.name || request.plan_code}</strong> a été approuvé.</p>
+          <p>🎯 <strong>Votre accès :</strong></p>
+          <ul>
+            <li>Forfait : ${planInfo?.name || request.plan_code}</li>
+            <li>Durée : ${durationMonths} mois</li>
+            <li>Valable jusqu'au : ${endDate.toLocaleDateString('fr-FR')}</li>
+          </ul>
+          <p>🔑 <strong>Prochaine étape :</strong></p>
+          <p><a href="${window.location.origin}/Dashboard" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block; margin: 16px 0;">Accéder à mon dashboard</a></p>
+          <p>📱 Commencez par créer votre profil vendeur et ajouter vos premiers produits.</p>
+          <p>💰 <strong>Paiement :</strong> Les instructions de paiement vous seront communiquées séparément.</p>
+          <p>Bienvenue sur QRSell !<br/>L'équipe QRSell</p>
+        `
+      });
+      alert(`Demande approuvée ! Email de bienvenue envoyé à ${request.user_email}`);
+    } catch (error) {
+      console.error('Erreur envoi email:', error);
+      alert(`Demande approuvée, mais erreur d'envoi d'email.`);
+    }
   };
 
   const handleReject = async (request) => {
