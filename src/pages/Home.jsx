@@ -1,4 +1,5 @@
 import React from 'react';
+import { base44 } from '@/api/base44Client';
 import Logo from '@/components/ui/Logo';
 import NewHeroSection from '@/components/landing/NewHeroSection';
 import HowItWorksNew from '@/components/landing/HowItWorksNew';
@@ -19,12 +20,14 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Logo size="md" />
           <div className="flex items-center gap-4">
-            <Link to={createPageUrl('Dashboard')}>
-              <Button variant="ghost" className="text-gray-600 hover:text-[#2563eb]">
-                Connexion
-              </Button>
-            </Link>
-            <Link to={createPageUrl('Dashboard')}>
+            <Button 
+              variant="ghost" 
+              className="text-gray-600 hover:text-[#2563eb]"
+              onClick={() => base44.auth.redirectToLogin()}
+            >
+              Connexion
+            </Button>
+            <Link to={createPageUrl('SubscriptionRequest')}>
               <Button className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-6">
                 Commencer
               </Button>

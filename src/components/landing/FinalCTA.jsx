@@ -48,7 +48,7 @@ export default function FinalCTA() {
 
           {/* CTA Button */}
           <div className="pt-4">
-            <Link to={createPageUrl('Dashboard')}>
+            <Link to={createPageUrl('SubscriptionRequest')}>
               <Button 
                 size="lg" 
                 className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xl px-12 py-8 rounded-full shadow-2xl hover:shadow-[#2563eb]/50 transition-all duration-300 group"

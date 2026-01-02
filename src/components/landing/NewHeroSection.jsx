@@ -57,7 +57,7 @@ export default function NewHeroSection() {
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link to={createPageUrl('Dashboard')}>
+              <Link to={createPageUrl('SubscriptionRequest')}>
                 <Button 
                   size="lg" 
                   className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
@@ -66,15 +66,17 @@ export default function NewHeroSection() {
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="border-2 border-[#2563eb] text-[#2563eb] hover:bg-[#2563eb] hover:text-white text-lg px-8 py-6 rounded-full group transition-all duration-300"
-              >
-                <Play className="mr-2 w-5 h-5" />
-                Voir comment ça marche
-              </Button>
+
+              <a href="#comment-ca-marche">
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="border-2 border-[#2563eb] text-[#2563eb] hover:bg-[#2563eb] hover:text-white text-lg px-8 py-6 rounded-full group transition-all duration-300"
+                >
+                  <Play className="mr-2 w-5 h-5" />
+                  Voir comment ça marche
+                </Button>
+              </a>
             </div>
 
             {/* Trust indicators */}
