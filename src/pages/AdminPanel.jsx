@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, Users, Package, Activity, LogOut, Loader2 } from 'lucide-react';
+import { Shield, Users, Package, Activity, LogOut, Loader2, Megaphone } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import StatsOverview from '@/components/admin/StatsOverview';
 import SellerManagement from '@/components/admin/SellerManagement';
@@ -112,6 +112,14 @@ export default function AdminPanel() {
               <Activity className="w-4 h-4" />
               Logs
             </TabsTrigger>
+            <TabsTrigger value="banners" className="flex items-center gap-2 data-[state=active]:bg-[#2563eb] data-[state=active]:text-white rounded-lg">
+              <Megaphone className="w-4 h-4" />
+              Bannières
+            </TabsTrigger>
+            <TabsTrigger value="campaigns" className="flex items-center gap-2 data-[state=active]:bg-[#2563eb] data-[state=active]:text-white rounded-lg">
+              <Package className="w-4 h-4" />
+              Campagnes
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -128,6 +136,22 @@ export default function AdminPanel() {
 
           <TabsContent value="logs">
             <ActivityLogs />
+          </TabsContent>
+
+          <TabsContent value="banners">
+            <iframe 
+              src="/AdminBanners" 
+              className="w-full h-[calc(100vh-300px)] border-0 rounded-lg bg-white"
+              title="Gestion des bannières"
+            />
+          </TabsContent>
+
+          <TabsContent value="campaigns">
+            <iframe 
+              src="/AdminCampaigns" 
+              className="w-full h-[calc(100vh-300px)] border-0 rounded-lg bg-white"
+              title="Gestion des campagnes"
+            />
           </TabsContent>
         </Tabs>
       </main>
