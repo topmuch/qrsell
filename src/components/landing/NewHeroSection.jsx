@@ -108,7 +108,43 @@ export default function NewHeroSection() {
             className="relative"
           >
             {/* Phone mockup with content */}
-            <div className="relative mx-auto w-full max-w-sm">
+            <div className="relative mx-auto w-full max-w-md">
+              {/* Floating notification badges */}
+              <motion.div
+                animate={{ 
+                  y: [0, -15, 0],
+                  x: [0, 10, 0]
+                }}
+                transition={{ 
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="absolute -left-12 top-16 z-30"
+              >
+                <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-full shadow-2xl text-sm font-bold flex items-center gap-2">
+                  🔥 +1 vente
+                </div>
+              </motion.div>
+
+              <motion.div
+                animate={{ 
+                  y: [0, 15, 0],
+                  x: [0, -10, 0]
+                }}
+                transition={{ 
+                  duration: 3.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.5
+                }}
+                className="absolute -right-16 top-32 z-30"
+              >
+                <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-full shadow-2xl text-sm font-bold flex items-center gap-2">
+                  📈 +3K vues
+                </div>
+              </motion.div>
+
               {/* Floating QR code */}
               <motion.div
                 animate={{ 
@@ -120,74 +156,139 @@ export default function NewHeroSection() {
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
-                className="absolute -left-8 top-20 z-20"
+                className="absolute -left-16 bottom-32 z-30"
               >
-                <div className="bg-white p-4 rounded-2xl shadow-2xl border-2 border-[#2563eb]">
-                  <QrCode className="w-16 h-16 text-[#2563eb]" />
-                  <div className="text-xs text-center mt-2 font-semibold text-gray-600">Scannez-moi!</div>
+                <div className="bg-white p-3 rounded-2xl shadow-2xl border-4 border-[#2563eb]">
+                  <QrCode className="w-20 h-20 text-[#2563eb]" />
+                  <div className="text-xs text-center mt-2 font-bold text-gray-700">Scan moi!</div>
                 </div>
               </motion.div>
 
-              {/* WhatsApp indicator */}
+              {/* TikTok logo floating */}
               <motion.div
                 animate={{ 
-                  scale: [1, 1.1, 1],
-                  opacity: [0.8, 1, 0.8]
+                  rotate: [0, 360],
+                  scale: [1, 1.1, 1]
                 }}
                 transition={{ 
-                  duration: 2,
+                  duration: 8,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: "linear"
                 }}
-                className="absolute -right-8 bottom-32 z-20"
+                className="absolute -right-12 bottom-24 z-30"
               >
-                <div className="bg-[#25D366] p-3 rounded-full shadow-2xl">
-                  <MessageCircle className="w-8 h-8 text-white" />
+                <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center shadow-2xl">
+                  <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none">
+                    <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z" fill="#25F4EE"/>
+                    <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z" fill="#FE2C55"/>
+                  </svg>
                 </div>
               </motion.div>
 
-              {/* Main phone frame */}
-              <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-[3rem] p-3 shadow-2xl">
-                <div className="bg-white rounded-[2.5rem] overflow-hidden aspect-[9/19]">
+              {/* Main phone frame - Premium mockup */}
+              <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-[3.5rem] p-4 shadow-2xl">
+                <div className="bg-white rounded-[3rem] overflow-hidden aspect-[9/19.5] relative">
                   {/* Status bar */}
                   <div className="bg-gray-50 px-6 py-3 flex items-center justify-between text-xs">
                     <span className="font-semibold">9:41</span>
-                    <div className="flex gap-1">
-                      <div className="w-4 h-3 border border-gray-400 rounded-sm" />
+                    <div className="flex gap-1 items-center">
+                      <div className="w-4 h-4">📶</div>
+                      <div className="w-4 h-3 border border-gray-400 rounded-sm relative">
+                        <div className="absolute inset-0.5 bg-gray-800 rounded-sm" />
+                      </div>
                     </div>
                   </div>
 
-                  {/* TikTok-style content */}
-                  <div className="relative h-full bg-gradient-to-br from-purple-400 via-pink-300 to-orange-300">
-                    {/* Simulated video content */}
-                    <div className="absolute inset-0 flex items-center justify-center">
+                  {/* TikTok interface */}
+                  <div className="relative h-full bg-black">
+                    {/* Video background */}
+                    <div className="absolute inset-0">
                       <img 
-                        src="https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=400&h=800&fit=crop"
-                        alt="TikTok seller"
+                        src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=800&fit=crop"
+                        alt="Shop products"
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                     </div>
 
-                    {/* QR overlay on video */}
-                    <div className="absolute bottom-24 right-4 bg-white p-3 rounded-xl shadow-lg border-2 border-white/50">
-                      <div className="w-24 h-24 bg-[#2563eb]/20 rounded-lg flex items-center justify-center">
-                        <QrCode className="w-16 h-16 text-[#2563eb]" />
+                    {/* Performance stats overlay - TOP */}
+                    <div className="absolute top-4 left-4 right-4 z-20 space-y-2">
+                      <div className="bg-black/60 backdrop-blur-md rounded-xl p-3 border border-white/20">
+                        <div className="grid grid-cols-2 gap-3 text-white text-xs">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                              👁️
+                            </div>
+                            <div>
+                              <div className="text-gray-300">Vues</div>
+                              <div className="font-bold text-sm">125.4K</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+                              ❤️
+                            </div>
+                            <div>
+                              <div className="text-gray-300">Likes</div>
+                              <div className="font-bold text-sm">8.2K</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                              💬
+                            </div>
+                            <div>
+                              <div className="text-gray-300">Comments</div>
+                              <div className="font-bold text-sm">342</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                              🛒
+                            </div>
+                            <div>
+                              <div className="text-gray-300">Ventes</div>
+                              <div className="font-bold text-sm">47</div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Video info */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 rounded-full bg-[#2563eb] border-2 border-white" />
-                        <span className="text-white font-semibold">@ma_boutique_sn</span>
+                    {/* QR Code in video */}
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+                      <div className="bg-white p-4 rounded-2xl shadow-2xl border-4 border-white/80">
+                        <QrCode className="w-20 h-20 text-[#2563eb]" />
                       </div>
-                      <p className="text-white text-sm">
-                        🔥 Nouveaux modèles disponibles ! Scannez le QR pour commander 👆
-                      </p>
+                    </div>
+
+                    {/* Bottom section - WhatsApp CTA */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 space-y-3 z-20">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#2563eb] to-blue-600 border-3 border-white flex items-center justify-center text-white font-bold text-lg">
+                          M
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-white font-bold text-sm">@ma_boutique</div>
+                          <div className="text-gray-300 text-xs">Boutique officielle 🔥</div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3 shadow-xl">
+                        <p className="text-gray-800 text-xs font-medium mb-2">
+                          ⚡ Nouveaux produits disponibles ! Scannez le QR
+                        </p>
+                        <button className="w-full bg-gradient-to-r from-[#25D366] to-green-600 text-white rounded-xl py-2.5 font-bold text-sm flex items-center justify-center gap-2 shadow-lg">
+                          <MessageCircle className="w-4 h-4" />
+                          Commander via WhatsApp
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
+                
+                {/* Phone button */}
+                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gray-700 rounded-full" />
               </div>
             </div>
           </motion.div>
