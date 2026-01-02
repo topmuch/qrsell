@@ -43,11 +43,27 @@ export default function Dashboard() {
     loadUser();
   }, []);
 
+  // Check subscription
+  const { data: subscriptions = [], isLoading: loadingSubscription } = useQuery({
+    queryKey: ['subscription', user?.email],
+    queryFn: async () => {
+      const subs = await base44.entities.Subscription.filter({ user_email: user?.email });
+      const now = new Date();
+      return subs.filter(sub => 
+        sub.is_active && 
+        new Date(sub.end_date) > now
+      );
+    },
+    enabled: !!user?.email
+  });
+
+  const activeSubscription = subscriptions[0];
+
   // Get seller profile
   const { data: sellers = [], isLoading: loadingSeller, refetch: refetchSeller } = useQuery({
     queryKey: ['seller', user?.email],
     queryFn: () => base44.entities.Seller.filter({ created_by: user?.email }),
-    enabled: !!user?.email
+    enabled: !!user?.email && !!activeSubscription
   });
 
   const seller = sellers[0];
@@ -148,12 +164,18 @@ export default function Dashboard() {
     base44.auth.logout();
   };
 
-  if (!user) {
+  if (!user || loadingSubscription) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <Loader2 className="w-8 h-8 animate-spin text-[#ed477c]" />
       </div>
     );
+  }
+
+  // Check if user has active subscription
+  if (!activeSubscription) {
+    window.location.href = '/SubscriptionExpired';
+    return null;
   }
 
   // Show profile form if seller profile not completed
