@@ -206,11 +206,11 @@ export default function NewHeroSection() {
                     {/* Video background */}
                     <div className="absolute inset-0">
                       <img 
-                        src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=800&fit=crop"
-                        alt="Shop products"
+                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6951cb5c7a9163102135b23b/80c43a477_dead40d7-fc51-4c1c-8cca-18669f66b408.png"
+                        alt="QRSell - Transformez vos produits en ventes"
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     </div>
 
                     {/* Performance stats overlay - TOP */}
