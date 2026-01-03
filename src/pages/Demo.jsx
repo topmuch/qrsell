@@ -254,7 +254,7 @@ export default function Demo() {
                   size="lg"
                   className="bg-white text-[#ed477c] hover:bg-gray-50 rounded-full px-8 py-6 text-lg font-bold shadow-xl">
 
-                  Créer ma boutique — 5 €/mois
+                  Créer ma boutique — 5000 CFA/mois
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
