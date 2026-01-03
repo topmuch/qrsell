@@ -27,7 +27,18 @@ export default function ManualClientCreation() {
   });
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [generatedPassword, setGeneratedPassword] = useState(null);
+  const [copied, setCopied] = useState(false);
   const queryClient = useQueryClient();
+
+  const generatePassword = () => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*";
+    let password = "";
+    for (let i = 0; i < 16; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+  };
 
   const { data: plans = [] } = useQuery({
     queryKey: ['plans'],
@@ -41,6 +52,10 @@ export default function ManualClientCreation() {
     mutationFn: async (data) => {
       setError(null);
       setSuccess(null);
+
+      // Générer un mot de passe sécurisé
+      const password = generatePassword();
+      setGeneratedPassword(password);
 
       // 1. Inviter l'utilisateur
       try {
@@ -69,7 +84,7 @@ export default function ManualClientCreation() {
         payment_note: `Compte créé manuellement le ${format(new Date(), 'dd/MM/yyyy', { locale: fr })}`
       });
 
-      // 3. Envoyer l'email de bienvenue
+      // 3. Envoyer l'email de bienvenue avec identifiants
       const plan = plans.find(p => p.code === data.plan_code);
       
       try {
@@ -88,6 +103,17 @@ export default function ManualClientCreation() {
                   Votre compte QRSell a été créé et est immédiatement actif ! 🚀
                 </p>
                 
+                <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #f59e0b;">
+                  <p style="margin: 0 0 10px 0; font-weight: bold; color: #92400e;">🔐 Vos identifiants de connexion :</p>
+                  <div style="background: white; padding: 15px; border-radius: 6px; margin-top: 10px;">
+                    <p style="margin: 5px 0; color: #374151;"><strong>Email :</strong> ${data.email}</p>
+                    <p style="margin: 5px 0; color: #374151;"><strong>Mot de passe :</strong> <code style="background: #f3f4f6; padding: 4px 8px; border-radius: 4px; font-family: monospace;">${password}</code></p>
+                  </div>
+                  <p style="margin: 10px 0 0 0; color: #92400e; font-size: 12px;">
+                    ⚠️ Conservez ces informations en lieu sûr. Vous pourrez changer votre mot de passe après votre première connexion.
+                  </p>
+                </div>
+
                 <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #2563eb;">
                   <p style="margin: 0 0 10px 0; font-weight: bold; color: #1e40af;">📋 Détails de votre abonnement :</p>
                   <ul style="margin: 10px 0; padding-left: 20px; color: #374151;">
@@ -101,26 +127,19 @@ export default function ManualClientCreation() {
                 <div style="text-align: center; margin: 30px 0;">
                   <a href="${window.location.origin}${createPageUrl('Dashboard')}" 
                      style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);">
-                    🔑 Accéder à mon Dashboard
+                    🔑 Me connecter maintenant
                   </a>
                 </div>
 
                 <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 25px 0;">
                   <p style="margin: 0 0 12px 0; font-weight: bold; color: #111827;">🚀 Prochaines étapes :</p>
                   <ol style="margin: 0; padding-left: 20px; color: #4b5563;">
-                    <li style="margin-bottom: 8px;">Connectez-vous via le lien ci-dessus</li>
+                    <li style="margin-bottom: 8px;">Connectez-vous avec vos identifiants</li>
                     <li style="margin-bottom: 8px;">Complétez votre profil vendeur</li>
                     <li style="margin-bottom: 8px;">Ajoutez vos premiers produits</li>
                     <li style="margin-bottom: 8px;">Téléchargez vos QR codes</li>
                     <li>Intégrez-les dans vos vidéos TikTok !</li>
                   </ol>
-                </div>
-
-                <div style="background-color: #fef3c7; padding: 16px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #f59e0b;">
-                  <p style="margin: 0; font-weight: bold; color: #92400e;">💡 Astuce :</p>
-                  <p style="margin: 8px 0 0 0; color: #92400e; font-size: 14px;">
-                    Consultez notre guide TikTok pour maximiser vos ventes et générer plus de scans QR !
-                  </p>
                 </div>
 
                 <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
@@ -138,7 +157,7 @@ export default function ManualClientCreation() {
         // Ne pas bloquer si l'email échoue
       }
 
-      return { subscription, plan };
+      return { subscription, plan, password };
     },
     onSuccess: (data) => {
       setSuccess({
@@ -204,9 +223,9 @@ export default function ManualClientCreation() {
 
         {success ? (
           <div className="space-y-4">
-            <Alert className="bg-green-50 border-green-200">
-              <CheckCircle2 className="w-4 h-4 text-green-600" />
-              <AlertDescription className="text-green-800">
+            <Alert className="bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800">
+              <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <AlertDescription className="text-green-800 dark:text-green-200">
                 <p className="font-semibold mb-2">Compte créé avec succès !</p>
                 <ul className="text-sm space-y-1">
                   <li>📧 Email : {success.email}</li>
@@ -216,6 +235,48 @@ export default function ManualClientCreation() {
                 </ul>
               </AlertDescription>
             </Alert>
+
+            {generatedPassword && (
+              <div className="bg-yellow-50 dark:bg-yellow-900/30 border-2 border-yellow-300 dark:border-yellow-700 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-10 h-10 bg-yellow-100 dark:bg-yellow-800 rounded-full flex items-center justify-center">
+                    <Key className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-yellow-900 dark:text-yellow-100 mb-2">Identifiants générés</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="bg-white dark:bg-gray-800 p-3 rounded border border-yellow-200 dark:border-yellow-800">
+                        <p className="text-gray-600 dark:text-gray-400 text-xs mb-1">Email</p>
+                        <code className="text-gray-900 dark:text-gray-100 font-mono">{formData.email}</code>
+                      </div>
+                      <div className="bg-white dark:bg-gray-800 p-3 rounded border border-yellow-200 dark:border-yellow-800">
+                        <p className="text-gray-600 dark:text-gray-400 text-xs mb-1">Mot de passe</p>
+                        <code className="text-gray-900 dark:text-gray-100 font-mono break-all">{generatedPassword}</code>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-3">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          navigator.clipboard.writeText(`Email: ${formData.email}\nMot de passe: ${generatedPassword}`);
+                          setCopied(true);
+                          setTimeout(() => setCopied(false), 2000);
+                        }}
+                        className="flex-1"
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        {copied ? 'Copié !' : 'Copier tout'}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-yellow-800 dark:text-yellow-200 mt-3">
+                      ⚠️ Ces identifiants ne seront plus affichés. Copiez-les maintenant ou ils ont été envoyés par email au client.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex justify-end gap-2">
               <Button onClick={handleClose}>
                 Fermer
@@ -225,6 +286,8 @@ export default function ManualClientCreation() {
                 onClick={() => {
                   setSuccess(null);
                   setError(null);
+                  setGeneratedPassword(null);
+                  setCopied(false);
                 }}
               >
                 Créer un autre client
