@@ -46,6 +46,10 @@ export default function ProductForm({ open, onClose, seller, onSuccess, editProd
     };
 
     if (editProduct) {
+      // Générer un public_id si manquant
+      if (!editProduct.public_id) {
+        productData.public_id = generatePublicId();
+      }
       await base44.entities.Product.update(editProduct.id, productData);
     } else {
       productData.public_id = generatePublicId();

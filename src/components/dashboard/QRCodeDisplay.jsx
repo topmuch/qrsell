@@ -53,14 +53,32 @@ export default function QRCodeDisplay({ product, seller, onClose }) {
       
       ctx.fillStyle = '#6b7280';
       ctx.font = '14px Inter, sans-serif';
-      ctx.fillText('TiktocQR', canvas.width / 2, textY + 30);
+      ctx.fillText('QRSell', canvas.width / 2, textY + 30);
     }
   };
 
   useEffect(() => {
-    generateQRCode(canvasRef.current, 200, false);
-    generateQRCode(tiktokCanvasRef.current, 300, true);
+    if (product?.public_id) {
+      generateQRCode(canvasRef.current, 200, false);
+      generateQRCode(tiktokCanvasRef.current, 300, true);
+    }
   }, [product]);
+
+  if (!product?.public_id) {
+    return (
+      <Dialog open={true} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>QR Code - {product.name}</DialogTitle>
+          </DialogHeader>
+          <div className="py-8 text-center">
+            <p className="text-gray-600 mb-4">ID public du produit manquant.</p>
+            <p className="text-sm text-gray-500">Veuillez recréer ce produit pour générer un QR code.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   const downloadQR = (canvas, filename) => {
     const link = document.createElement('a');
