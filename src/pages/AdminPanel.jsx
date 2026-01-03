@@ -12,6 +12,7 @@ import ActivityLogs from '@/components/admin/ActivityLogs';
 import PlanManagement from '@/components/admin/PlanManagement';
 import SubscriptionRequestManagement from '@/components/admin/SubscriptionRequestManagement';
 import SubscriptionManagement from '@/components/admin/SubscriptionManagement';
+import ManualClientCreation from '@/components/admin/ManualClientCreation';
 import { motion } from 'framer-motion';
 
 export default function AdminPanel() {
@@ -174,7 +175,16 @@ export default function AdminPanel() {
           </TabsContent>
 
           <TabsContent value="requests">
-            <SubscriptionRequestManagement />
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Gestion des demandes</h2>
+                  <p className="text-gray-500">Approuvez ou rejetez les demandes d'inscription</p>
+                </div>
+                <ManualClientCreation />
+              </div>
+              <SubscriptionRequestManagement />
+            </div>
           </TabsContent>
 
           <TabsContent value="subscriptions">
