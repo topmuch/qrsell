@@ -184,11 +184,10 @@ export default function ManualClientCreation() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button 
           className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
-          onClick={() => setOpen(true)}
         >
           <UserPlus className="w-4 h-4 mr-2" />
           Créer un client manuellement
