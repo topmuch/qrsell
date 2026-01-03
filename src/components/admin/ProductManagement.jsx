@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Eye, Trash2, ExternalLink, Loader2, Package } from 'lucide-react';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Search, Eye, Trash2, ExternalLink, Loader2, Package, AlertCircle, RefreshCw } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -38,6 +39,24 @@ export default function ProductManagement() {
     mutationFn: (productId) => base44.entities.Product.delete(productId),
     onSuccess: () => {
       queryClient.invalidateQueries(['admin-products']);
+    }
+  });
+
+  const fixPublicIdMutation = useMutation({
+    mutationFn: async () => {
+      const productsWithoutId = products.filter(p => !p.public_id);
+      const updates = productsWithoutId.map(product => {
+        const year = new Date().getFullYear();
+        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        const public_id = `PROD-${year}-${random}`;
+        return base44.entities.Product.update(product.id, { public_id });
+      });
+      await Promise.all(updates);
+      return productsWithoutId.length;
+    },
+    onSuccess: (count) => {
+      queryClient.invalidateQueries(['admin-products']);
+      alert(`${count} produit(s) mis à jour avec succès !`);
     }
   });
 
@@ -78,8 +97,40 @@ export default function ProductManagement() {
     );
   }
 
+  const productsWithoutPublicId = products.filter(p => !p.public_id);
+
   return (
     <div className="space-y-6">
+      {/* Alert for products without public_id */}
+      {productsWithoutPublicId.length > 0 && (
+        <Alert className="bg-yellow-50 border-yellow-200">
+          <AlertCircle className="w-4 h-4 text-yellow-600" />
+          <AlertDescription className="flex items-center justify-between">
+            <span className="text-yellow-800">
+              <strong>{productsWithoutPublicId.length}</strong> produit(s) sans ID public. Les QR codes ne fonctionneront pas.
+            </span>
+            <Button
+              size="sm"
+              onClick={() => fixPublicIdMutation.mutate()}
+              disabled={fixPublicIdMutation.isPending}
+              className="bg-yellow-600 hover:bg-yellow-700"
+            >
+              {fixPublicIdMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Correction...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Corriger automatiquement
+                </>
+              )}
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Search bar */}
       <Card>
         <CardContent className="pt-6">
@@ -145,7 +196,11 @@ export default function ProductManagement() {
                           )}
                           <div>
                             <div className="font-medium text-gray-900">{product.name}</div>
-                            <code className="text-xs text-gray-400">{product.public_id}</code>
+                            {product.public_id ? (
+                              <code className="text-xs text-gray-400">{product.public_id}</code>
+                            ) : (
+                              <span className="text-xs text-red-500">❌ ID manquant</span>
+                            )}
                           </div>
                         </div>
                       </td>
