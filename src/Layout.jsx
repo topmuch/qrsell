@@ -74,7 +74,7 @@ export default function Layout({ children, currentPageName }) {
                   isActive('TikTokGuidePublic') ? 'text-[#2563eb]' : 'text-gray-700 hover:text-[#2563eb]'
                 }`}
               >
-                Guide TikTok
+                Guide
               </Link>
             </div>
 
@@ -166,7 +166,7 @@ export default function Layout({ children, currentPageName }) {
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Guide TikTok
+                Guide
               </Link>
               {user ? (
                 <Link 

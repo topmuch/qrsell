@@ -3,8 +3,6 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { 
   Plus, 
   Package, 
@@ -15,8 +13,7 @@ import {
   Check,
   ExternalLink,
   Loader2,
-  Sparkles,
-  TrendingUp
+  Sparkles
 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import SellerProfileForm from '@/components/dashboard/SellerProfileForm';
@@ -31,106 +28,6 @@ import ActionCards from '@/components/dashboard/ActionCards';
 import SellerStatus from '@/components/dashboard/SellerStatus';
 import BannerDisplay from '@/components/dashboard/BannerDisplay';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// Campaigns section component
-function CampaignsSection({ user }) {
-  const { data: campaigns = [], isLoading } = useQuery({
-    queryKey: ['active-campaigns'],
-    queryFn: async () => {
-      const allCampaigns = await base44.entities.Campaign.list();
-      return allCampaigns.filter(c => c.status === 'active');
-    }
-  });
-
-  const { data: myParticipations = [] } = useQuery({
-    queryKey: ['my-participations', user?.email],
-    queryFn: () => base44.entities.CampaignParticipation.filter({ seller_email: user.email }),
-    enabled: !!user?.email
-  });
-
-  const participateMutation = useMutation({
-    mutationFn: async ({ campaignId }) => {
-      return await base44.entities.CampaignParticipation.create({
-        campaign_id: campaignId,
-        seller_email: user.email,
-        seller_name: user.full_name,
-        integration_type: 'live',
-        status: 'pending',
-        participated_at: new Date().toISOString()
-      });
-    }
-  });
-
-  const hasParticipated = (campaignId) => {
-    return myParticipations.some(p => p.campaign_id === campaignId);
-  };
-
-  if (isLoading) {
-    return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin" /></div>;
-  }
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">🔥 Campagnes sponsorisées</h2>
-        <p className="text-gray-600">Participez à des campagnes et gagnez jusqu'à 5 € par intégration</p>
-      </div>
-
-      {campaigns.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <TrendingUp className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">Aucune campagne disponible pour l'instant.</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid sm:grid-cols-2 gap-6">
-          {campaigns.map(campaign => (
-            <Card key={campaign.id} className="overflow-hidden">
-              {campaign.product_image && (
-                <img 
-                  src={campaign.product_image} 
-                  alt={campaign.product_name}
-                  className="w-full h-32 object-cover"
-                />
-              )}
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span className="text-lg">{campaign.product_name}</span>
-                  <Badge className="bg-green-600">
-                    {campaign.commission_value} {campaign.commission_type === 'fixed' ? '€' : '%'}
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-sm text-gray-600">{campaign.product_description}</p>
-                
-                {hasParticipated(campaign.id) ? (
-                  <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-lg">
-                    <Check className="w-5 h-5" />
-                    <span className="font-medium text-sm">Vous participez</span>
-                  </div>
-                ) : (
-                  <Button
-                    onClick={() => participateMutation.mutate({ campaignId: campaign.id })}
-                    disabled={participateMutation.isPending}
-                    className="w-full bg-green-500 hover:bg-green-600"
-                  >
-                    {participateMutation.isPending ? (
-                      <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Participation...</>
-                    ) : (
-                      'Participer'
-                    )}
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -184,6 +81,15 @@ export default function Dashboard() {
     queryKey: ['analytics', seller?.id],
     queryFn: () => base44.entities.Analytics.filter({ seller_id: seller?.id }),
     enabled: !!seller?.id
+  });
+
+  // Fetch active campaigns
+  const { data: campaigns = [] } = useQuery({
+    queryKey: ['campaigns-for-seller'],
+    queryFn: async () => {
+      const all = await base44.entities.Campaign.list();
+      return all.filter(c => c.status === 'active');
+    }
   });
 
   // Calculate stats
@@ -379,7 +285,7 @@ export default function Dashboard() {
               Produits
             </TabsTrigger>
             <TabsTrigger value="campaigns" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
-              <TrendingUp className="w-4 h-4" />
+              <Sparkles className="w-4 h-4" />
               Campagnes
             </TabsTrigger>
             <TabsTrigger value="guide" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
@@ -483,7 +389,50 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="campaigns" className="space-y-6">
-            <CampaignsSection user={user} />
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                <Sparkles className="w-6 h-6 text-green-500" />
+                🔥 Campagnes sponsorisées
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Participez à des campagnes et gagnez jusqu'à 5 € par intégration.
+              </p>
+              
+              {campaigns.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {campaigns.map(camp => (
+                    <div key={camp.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                      {camp.product_image && (
+                        <img 
+                          src={camp.product_image} 
+                          alt={camp.product_name} 
+                          className="w-full h-32 object-cover rounded mb-3" 
+                        />
+                      )}
+                      <h3 className="font-bold text-lg mb-1">{camp.product_name}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{camp.partner_name}</p>
+                      <p className="text-sm text-gray-500 mb-3">{camp.product_description}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-green-600 font-bold">
+                          {camp.commission_value} {camp.commission_type === 'percentage' ? '%' : '€'}
+                        </span>
+                        <Button 
+                          onClick={() => window.location.href = '/SellerCampaigns'}
+                          className="bg-green-500 hover:bg-green-600 text-white"
+                        >
+                          Participer
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                  <Sparkles className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500">Aucune campagne disponible pour l'instant.</p>
+                </div>
+              )}
+            </div>
           </TabsContent>
 
           <TabsContent value="guide">
