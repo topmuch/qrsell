@@ -16,7 +16,6 @@ import QRCode from 'qrcode';
 export default function ProductPage() {
   const params = new URLSearchParams(window.location.search);
   const publicId = params.get('id');
-  const [showQR, setShowQR] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
 
   console.log('🔍 ProductPage - Public ID from URL:', publicId);
@@ -233,14 +232,6 @@ Est-ce toujours disponible ${timePhrase} ?`;
                 size="icon"
                 variant="secondary"
                 className="rounded-full bg-white/90 hover:bg-white"
-                onClick={() => setShowQR(true)}
-              >
-                <QrCode className="w-5 h-5" />
-              </Button>
-              <Button
-                size="icon"
-                variant="secondary"
-                className="rounded-full bg-white/90 hover:bg-white"
                 onClick={handleShare}
               >
                 <Share2 className="w-5 h-5" />
@@ -298,14 +289,6 @@ Est-ce toujours disponible ${timePhrase} ?`;
         </Card>
       </div>
 
-      {/* QR Code Modal */}
-      {showQR && (
-        <QRCodeModal 
-          productUrl={window.location.href}
-          onClose={() => setShowQR(false)}
-        />
-      )}
-
       {/* Share Modal */}
       {showShareModal && (
         <ShareModal
@@ -315,42 +298,6 @@ Est-ce toujours disponible ${timePhrase} ?`;
         />
       )}
     </div>
-  );
-}
-
-// QR Code Modal Component
-function QRCodeModal({ productUrl, onClose }) {
-  const canvasRef = React.useRef(null);
-
-  React.useEffect(() => {
-    if (canvasRef.current) {
-      QRCode.toCanvas(canvasRef.current, productUrl, {
-        width: 300,
-        margin: 2,
-        color: {
-          dark: '#1f2937',
-          light: '#ffffff'
-        }
-      });
-    }
-  }, [productUrl]);
-
-  return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>QR Code de ce produit</DialogTitle>
-        </DialogHeader>
-        <div className="flex flex-col items-center py-4">
-          <div className="bg-white p-4 rounded-xl border">
-            <canvas ref={canvasRef} />
-          </div>
-          <p className="text-sm text-gray-500 mt-4 text-center">
-            Scannez ce code pour accéder directement à ce produit
-          </p>
-        </div>
-      </DialogContent>
-    </Dialog>
   );
 }
 
