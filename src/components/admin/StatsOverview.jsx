@@ -25,7 +25,7 @@ export default function StatsOverview() {
   if (loadingSellers || loadingProducts || loadingAnalytics) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-[#2563eb]" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#2563eb] dark:text-blue-400" />
       </div>
     );
   }
@@ -86,18 +86,18 @@ export default function StatsOverview() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <Card className="hover:shadow-lg transition-shadow">
+            <Card className="hover:shadow-lg transition-shadow dark:bg-gray-800 dark:border-gray-700">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
                     <stat.icon className="w-6 h-6 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-green-600">{stat.change}</span>
+                  <span className="text-sm font-medium text-green-600 dark:text-green-400">{stat.change}</span>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
                   {stat.value.toLocaleString()}
                 </h3>
-                <p className="text-sm text-gray-500">{stat.title}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{stat.title}</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -105,9 +105,9 @@ export default function StatsOverview() {
       </div>
 
       {/* Top sellers chart */}
-      <Card>
+      <Card className="dark:bg-gray-800 dark:border-gray-700">
         <CardHeader>
-          <CardTitle>Top 5 vendeurs par activité</CardTitle>
+          <CardTitle className="dark:text-white">Top 5 vendeurs par activité</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -125,49 +125,49 @@ export default function StatsOverview() {
 
       {/* Recent activity summary */}
       <div className="grid md:grid-cols-2 gap-6">
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Activité récente</CardTitle>
+            <CardTitle className="dark:text-white">Activité récente</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="flex items-center justify-between py-2 border-b">
-                <span className="text-sm text-gray-600">Vues produits</span>
-                <span className="font-semibold text-gray-900">{totalViews}</span>
+              <div className="flex items-center justify-between py-2 border-b dark:border-gray-700">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Vues produits</span>
+                <span className="font-semibold text-gray-900 dark:text-white">{totalViews}</span>
               </div>
-              <div className="flex items-center justify-between py-2 border-b">
-                <span className="text-sm text-gray-600">Scans QR</span>
-                <span className="font-semibold text-gray-900">{totalScans}</span>
+              <div className="flex items-center justify-between py-2 border-b dark:border-gray-700">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Scans QR</span>
+                <span className="font-semibold text-gray-900 dark:text-white">{totalScans}</span>
               </div>
               <div className="flex items-center justify-between py-2">
-                <span className="text-sm text-gray-600">Clics WhatsApp</span>
-                <span className="font-semibold text-gray-900">{totalClicks}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Clics WhatsApp</span>
+                <span className="font-semibold text-gray-900 dark:text-white">{totalClicks}</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Statistiques globales</CardTitle>
+            <CardTitle className="dark:text-white">Statistiques globales</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="flex items-center justify-between py-2 border-b">
-                <span className="text-sm text-gray-600">Taux de conversion</span>
-                <span className="font-semibold text-green-600">
+              <div className="flex items-center justify-between py-2 border-b dark:border-gray-700">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Taux de conversion</span>
+                <span className="font-semibold text-green-600 dark:text-green-400">
                   {totalViews > 0 ? Math.round((totalClicks / totalViews) * 100) : 0}%
                 </span>
               </div>
-              <div className="flex items-center justify-between py-2 border-b">
-                <span className="text-sm text-gray-600">Produits par vendeur</span>
-                <span className="font-semibold text-gray-900">
+              <div className="flex items-center justify-between py-2 border-b dark:border-gray-700">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Produits par vendeur</span>
+                <span className="font-semibold text-gray-900 dark:text-white">
                   {sellers.length > 0 ? Math.round(products.length / sellers.length) : 0}
                 </span>
               </div>
               <div className="flex items-center justify-between py-2">
-                <span className="text-sm text-gray-600">Scans par produit</span>
-                <span className="font-semibold text-gray-900">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Scans par produit</span>
+                <span className="font-semibold text-gray-900 dark:text-white">
                   {products.length > 0 ? Math.round(totalScans / products.length) : 0}
                 </span>
               </div>

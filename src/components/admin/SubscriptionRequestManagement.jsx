@@ -185,7 +185,7 @@ export default function SubscriptionRequestManagement() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Demandes d'abonnement</h2>
+        <h2 className="text-2xl font-bold dark:text-white">Demandes d'abonnement</h2>
         <div className="flex gap-2">
           {['all', 'pending', 'approved', 'rejected'].map(status => (
             <Button
@@ -206,12 +206,12 @@ export default function SubscriptionRequestManagement() {
           const plan = plans.find(p => p.code === request.plan_code);
           
           return (
-            <Card key={request.id}>
+            <Card key={request.id} className="dark:bg-gray-800 dark:border-gray-700">
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between">
                   <div className="space-y-3 flex-1">
                     <div className="flex items-center gap-3">
-                      <h3 className="font-bold text-lg">{request.full_name}</h3>
+                      <h3 className="font-bold text-lg dark:text-white">{request.full_name}</h3>
                       <Badge className={statusConfig[request.status]?.color}>
                         <StatusIcon className="w-3 h-3 mr-1" />
                         {statusConfig[request.status]?.label}
@@ -220,20 +220,20 @@ export default function SubscriptionRequestManagement() {
                     
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
-                        <p className="text-gray-500">Email</p>
-                        <p className="font-medium">{request.user_email}</p>
+                        <p className="text-gray-500 dark:text-gray-400">Email</p>
+                        <p className="font-medium dark:text-gray-200">{request.user_email}</p>
                       </div>
                       <div>
-                        <p className="text-gray-500">Téléphone</p>
-                        <p className="font-medium">{request.phone}</p>
+                        <p className="text-gray-500 dark:text-gray-400">Téléphone</p>
+                        <p className="font-medium dark:text-gray-200">{request.phone}</p>
                       </div>
                       <div>
-                        <p className="text-gray-500">Boutique</p>
-                        <p className="font-medium">{request.business_name}</p>
+                        <p className="text-gray-500 dark:text-gray-400">Boutique</p>
+                        <p className="font-medium dark:text-gray-200">{request.business_name}</p>
                       </div>
                       <div>
-                        <p className="text-gray-500">Localisation</p>
-                        <p className="font-medium">{request.city}, {request.country}</p>
+                        <p className="text-gray-500 dark:text-gray-400">Localisation</p>
+                        <p className="font-medium dark:text-gray-200">{request.city}, {request.country}</p>
                       </div>
                     </div>
 

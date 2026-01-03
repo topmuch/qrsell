@@ -86,7 +86,7 @@ export default function SellerManagement() {
   return (
     <div className="space-y-6">
       {/* Search bar */}
-      <Card>
+      <Card className="dark:bg-gray-800 dark:border-gray-700">
         <CardContent className="pt-6">
           <div className="flex items-center gap-4">
             <div className="relative flex-1">
@@ -106,22 +106,22 @@ export default function SellerManagement() {
       </Card>
 
       {/* Sellers table */}
-      <Card>
+      <Card className="dark:bg-gray-800 dark:border-gray-700">
         <CardHeader>
-          <CardTitle>Liste des vendeurs</CardTitle>
+          <CardTitle className="dark:text-white">Liste des vendeurs</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">Boutique</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">Vendeur</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">Slug</th>
-                  <th className="text-center py-3 px-4 font-medium text-gray-700">Produits</th>
-                  <th className="text-center py-3 px-4 font-medium text-gray-700">Scans</th>
-                  <th className="text-center py-3 px-4 font-medium text-gray-700">Statut</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-700">Actions</th>
+                <tr className="border-b dark:border-gray-700">
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Boutique</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Vendeur</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Slug</th>
+                  <th className="text-center py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Produits</th>
+                  <th className="text-center py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Scans</th>
+                  <th className="text-center py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Statut</th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -133,17 +133,17 @@ export default function SellerManagement() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="border-b hover:bg-gray-50"
+                      className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                     >
                       <td className="py-3 px-4">
-                        <div className="font-medium text-gray-900">{seller.shop_name}</div>
+                        <div className="font-medium text-gray-900 dark:text-white">{seller.shop_name}</div>
                       </td>
                       <td className="py-3 px-4">
-                        <div className="text-sm text-gray-600">{seller.full_name}</div>
-                        <div className="text-xs text-gray-400">{seller.whatsapp_number}</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-300">{seller.full_name}</div>
+                        <div className="text-xs text-gray-400 dark:text-gray-500">{seller.whatsapp_number}</div>
                       </td>
                       <td className="py-3 px-4">
-                        <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                        <code className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded dark:text-gray-300">
                           {seller.shop_slug}
                         </code>
                       </td>
