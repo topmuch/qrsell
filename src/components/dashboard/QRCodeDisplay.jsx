@@ -77,22 +77,18 @@ export default function QRCodeDisplay({ product, seller, onClose }) {
   };
 
   useEffect(() => {
-    if (product?.public_id && productUrl && canvasRef.current) {
-      console.log('✅ Generating standard QR');
+    if (product?.public_id && productUrl) {
+      console.log('✅ Generating both QR codes');
       setTimeout(() => {
-        generateQRCode(canvasRef.current, 200, false);
-      }, 100);
-    }
-  }, [product, productUrl]);
-
-  useEffect(() => {
-    if (product?.public_id && productUrl && activeTab === 'tiktok' && tiktokCanvasRef.current) {
-      console.log('✅ Generating TikTok QR');
-      setTimeout(() => {
-        generateQRCode(tiktokCanvasRef.current, 300, true);
+        if (canvasRef.current) {
+          generateQRCode(canvasRef.current, 200, false);
+        }
+        if (tiktokCanvasRef.current) {
+          generateQRCode(tiktokCanvasRef.current, 300, true);
+        }
       }, 150);
     }
-  }, [product, productUrl, activeTab]);
+  }, [product, productUrl]);
 
   if (!product?.public_id) {
     return (
