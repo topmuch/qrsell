@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { UserPlus, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { UserPlus, Loader2, CheckCircle2, AlertCircle, Copy, Key } from "lucide-react";
 import { createPageUrl } from "@/utils/index";
 import { format, addMonths } from "date-fns";
 import { fr } from "date-fns/locale";
