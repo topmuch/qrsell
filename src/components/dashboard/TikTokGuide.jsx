@@ -54,21 +54,19 @@ export default function TikTokGuide({ shopUrl }) {
         </Badge>
       </div>
 
-      {/* Video tutorial placeholder */}
+      {/* Video tutorial */}
       <Card className="overflow-hidden">
-        <div className="relative aspect-video bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800')] bg-cover bg-center opacity-30" />
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="relative z-10 w-20 h-20 rounded-full bg-white/90 flex items-center justify-center shadow-xl"
-          >
-            <Play className="w-8 h-8 text-[#ed477c] ml-1" />
-          </motion.button>
-          <div className="absolute bottom-4 left-4 text-white z-10">
-            <p className="font-medium">Tutoriel vidéo</p>
-            <p className="text-sm text-white/70">Comment utiliser TiktocQR sur TikTok</p>
-          </div>
+        <div className="aspect-video">
+          <iframe 
+            width="100%" 
+            height="100%" 
+            src="https://www.youtube.com/embed/2kcWlO7GfbQ" 
+            title="Guide TikTok - QRSell" 
+            frameBorder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowFullScreen
+            className="w-full h-full"
+          ></iframe>
         </div>
       </Card>
 

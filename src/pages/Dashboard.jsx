@@ -13,7 +13,9 @@ import {
   Check,
   ExternalLink,
   Loader2,
-  Sparkles
+  Sparkles,
+  Moon,
+  Sun
 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import SellerProfileForm from '@/components/dashboard/SellerProfileForm';
@@ -35,6 +37,7 @@ export default function Dashboard() {
   const [showProductForm, setShowProductForm] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -43,7 +46,25 @@ export default function Dashboard() {
       setUser(currentUser);
     };
     loadUser();
+
+    // Load theme from localStorage
+    const savedTheme = localStorage.getItem('dashboard-theme');
+    if (savedTheme === 'dark') {
+      setDarkMode(true);
+      document.documentElement.classList.add('dark');
+    }
   }, []);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    if (!darkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('dashboard-theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('dashboard-theme', 'light');
+    }
+  };
 
   // Check subscription
   const { data: subscriptions = [], isLoading: loadingSubscription } = useQuery({
@@ -204,18 +225,18 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50">
+      <header className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Logo size="md" />
             
             <div className="flex items-center gap-4">
               {seller && (
-                <div className="hidden md:flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2">
-                  <Store className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm text-gray-600 truncate max-w-[150px]">
+                <div className="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-2">
+                  <Store className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm text-gray-600 dark:text-gray-300 truncate max-w-[150px]">
                     {seller.shop_name}
                   </span>
                   <Button 
@@ -227,17 +248,25 @@ export default function Dashboard() {
                     {copied ? (
                       <Check className="w-3 h-3 text-green-500" />
                     ) : (
-                      <Copy className="w-3 h-3" />
+                      <Copy className="w-3 h-3 dark:text-gray-300" />
                     )}
                   </Button>
                   <a href={shopUrl} target="_blank" rel="noopener noreferrer">
                     <Button size="icon" variant="ghost" className="h-6 w-6">
-                      <ExternalLink className="w-3 h-3" />
+                      <ExternalLink className="w-3 h-3 dark:text-gray-300" />
                     </Button>
                   </a>
                 </div>
               )}
-              <Button variant="outline" size="sm" onClick={handleLogout}>
+              <Button 
+                size="icon" 
+                variant="ghost" 
+                onClick={toggleDarkMode}
+                className="dark:text-gray-300"
+              >
+                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleLogout} className="dark:text-gray-300 dark:border-gray-600">
                 Déconnexion
               </Button>
             </div>
