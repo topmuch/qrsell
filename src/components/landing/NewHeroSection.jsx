@@ -21,15 +21,15 @@ export default function NewHeroSection() {
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="space-y-8"
-          >
+            className="space-y-8">
+
             {/* Badge */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 bg-[#2563eb]/10 border border-[#2563eb]/20 rounded-full px-4 py-2"
-            >
+              className="inline-flex items-center gap-2 bg-[#2563eb]/10 border border-[#2563eb]/20 rounded-full px-4 py-2">
+
               <span className="w-2 h-2 bg-[#2563eb] rounded-full animate-pulse" />
               <span className="text-sm font-medium text-[#2563eb]">
                 Votre vitrine digitale, en un scan
@@ -38,16 +38,16 @@ export default function NewHeroSection() {
 
             {/* Main heading */}
             <div className="space-y-4">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-[#222222] leading-tight">
-                Transformez vos{' '}
-                <span className="text-[#2563eb] relative">
-                  produits
-                  <svg className="absolute -bottom-2 left-0 w-full" height="12" viewBox="0 0 200 12" fill="none">
-                    <path d="M2 10C60 4 140 4 198 10" stroke="#2563eb" strokeWidth="3" strokeLinecap="round"/>
-                  </svg>
-                </span>
-                {' '}en{' '}
-                <span className="text-[#2563eb]">ventes — en un scan</span>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-[#222222] leading-tight"> De TikTok à la vente : un scan WhatsApp suffit
+
+
+
+
+
+
+
+
+
               </h1>
               
               <p className="text-xl md:text-2xl text-gray-600 max-w-2xl leading-relaxed">
@@ -58,21 +58,21 @@ export default function NewHeroSection() {
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to={createPageUrl('SubscriptionRequest')}>
-                <Button 
-                  size="lg" 
-                  className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
-                >
+                <Button
+                  size="lg"
+                  className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group">
+
                   Commencer gratuitement
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
 
               <a href="#comment-ca-marche">
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   variant="outline"
-                  className="border-2 border-[#2563eb] text-[#2563eb] hover:bg-[#2563eb] hover:text-white text-lg px-8 py-6 rounded-full group transition-all duration-300"
-                >
+                  className="border-2 border-[#2563eb] text-[#2563eb] hover:bg-[#2563eb] hover:text-white text-lg px-8 py-6 rounded-full group transition-all duration-300">
+
                   <Play className="mr-2 w-5 h-5" />
                   Voir comment ça marche
                 </Button>
@@ -83,19 +83,19 @@ export default function NewHeroSection() {
             <div className="flex flex-wrap items-center gap-6 pt-4 text-sm text-gray-500">
               <div className="flex items-center gap-2">
                 <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span>Sans carte bancaire</span>
               </div>
               <div className="flex items-center gap-2">
                 <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span>Configuration en 2 minutes</span>
               </div>
               <div className="flex items-center gap-2">
                 <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span>Annulation libre</span>
               </div>
@@ -107,16 +107,16 @@ export default function NewHeroSection() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="relative"
-          >
-            <img 
+            className="relative">
+
+            <img
               src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6951cb5c7a9163102135b23b/3411ce811_dead40d7-fc51-4c1c-8cca-18669f66b408.png"
               alt="QRSell - Transformez vos produits en ventes en un scan"
-              className="w-full h-auto rounded-2xl shadow-2xl"
-            />
+              className="w-full h-auto rounded-2xl shadow-2xl" />
+
           </motion.div>
         </div>
       </div>
-    </section>
-  );
+    </section>);
+
 }
