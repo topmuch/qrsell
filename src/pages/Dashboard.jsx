@@ -14,8 +14,8 @@ import {
   ExternalLink,
   Loader2,
   Sparkles,
-  Moon,
-  Sun
+  Sun,
+  Moon
 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import SellerProfileForm from '@/components/dashboard/SellerProfileForm';
@@ -47,7 +47,7 @@ export default function Dashboard() {
     };
     loadUser();
 
-    // Load theme from localStorage
+    // Load theme preference
     const savedTheme = localStorage.getItem('dashboard-theme');
     if (savedTheme === 'dark') {
       setDarkMode(true);
@@ -233,6 +233,14 @@ export default function Dashboard() {
             <Logo size="md" />
             
             <div className="flex items-center gap-4">
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={toggleDarkMode}
+                className="dark:text-gray-300"
+              >
+                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </Button>
               {seller && (
                 <div className="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-2">
                   <Store className="w-4 h-4 text-gray-500 dark:text-gray-400" />
@@ -248,25 +256,17 @@ export default function Dashboard() {
                     {copied ? (
                       <Check className="w-3 h-3 text-green-500" />
                     ) : (
-                      <Copy className="w-3 h-3 dark:text-gray-300" />
+                      <Copy className="w-3 h-3" />
                     )}
                   </Button>
                   <a href={shopUrl} target="_blank" rel="noopener noreferrer">
                     <Button size="icon" variant="ghost" className="h-6 w-6">
-                      <ExternalLink className="w-3 h-3 dark:text-gray-300" />
+                      <ExternalLink className="w-3 h-3" />
                     </Button>
                   </a>
                 </div>
               )}
-              <Button 
-                size="icon" 
-                variant="ghost" 
-                onClick={toggleDarkMode}
-                className="dark:text-gray-300"
-              >
-                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleLogout} className="dark:text-gray-300 dark:border-gray-600">
+              <Button variant="outline" size="sm" onClick={handleLogout}>
                 Déconnexion
               </Button>
             </div>

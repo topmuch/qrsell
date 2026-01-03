@@ -60,8 +60,8 @@ export default function TikTokGuide({ shopUrl }) {
           <iframe 
             width="100%" 
             height="100%" 
-            src="https://www.youtube.com/embed/2kcWlO7GfbQ" 
-            title="Guide TikTok - QRSell" 
+            src="https://www.youtube.com/embed/2kcWlO7GfbQ?start=5" 
+            title="Guide TikTok - Vendez avec QRSell" 
             frameBorder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
             allowFullScreen
