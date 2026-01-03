@@ -146,7 +146,7 @@ export default function QRCodeDisplay({ product, seller, onClose }) {
           <TabsContent value="standard" className="mt-4">
             <div className="flex flex-col items-center">
               <div className="bg-white p-4 rounded-xl shadow-sm border">
-                <canvas ref={canvasRef} style={{display: 'block', width: '240px', height: '240px'}} />
+                <canvas ref={canvasRef} style={{display: 'block'}} />
               </div>
               <Button 
                 onClick={() => downloadQR(canvasRef.current, `${product.public_id}-qr.png`)}
@@ -161,7 +161,7 @@ export default function QRCodeDisplay({ product, seller, onClose }) {
           <TabsContent value="tiktok" className="mt-4">
             <div className="flex flex-col items-center">
               <div className="bg-gradient-to-br from-pink-50 to-pink-100 p-4 rounded-xl border border-pink-200">
-                <canvas ref={tiktokCanvasRef} style={{display: 'block', width: '340px', height: '420px'}} />
+                <canvas ref={tiktokCanvasRef} style={{display: 'block'}} />
               </div>
               <p className="text-sm text-gray-500 mt-2 text-center">
                 Optimisé pour vos vidéos et lives TikTok
