@@ -63,6 +63,9 @@ export default function SiteSettings() {
       queryClient.invalidateQueries(['site-settings']);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
+    },
+    onError: (error) => {
+      alert(`❌ Échec de la sauvegarde : ${error.message}`);
     }
   });
 
