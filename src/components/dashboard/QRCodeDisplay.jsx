@@ -78,8 +78,11 @@ export default function QRCodeDisplay({ product, seller, onClose }) {
   useEffect(() => {
     if (product?.public_id && productUrl) {
       console.log('✅ Triggering QR generation');
-      generateQRCode(canvasRef.current, 200, false);
-      generateQRCode(tiktokCanvasRef.current, 300, true);
+      // Small delay to ensure canvas is mounted in DOM
+      setTimeout(() => {
+        generateQRCode(canvasRef.current, 200, false);
+        generateQRCode(tiktokCanvasRef.current, 300, true);
+      }, 100);
     } else {
       console.log('❌ Cannot generate QR: missing public_id or URL');
     }
