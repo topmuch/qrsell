@@ -54,16 +54,7 @@ export default function Demo() {
       {/* Header */}
       <header className="bg-white border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to={createPageUrl('Home')}>
-              <Logo size="md" />
-            </Link>
-            <Link to={createPageUrl('Dashboard')}>
-              <Button className="bg-[#ed477c] hover:bg-[#d43a6b] text-white rounded-full">
-                Créer ma boutique
-              </Button>
-            </Link>
-          </div>
+
         </div>
       </header>
 
