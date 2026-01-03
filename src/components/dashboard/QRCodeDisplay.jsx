@@ -9,6 +9,7 @@ export default function QRCodeDisplay({ product, seller, onClose }) {
   const canvasRef = useRef(null);
   const tiktokCanvasRef = useRef(null);
   const [copied, setCopied] = useState(false);
+  const [activeTab, setActiveTab] = useState('standard');
   
   const productUrl = product?.public_id ? `${window.location.origin}/ProductPage?id=${product.public_id}` : '';
 
@@ -76,17 +77,22 @@ export default function QRCodeDisplay({ product, seller, onClose }) {
   };
 
   useEffect(() => {
-    if (product?.public_id && productUrl) {
-      console.log('✅ Triggering QR generation');
-      // Small delay to ensure canvas is mounted in DOM
+    if (product?.public_id && productUrl && canvasRef.current) {
+      console.log('✅ Generating standard QR');
       setTimeout(() => {
         generateQRCode(canvasRef.current, 200, false);
-        generateQRCode(tiktokCanvasRef.current, 300, true);
       }, 100);
-    } else {
-      console.log('❌ Cannot generate QR: missing public_id or URL');
     }
   }, [product, productUrl]);
+
+  useEffect(() => {
+    if (product?.public_id && productUrl && activeTab === 'tiktok' && tiktokCanvasRef.current) {
+      console.log('✅ Generating TikTok QR');
+      setTimeout(() => {
+        generateQRCode(tiktokCanvasRef.current, 300, true);
+      }, 150);
+    }
+  }, [product, productUrl, activeTab]);
 
   if (!product?.public_id) {
     return (
@@ -125,7 +131,7 @@ export default function QRCodeDisplay({ product, seller, onClose }) {
           <DialogTitle>QR Code - {product.name}</DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="standard" className="w-full">
+        <Tabs defaultValue="standard" className="w-full" onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="standard" className="flex items-center gap-2">
               <Smartphone className="w-4 h-4" />
