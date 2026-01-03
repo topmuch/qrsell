@@ -69,20 +69,12 @@ export default function Layout({ children, currentPageName }) {
                 Démo
               </Link>
               <Link 
-                to={createPageUrl('Campaigns')} 
+                to={createPageUrl('Campagnes')} 
                 className={`font-medium transition-colors ${
-                  isActive('Campaigns') ? 'text-[#2563eb]' : 'text-gray-700 hover:text-[#2563eb]'
+                  isActive('Campagnes') ? 'text-[#2563eb]' : 'text-gray-700 hover:text-[#2563eb]'
                 }`}
               >
                 Campagnes
-              </Link>
-              <Link 
-                to={createPageUrl('SubscriptionRequest')} 
-                className={`font-medium transition-colors ${
-                  isActive('SubscriptionRequest') ? 'text-[#2563eb]' : 'text-gray-700 hover:text-[#2563eb]'
-                }`}
-              >
-                Tarifs
               </Link>
             </div>
 
@@ -115,7 +107,7 @@ export default function Layout({ children, currentPageName }) {
                   >
                     Connexion
                   </Button>
-                  <Link to={createPageUrl('SubscriptionRequest')}>
+                  <Link to={createPageUrl('DevenirVendeur')}>
                     <Button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90 text-white rounded-full px-6 font-bold">
                       Devenir vendeur
                     </Button>
@@ -168,22 +160,13 @@ export default function Layout({ children, currentPageName }) {
                 Démo
               </Link>
               <Link 
-                to={createPageUrl('Campaigns')} 
+                to={createPageUrl('Campagnes')} 
                 className={`block py-2 font-medium ${
-                  isActive('Campaigns') ? 'text-[#2563eb]' : 'text-gray-700'
+                  isActive('Campagnes') ? 'text-[#2563eb]' : 'text-gray-700'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Campagnes
-              </Link>
-              <Link 
-                to={createPageUrl('SubscriptionRequest')} 
-                className={`block py-2 font-medium ${
-                  isActive('SubscriptionRequest') ? 'text-[#2563eb]' : 'text-gray-700'
-                }`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Tarifs
               </Link>
               {user ? (
                 <Link 
@@ -207,7 +190,7 @@ export default function Layout({ children, currentPageName }) {
                     Connexion
                   </Button>
                   <Link 
-                    to={createPageUrl('SubscriptionRequest')}
+                    to={createPageUrl('DevenirVendeur')}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90 text-white rounded-full font-bold">
