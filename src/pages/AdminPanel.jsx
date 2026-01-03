@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
-import { Shield, Users, Package, Activity, LogOut, Loader2, Megaphone, CreditCard, FileText, Moon, Sun, ChevronLeft, ChevronRight, BarChart3 } from 'lucide-react';
+import { Shield, Users, Package, Activity, LogOut, Loader2, Megaphone, CreditCard, FileText, Moon, Sun, ChevronLeft, ChevronRight, BarChart3, Bug } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import StatsOverview from '@/components/admin/StatsOverview';
 import SellerManagement from '@/components/admin/SellerManagement';
@@ -95,6 +95,7 @@ export default function AdminPanel() {
     { id: 'overview', label: 'Vue d\'ensemble', icon: BarChart3 },
     { id: 'sellers', label: 'Vendeurs', icon: Users },
     { id: 'products', label: 'Produits', icon: Package },
+    { id: 'debug', label: 'Debug QR', icon: Bug },
     { id: 'logs', label: 'Logs', icon: Activity },
     { id: 'banners', label: 'Bannières', icon: Megaphone },
     { id: 'campaigns', label: 'Campagnes', icon: Package },
@@ -183,6 +184,13 @@ export default function AdminPanel() {
           {activeTab === 'overview' && <StatsOverview />}
           {activeTab === 'sellers' && <SellerManagement />}
           {activeTab === 'products' && <ProductManagement />}
+          {activeTab === 'debug' && (
+            <iframe 
+              src="/DebugProducts" 
+              className="w-full h-[calc(100vh-100px)] border-0 rounded-lg bg-white dark:bg-gray-800"
+              title="Debug QR Codes"
+            />
+          )}
           {activeTab === 'logs' && <ActivityLogs />}
           {activeTab === 'banners' && (
             <iframe 
