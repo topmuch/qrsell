@@ -332,6 +332,61 @@ export default function Dashboard() {
             {/* KPIs */}
             <KPICards analytics={analytics} />
 
+            {/* Shop QR Code Card */}
+            {seller && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border dark:border-gray-700"
+              >
+                <div className="flex flex-col md:flex-row items-center gap-8">
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                      QR Code de votre boutique
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                      Scannez ce code pour accéder directement à votre vitrine en ligne. Partagez-le sur vos réseaux sociaux, flyers ou vidéos TikTok.
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={copyShopLink}
+                        className="dark:border-gray-600 dark:text-gray-300"
+                      >
+                        {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+                        Copier le lien
+                      </Button>
+                      <a href={shopUrl} target="_blank" rel="noopener noreferrer">
+                        <Button variant="outline" size="sm" className="dark:border-gray-600 dark:text-gray-300">
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          Voir la boutique
+                        </Button>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl shadow-xl">
+                    <canvas 
+                      ref={(canvas) => {
+                        if (canvas && seller) {
+                          import('qrcode').then(QRCode => {
+                            QRCode.toCanvas(canvas, shopUrl, {
+                              width: 300,
+                              margin: 2,
+                              color: {
+                                dark: '#2563eb',
+                                light: '#ffffff'
+                              }
+                            });
+                          });
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
             {/* Two columns layout */}
             <div className="grid lg:grid-cols-3 gap-8">
               {/* Left: Chart + Actions */}
