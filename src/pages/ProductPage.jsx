@@ -38,18 +38,17 @@ export default function ProductPage() {
   console.log('🔍 ProductPage - Product found:', product);
 
   // Get seller info
-  const { data: sellers = [], isLoading: loadingSeller } = useQuery({
+  const { data: seller, isLoading: loadingSeller } = useQuery({
     queryKey: ['seller', product?.seller_id],
     queryFn: async () => {
       console.log('📡 Fetching seller with ID:', product?.seller_id);
-      const result = await base44.entities.Seller.filter({ id: product?.seller_id });
-      console.log('👤 Seller fetch result:', result);
-      return result;
+      const allSellers = await base44.entities.Seller.list();
+      const foundSeller = allSellers.find(s => s.id === product?.seller_id);
+      console.log('👤 Seller fetch result:', foundSeller);
+      return foundSeller;
     },
     enabled: !!product?.seller_id
   });
-
-  const seller = sellers[0];
 
   console.log('🔍 ProductPage - Seller found:', seller);
 
