@@ -22,6 +22,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { motion } from 'framer-motion';
+import ManualClientCreation from '@/components/admin/ManualClientCreation';
 
 export default function SellerManagement() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -85,6 +86,14 @@ export default function SellerManagement() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Gestion des vendeurs</h2>
+          <p className="text-gray-500 dark:text-gray-400">Liste et gestion des comptes vendeurs</p>
+        </div>
+        <ManualClientCreation />
+      </div>
+
       {/* Search bar */}
       <Card className="dark:bg-gray-800 dark:border-gray-700">
         <CardContent className="pt-6">

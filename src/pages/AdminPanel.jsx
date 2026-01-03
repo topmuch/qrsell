@@ -12,6 +12,7 @@ import PlanManagement from '@/components/admin/PlanManagement';
 import SubscriptionRequestManagement from '@/components/admin/SubscriptionRequestManagement';
 import SubscriptionManagement from '@/components/admin/SubscriptionManagement';
 import ManualClientCreation from '@/components/admin/ManualClientCreation';
+import SiteSettings from '@/components/admin/SiteSettings';
 
 export default function AdminPanel() {
   const [user, setUser] = useState(null);
@@ -99,7 +100,8 @@ export default function AdminPanel() {
     { id: 'campaigns', label: 'Campagnes', icon: Package },
     { id: 'plans', label: 'Forfaits', icon: FileText },
     { id: 'requests', label: 'Demandes', icon: CreditCard },
-    { id: 'subscriptions', label: 'Abonnements', icon: CreditCard }
+    { id: 'subscriptions', label: 'Abonnements', icon: CreditCard },
+    { id: 'settings', label: 'Paramètres', icon: Shield }
   ];
 
   return (
@@ -210,6 +212,7 @@ export default function AdminPanel() {
             </div>
           )}
           {activeTab === 'subscriptions' && <SubscriptionManagement />}
+          {activeTab === 'settings' && <SiteSettings />}
         </div>
       </main>
     </div>
