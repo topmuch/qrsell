@@ -15,7 +15,13 @@ export default function ShopCustomization({ seller }) {
     logo_url: seller?.logo_url || '',
     banner_url: seller?.banner_url || '',
     primary_color: seller?.primary_color || '#ed477c',
-    secondary_color: seller?.secondary_color || '#ff6b9d'
+    secondary_color: seller?.secondary_color || '#ff6b9d',
+    address: seller?.address || '',
+    email: seller?.email || '',
+    tiktok: seller?.tiktok || '',
+    instagram: seller?.instagram || '',
+    facebook: seller?.facebook || '',
+    whatsapp_business: seller?.whatsapp_business || ''
   });
   const [uploading, setUploading] = useState({ logo: false, banner: false });
   
@@ -177,6 +183,78 @@ export default function ShopCustomization({ seller }) {
                 className="flex-1"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Contact Info */}
+        <div className="space-y-4 pt-4 border-t">
+          <h3 className="font-semibold text-gray-900">Informations de contact</h3>
+          
+          <div className="space-y-2">
+            <Label htmlFor="address">Adresse</Label>
+            <Textarea
+              id="address"
+              value={formData.address}
+              onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+              placeholder="123 Rue de Dakar, Sénégal"
+              rows={2}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">Email (optionnel)</Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+              placeholder="contact@maboutique.com"
+            />
+          </div>
+        </div>
+
+        {/* Social Media */}
+        <div className="space-y-4 pt-4 border-t">
+          <h3 className="font-semibold text-gray-900">Réseaux sociaux</h3>
+          
+          <div className="space-y-2">
+            <Label htmlFor="tiktok">TikTok</Label>
+            <Input
+              id="tiktok"
+              value={formData.tiktok}
+              onChange={(e) => setFormData(prev => ({ ...prev, tiktok: e.target.value }))}
+              placeholder="@maboutique"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="instagram">Instagram</Label>
+            <Input
+              id="instagram"
+              value={formData.instagram}
+              onChange={(e) => setFormData(prev => ({ ...prev, instagram: e.target.value }))}
+              placeholder="@maboutique"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="facebook">Facebook (URL)</Label>
+            <Input
+              id="facebook"
+              value={formData.facebook}
+              onChange={(e) => setFormData(prev => ({ ...prev, facebook: e.target.value }))}
+              placeholder="https://facebook.com/maboutique"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="whatsapp_business">WhatsApp Business (si différent)</Label>
+            <Input
+              id="whatsapp_business"
+              value={formData.whatsapp_business}
+              onChange={(e) => setFormData(prev => ({ ...prev, whatsapp_business: e.target.value }))}
+              placeholder="+221 77 123 45 67"
+            />
           </div>
         </div>
 
