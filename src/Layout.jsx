@@ -61,20 +61,28 @@ export default function Layout({ children, currentPageName }) {
                 Boutiques
               </Link>
               <Link 
+                to={createPageUrl('Demo')} 
+                className={`font-medium transition-colors ${
+                  isActive('Demo') ? 'text-[#2563eb]' : 'text-gray-700 hover:text-[#2563eb]'
+                }`}
+              >
+                Démo
+              </Link>
+              <Link 
+                to={createPageUrl('Campaigns')} 
+                className={`font-medium transition-colors ${
+                  isActive('Campaigns') ? 'text-[#2563eb]' : 'text-gray-700 hover:text-[#2563eb]'
+                }`}
+              >
+                Campagnes
+              </Link>
+              <Link 
                 to={createPageUrl('SubscriptionRequest')} 
                 className={`font-medium transition-colors ${
                   isActive('SubscriptionRequest') ? 'text-[#2563eb]' : 'text-gray-700 hover:text-[#2563eb]'
                 }`}
               >
-                Devenir vendeur
-              </Link>
-              <Link 
-                to={createPageUrl('TikTokGuidePublic')} 
-                className={`font-medium transition-colors ${
-                  isActive('TikTokGuidePublic') ? 'text-[#2563eb]' : 'text-gray-700 hover:text-[#2563eb]'
-                }`}
-              >
-                Guide
+                Tarifs
               </Link>
             </div>
 
@@ -108,8 +116,8 @@ export default function Layout({ children, currentPageName }) {
                     Connexion
                   </Button>
                   <Link to={createPageUrl('SubscriptionRequest')}>
-                    <Button className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-6">
-                      Commencer
+                    <Button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90 text-white rounded-full px-6 font-bold">
+                      Devenir vendeur
                     </Button>
                   </Link>
                 </>
@@ -151,22 +159,31 @@ export default function Layout({ children, currentPageName }) {
                 Boutiques
               </Link>
               <Link 
+                to={createPageUrl('Demo')} 
+                className={`block py-2 font-medium ${
+                  isActive('Demo') ? 'text-[#2563eb]' : 'text-gray-700'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Démo
+              </Link>
+              <Link 
+                to={createPageUrl('Campaigns')} 
+                className={`block py-2 font-medium ${
+                  isActive('Campaigns') ? 'text-[#2563eb]' : 'text-gray-700'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Campagnes
+              </Link>
+              <Link 
                 to={createPageUrl('SubscriptionRequest')} 
                 className={`block py-2 font-medium ${
                   isActive('SubscriptionRequest') ? 'text-[#2563eb]' : 'text-gray-700'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Devenir vendeur
-              </Link>
-              <Link 
-                to={createPageUrl('TikTokGuidePublic')} 
-                className={`block py-2 font-medium ${
-                  isActive('TikTokGuidePublic') ? 'text-[#2563eb]' : 'text-gray-700'
-                }`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Guide
+                Tarifs
               </Link>
               {user ? (
                 <Link 
@@ -193,8 +210,8 @@ export default function Layout({ children, currentPageName }) {
                     to={createPageUrl('SubscriptionRequest')}
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <Button className="w-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full">
-                      Commencer
+                    <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90 text-white rounded-full font-bold">
+                      Devenir vendeur
                     </Button>
                   </Link>
                 </div>
