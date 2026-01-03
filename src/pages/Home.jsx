@@ -5,6 +5,7 @@ import ShopShowcase from '@/components/landing/ShopShowcase';
 import WhyChooseUs from '@/components/landing/WhyChooseUs';
 import TestimonialSection from '@/components/landing/TestimonialSection';
 import PlansSection from '@/components/landing/PlansSection';
+import PricingPreview from '@/components/landing/PricingPreview';
 import FinalCTA from '@/components/landing/FinalCTA';
 import Footer from '@/components/landing/Footer';
 import { CheckCircle2, X } from 'lucide-react';
@@ -48,7 +49,7 @@ export default function Home() {
         <HowItWorksNew />
         <ShopShowcase />
         <WhyChooseUs />
-        <PlansSection />
+        <PricingPreview />
         <TestimonialSection />
         <FinalCTA />
       </main>
