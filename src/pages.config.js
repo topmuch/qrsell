@@ -17,6 +17,8 @@ import SubscriptionRequest from './pages/SubscriptionRequest';
 import TikTokGuide from './pages/TikTokGuide';
 import TikTokGuidePublic from './pages/TikTokGuidePublic';
 import Campaigns from './pages/Campaigns';
+import DevenirVendeur from './pages/DevenirVendeur';
+import Campagnes from './pages/Campagnes';
 import __Layout from './Layout.jsx';
 
 
@@ -40,6 +42,8 @@ export const PAGES = {
     "TikTokGuide": TikTokGuide,
     "TikTokGuidePublic": TikTokGuidePublic,
     "Campaigns": Campaigns,
+    "DevenirVendeur": DevenirVendeur,
+    "Campagnes": Campagnes,
 }
 
 export const pagesConfig = {
