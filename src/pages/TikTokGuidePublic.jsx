@@ -23,13 +23,19 @@ export default function TikTokGuidePublic() {
           </p>
         </div>
 
-        {/* Video placeholder */}
+        {/* Video YouTube */}
         <Card className="mb-12 overflow-hidden">
-          <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
-            <div className="text-center text-white">
-              <Play className="w-20 h-20 mx-auto mb-4 opacity-50" />
-              <p className="text-lg opacity-75">Vidéo tutoriel à venir</p>
-            </div>
+          <div className="aspect-video">
+            <iframe 
+              width="100%" 
+              height="100%" 
+              src="https://www.youtube.com/embed/2kcWlO7GfbQ" 
+              title="Guide TikTok - Vendez avec QRSell" 
+              frameBorder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+              className="w-full h-full"
+            ></iframe>
           </div>
         </Card>
 

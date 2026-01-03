@@ -42,14 +42,26 @@ export default function Shop() {
     return new Intl.NumberFormat('fr-FR').format(price);
   };
 
+  const generateProfessionalWhatsAppMessage = (product) => {
+    const now = new Date();
+    const hour = now.getHours();
+    
+    let timePhrase = "";
+    if (hour >= 6 && hour < 12) timePhrase = "ce matin";
+    else if (hour >= 12 && hour < 18) timePhrase = "cet après-midi";
+    else if (hour >= 18 && hour < 22) timePhrase = "ce soir";
+    else timePhrase = "aujourd'hui";
+
+    return `Bonjour, je souhaite commander le/la « ${product.name} » (${product.public_id}) à ${formatPrice(product.price)} FCFA.
+
+${product.image_url || ''}
+
+Est-ce toujours disponible ${timePhrase} ?`;
+  };
+
   const getWhatsAppLink = (product) => {
     const phone = seller?.whatsapp_number?.replace(/[^0-9]/g, '');
-    const message = encodeURIComponent(
-      `Bonjour ! Je suis intéressé(e) par:\n\n` +
-      `📦 *${product.name}*\n` +
-      `💰 Prix: ${formatPrice(product.price)} FCFA\n\n` +
-      `Réf: ${product.public_id}`
-    );
+    const message = encodeURIComponent(generateProfessionalWhatsAppMessage(product));
     return `https://wa.me/${phone}?text=${message}`;
   };
 

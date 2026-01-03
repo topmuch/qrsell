@@ -78,6 +78,23 @@ export default function ProductPage() {
     return new Intl.NumberFormat('fr-FR').format(price);
   };
 
+  const generateProfessionalWhatsAppMessage = () => {
+    const now = new Date();
+    const hour = now.getHours();
+    
+    let timePhrase = "";
+    if (hour >= 6 && hour < 12) timePhrase = "ce matin";
+    else if (hour >= 12 && hour < 18) timePhrase = "cet après-midi";
+    else if (hour >= 18 && hour < 22) timePhrase = "ce soir";
+    else timePhrase = "aujourd'hui";
+
+    return `Bonjour, je souhaite commander le/la « ${product.name} » (${product.public_id}) à ${formatPrice(product.price)} FCFA.
+
+${product.image_url || ''}
+
+Est-ce toujours disponible ${timePhrase} ?`;
+  };
+
   const handleWhatsAppClick = () => {
     if (!seller || !product) return;
 
@@ -97,10 +114,7 @@ export default function ProductPage() {
     });
 
     // Redirect to WhatsApp
-    const message = `Bonjour, je suis intéressé par *${product.name}* à ${formatPrice(product.price)} FCFA. 
-
-Vu sur votre boutique QRSell 🛍️`;
-    
+    const message = generateProfessionalWhatsAppMessage();
     const whatsappUrl = `https://wa.me/${seller.whatsapp_number.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };

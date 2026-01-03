@@ -1,248 +1,210 @@
-import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useState } from 'react';
+import { base44 } from '@/api/base44Client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, DollarSign, CheckCircle2, Clock } from "lucide-react";
-import CampaignCard from "../components/campaigns/CampaignCard";
-import ParticipationModal from "../components/campaigns/ParticipationModal";
+import { Loader2, TrendingUp, Download, CheckCircle2, Coins } from 'lucide-react';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
-export default function SellerCampaignsPage() {
+export default function SellerCampaigns() {
   const [user, setUser] = useState(null);
-  const [selectedCampaign, setSelectedCampaign] = useState(null);
-  const [showParticipationModal, setShowParticipationModal] = useState(false);
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-    };
-    checkAuth();
+  React.useEffect(() => {
+    base44.auth.me().then(setUser).catch(() => {});
   }, []);
 
-  const { data: campaigns = [], isLoading } = useQuery({
-    queryKey: ['activeCampaigns'],
+  const { data: campaigns = [], isLoading: loadingCampaigns } = useQuery({
+    queryKey: ['active-campaigns'],
     queryFn: async () => {
-      const allCampaigns = await base44.entities.Campaign.list('-created_date');
-      // Filtrer seulement les campagnes actives
+      const allCampaigns = await base44.entities.Campaign.list();
       return allCampaigns.filter(c => c.status === 'active');
-    },
+    }
   });
 
-  const { data: myParticipations = [] } = useQuery({
-    queryKey: ['myParticipations', user?.email],
-    queryFn: async () => {
-      if (!user) return [];
-      const allParticipations = await base44.entities.CampaignParticipation.list();
-      return allParticipations.filter(p => p.seller_email === user.email);
-    },
-    enabled: !!user,
+  const { data: myParticipations = [], isLoading: loadingParticipations } = useQuery({
+    queryKey: ['my-participations', user?.email],
+    queryFn: () => base44.entities.CampaignParticipation.filter({ seller_email: user.email }),
+    enabled: !!user?.email
   });
 
   const participateMutation = useMutation({
-    mutationFn: async (data) => {
+    mutationFn: async ({ campaignId, integrationType }) => {
       return await base44.entities.CampaignParticipation.create({
-        campaign_id: data.campaign_id,
+        campaign_id: campaignId,
         seller_email: user.email,
-        seller_name: user.full_name || user.email,
-        integration_type: data.integrationType,
+        seller_name: user.full_name,
+        integration_type: integrationType,
         status: 'pending',
-        earnings: 0,
-        participated_at: new Date().toISOString(),
-        scans_generated: 0,
-        conversions: 0,
-        payment_status: 'pending'
+        participated_at: new Date().toISOString()
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['myParticipations']);
-      setShowParticipationModal(false);
-      setSelectedCampaign(null);
-    },
+      queryClient.invalidateQueries(['my-participations']);
+    }
   });
 
-  const handleParticipate = (campaign) => {
-    setSelectedCampaign(campaign);
-    setShowParticipationModal(true);
-  };
-
-  const handleConfirmParticipation = (data) => {
-    participateMutation.mutate(data);
-  };
-
-  // Vérifier si l'utilisateur participe déjà à une campagne
   const hasParticipated = (campaignId) => {
     return myParticipations.some(p => p.campaign_id === campaignId);
   };
 
-  // Calculer les gains totaux
-  const totalEarnings = myParticipations.reduce((sum, p) => sum + (p.earnings || 0), 0);
-  const pendingEarnings = myParticipations
-    .filter(p => p.payment_status === 'pending')
-    .reduce((sum, p) => sum + (p.earnings || 0), 0);
+  const getTotalEarnings = () => {
+    return myParticipations.reduce((sum, p) => sum + (p.earnings || 0), 0);
+  };
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* En-tête */}
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Campagnes disponibles
-          </h1>
-          <p className="text-gray-600">
-            Participez aux campagnes de placement de produit et gagnez de l'argent
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">🔥 Campagnes sponsorisées</h1>
+          <p className="text-gray-600">Participez et gagnez jusqu'à 5 € par intégration</p>
         </div>
 
-        {/* Statistiques du vendeur */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Mes participations</p>
-                  <p className="text-2xl font-bold text-gray-900">{myParticipations.length}</p>
+        {/* Earnings card */}
+        <Card className="mb-8 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                  <Coins className="w-6 h-6 text-green-600" />
                 </div>
-                <TrendingUp className="w-10 h-10 text-indigo-500" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Gains totaux</p>
-                  <p className="text-2xl font-bold text-gray-900">{totalEarnings.toFixed(2)} €</p>
+                  <p className="text-sm text-gray-600">Mes gains totaux</p>
+                  <p className="text-2xl font-bold text-gray-900">{getTotalEarnings().toFixed(2)} €</p>
                 </div>
-                <DollarSign className="w-10 h-10 text-green-500" />
               </div>
-            </CardContent>
-          </Card>
+              <Badge variant="outline" className="bg-white">
+                {myParticipations.length} participation{myParticipations.length > 1 ? 's' : ''}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">En attente</p>
-                  <p className="text-2xl font-bold text-gray-900">{pendingEarnings.toFixed(2)} €</p>
-                </div>
-                <Clock className="w-10 h-10 text-amber-500" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Liste des campagnes */}
+        {/* Active campaigns */}
         <div className="mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Campagnes actives</h2>
-          
-          {isLoading ? (
+          <h2 className="text-xl font-bold mb-4">Campagnes disponibles</h2>
+          {loadingCampaigns ? (
             <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+              <Loader2 className="w-8 h-8 animate-spin" />
             </div>
           ) : campaigns.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <TrendingUp className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">Aucune campagne disponible pour le moment</p>
-              </CardContent>
-            </Card>
+            <Alert>
+              <TrendingUp className="w-4 h-4" />
+              <AlertDescription>
+                Aucune campagne disponible pour le moment. Revenez bientôt !
+              </AlertDescription>
+            </Alert>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {campaigns.map((campaign) => (
-                <CampaignCard
-                  key={campaign.id}
-                  campaign={campaign}
-                  onParticipate={handleParticipate}
-                  hasParticipated={hasParticipated(campaign.id)}
-                />
+            <div className="grid md:grid-cols-2 gap-6">
+              {campaigns.map(campaign => (
+                <Card key={campaign.id} className="overflow-hidden">
+                  {campaign.product_image && (
+                    <img 
+                      src={campaign.product_image} 
+                      alt={campaign.product_name}
+                      className="w-full h-48 object-cover"
+                    />
+                  )}
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span>{campaign.product_name}</span>
+                      <Badge variant="default" className="bg-green-600">
+                        {campaign.commission_value} {campaign.commission_type === 'fixed' ? '€' : '%'}
+                      </Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-sm text-gray-600">{campaign.product_description}</p>
+                    
+                    {campaign.script_text && (
+                      <div className="bg-blue-50 p-3 rounded-lg">
+                        <p className="text-xs font-semibold text-blue-900 mb-1">📝 Script suggéré :</p>
+                        <p className="text-sm text-blue-800">{campaign.script_text}</p>
+                      </div>
+                    )}
+
+                    {hasParticipated(campaign.id) ? (
+                      <div className="flex items-center gap-2 text-green-600 bg-green-50 p-3 rounded-lg">
+                        <CheckCircle2 className="w-5 h-5" />
+                        <span className="font-medium">Vous participez à cette campagne</span>
+                      </div>
+                    ) : (
+                      <Button
+                        onClick={() => participateMutation.mutate({ 
+                          campaignId: campaign.id, 
+                          integrationType: 'live' 
+                        })}
+                        disabled={participateMutation.isPending}
+                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600"
+                      >
+                        {participateMutation.isPending ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Participation en cours...
+                          </>
+                        ) : (
+                          <>
+                            <TrendingUp className="w-4 h-4 mr-2" />
+                            Participer maintenant
+                          </>
+                        )}
+                      </Button>
+                    )}
+
+                    {campaign.product_link && (
+                      <a 
+                        href={campaign.product_link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:underline block text-center"
+                      >
+                        Voir le produit →
+                      </a>
+                    )}
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}
         </div>
 
-        {/* Mes participations */}
+        {/* My participations history */}
         {myParticipations.length > 0 && (
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Mes participations</h2>
-            <div className="space-y-4">
-              {myParticipations.map((participation) => {
-                const campaign = campaigns.find(c => c.id === participation.campaign_id);
-                
-                const statusColors = {
-                  pending: "bg-yellow-100 text-yellow-800",
-                  approved: "bg-green-100 text-green-800",
-                  rejected: "bg-red-100 text-red-800",
-                  completed: "bg-blue-100 text-blue-800"
-                };
-
-                const statusLabels = {
-                  pending: "En attente",
-                  approved: "Approuvée",
-                  rejected: "Rejetée",
-                  completed: "Terminée"
-                };
-
-                return (
-                  <Card key={participation.id}>
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 mb-1">
-                            {campaign?.product_name || 'Campagne supprimée'}
-                          </h3>
-                          <p className="text-sm text-gray-600 mb-3">
-                            {campaign?.partner_name || ''}
+            <h2 className="text-xl font-bold mb-4">Mon historique</h2>
+            <Card>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  {myParticipations.map(participation => {
+                    const campaign = campaigns.find(c => c.id === participation.campaign_id);
+                    return (
+                      <div key={participation.id} className="flex items-center justify-between border-b pb-4 last:border-0">
+                        <div>
+                          <p className="font-medium">{campaign?.product_name || 'Campagne'}</p>
+                          <p className="text-sm text-gray-500">
+                            {participation.integration_type} • {new Date(participation.participated_at).toLocaleDateString('fr-FR')}
                           </p>
-                          
-                          <div className="flex flex-wrap gap-2">
-                            <Badge className={statusColors[participation.status]}>
-                              {statusLabels[participation.status]}
-                            </Badge>
-                            <Badge variant="outline">
-                              {participation.integration_type}
-                            </Badge>
-                            {participation.earnings > 0 && (
-                              <Badge className="bg-green-100 text-green-800">
-                                +{participation.earnings.toFixed(2)} €
-                              </Badge>
-                            )}
-                          </div>
                         </div>
-
-                        {participation.status === 'approved' && (
-                          <CheckCircle2 className="w-6 h-6 text-green-500" />
-                        )}
+                        <div className="text-right">
+                          <p className="font-bold text-green-600">{participation.earnings || 0} €</p>
+                          <Badge variant="outline">{participation.status}</Badge>
+                        </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        )}
-
-        {/* Modal de participation */}
-        {showParticipationModal && selectedCampaign && (
-          <ParticipationModal
-            campaign={selectedCampaign}
-            sellerInfo={user}
-            onConfirm={handleConfirmParticipation}
-            onCancel={() => {
-              setShowParticipationModal(false);
-              setSelectedCampaign(null);
-            }}
-          />
         )}
       </div>
     </div>

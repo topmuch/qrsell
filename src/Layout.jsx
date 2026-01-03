@@ -53,6 +53,14 @@ export default function Layout({ children, currentPageName }) {
                 Accueil
               </Link>
               <Link 
+                to={createPageUrl('AllShops')} 
+                className={`font-medium transition-colors ${
+                  isActive('AllShops') ? 'text-[#2563eb]' : 'text-gray-700 hover:text-[#2563eb]'
+                }`}
+              >
+                Boutiques
+              </Link>
+              <Link 
                 to={createPageUrl('SubscriptionRequest')} 
                 className={`font-medium transition-colors ${
                   isActive('SubscriptionRequest') ? 'text-[#2563eb]' : 'text-gray-700 hover:text-[#2563eb]'
@@ -73,11 +81,23 @@ export default function Layout({ children, currentPageName }) {
             {/* Auth Buttons */}
             <div className="hidden md:flex items-center gap-3">
               {user ? (
-                <Link to={createPageUrl('Dashboard')}>
-                  <Button className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-6">
-                    Mon Dashboard
+                <>
+                  <Link to={createPageUrl('Dashboard')}>
+                    <Button className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-6">
+                      Mon Dashboard
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    className="text-red-600 hover:text-red-700"
+                    onClick={async () => {
+                      await base44.auth.logout();
+                      window.location.href = createPageUrl('Home');
+                    }}
+                  >
+                    Déconnexion
                   </Button>
-                </Link>
+                </>
               ) : (
                 <>
                   <Button 
@@ -120,6 +140,15 @@ export default function Layout({ children, currentPageName }) {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Accueil
+              </Link>
+              <Link 
+                to={createPageUrl('AllShops')} 
+                className={`block py-2 font-medium ${
+                  isActive('AllShops') ? 'text-[#2563eb]' : 'text-gray-700'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Boutiques
               </Link>
               <Link 
                 to={createPageUrl('SubscriptionRequest')} 
