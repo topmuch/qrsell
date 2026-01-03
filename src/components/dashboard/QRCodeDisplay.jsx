@@ -10,11 +10,24 @@ export default function QRCodeDisplay({ product, seller, onClose }) {
   const tiktokCanvasRef = useRef(null);
   const [copied, setCopied] = useState(false);
   
-  const productUrl = `${window.location.origin}/ProductPage?id=${product.public_id}`;
+  const productUrl = product?.public_id ? `${window.location.origin}/ProductPage?id=${product.public_id}` : '';
+
+  console.log('🔍 QRCodeDisplay - Product:', product);
+  console.log('🔍 QRCodeDisplay - Product URL:', productUrl);
 
   // Generate real QR code using qrcode library
   const generateQRCode = async (canvas, size, withBranding = false) => {
-    if (!canvas) return;
+    if (!canvas) {
+      console.log('❌ QR Generation: Canvas is null');
+      return;
+    }
+    
+    if (!productUrl) {
+      console.log('❌ QR Generation: Product URL is empty');
+      return;
+    }
+
+    console.log('✅ Generating QR code for:', productUrl);
     
     const ctx = canvas.getContext('2d');
     
@@ -28,52 +41,61 @@ export default function QRCodeDisplay({ product, seller, onClose }) {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Generate QR code
-    const tempCanvas = document.createElement('canvas');
-    await QRCode.toCanvas(tempCanvas, productUrl, {
-      width: size,
-      margin: 0,
-      color: {
-        dark: '#1f2937',
-        light: '#ffffff'
+    try {
+      // Generate QR code
+      const tempCanvas = document.createElement('canvas');
+      await QRCode.toCanvas(tempCanvas, productUrl, {
+        width: size,
+        margin: 0,
+        color: {
+          dark: '#1f2937',
+          light: '#ffffff'
+        }
+      });
+      
+      // Draw QR code on main canvas
+      ctx.drawImage(tempCanvas, padding, padding);
+      console.log('✅ QR code generated successfully');
+      
+      if (withBranding) {
+        // Add branding below QR
+        const textY = size + padding + 20;
+        
+        ctx.fillStyle = '#ed477c';
+        ctx.font = 'bold 18px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Scan pour acheter sur WhatsApp !', canvas.width / 2, textY);
+        
+        ctx.fillStyle = '#6b7280';
+        ctx.font = '14px Inter, sans-serif';
+        ctx.fillText('QRSell', canvas.width / 2, textY + 30);
       }
-    });
-    
-    // Draw QR code on main canvas
-    ctx.drawImage(tempCanvas, padding, padding);
-    
-    if (withBranding) {
-      // Add branding below QR
-      const textY = size + padding + 20;
-      
-      ctx.fillStyle = '#ed477c';
-      ctx.font = 'bold 18px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('Scan pour acheter sur WhatsApp !', canvas.width / 2, textY);
-      
-      ctx.fillStyle = '#6b7280';
-      ctx.font = '14px Inter, sans-serif';
-      ctx.fillText('QRSell', canvas.width / 2, textY + 30);
+    } catch (error) {
+      console.error('❌ Error generating QR code:', error);
     }
   };
 
   useEffect(() => {
-    if (product?.public_id) {
+    if (product?.public_id && productUrl) {
+      console.log('✅ Triggering QR generation');
       generateQRCode(canvasRef.current, 200, false);
       generateQRCode(tiktokCanvasRef.current, 300, true);
+    } else {
+      console.log('❌ Cannot generate QR: missing public_id or URL');
     }
-  }, [product]);
+  }, [product, productUrl]);
 
   if (!product?.public_id) {
     return (
       <Dialog open={true} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>QR Code - {product.name}</DialogTitle>
+            <DialogTitle>QR Code - {product?.name || 'Produit'}</DialogTitle>
           </DialogHeader>
           <div className="py-8 text-center">
-            <p className="text-gray-600 mb-4">ID public du produit manquant.</p>
-            <p className="text-sm text-gray-500">Veuillez recréer ce produit pour générer un QR code.</p>
+            <p className="text-red-600 mb-4 font-semibold">⚠️ ID public du produit manquant.</p>
+            <p className="text-sm text-gray-500">Public ID actuel: {product?.public_id || 'null'}</p>
+            <p className="text-sm text-gray-500 mt-2">Veuillez utiliser le bouton "Corriger automatiquement" dans le panneau admin.</p>
           </div>
         </DialogContent>
       </Dialog>

@@ -1,139 +1,150 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Store, Loader2, ArrowLeft, Share2, Check } from 'lucide-react';
-import Logo from '@/components/ui/Logo';
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils/index';
+import { Card, CardContent } from "@/components/ui/card";
+import { 
+  Share2, 
+  MessageCircle, 
+  Loader2,
+  AlertCircle,
+  QrCode
+} from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import QRCode from 'qrcode';
 
 export default function ProductPage() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const publicId = urlParams.get('id');
-  const [copied, setCopied] = React.useState(false);
-  const qrCanvasRef = useRef(null);
+  const params = new URLSearchParams(window.location.search);
+  const publicId = params.get('id');
+  const [showQR, setShowQR] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+
+  console.log('🔍 ProductPage - Public ID from URL:', publicId);
 
   // Get product by public_id
   const { data: products = [], isLoading: loadingProduct } = useQuery({
     queryKey: ['product', publicId],
-    queryFn: () => base44.entities.Product.filter({ public_id: publicId }),
+    queryFn: async () => {
+      console.log('📡 Fetching product with public_id:', publicId);
+      const result = await base44.entities.Product.filter({ public_id: publicId });
+      console.log('📦 Product fetch result:', result);
+      return result;
+    },
     enabled: !!publicId
   });
 
   const product = products[0];
 
-  // Get seller
+  console.log('🔍 ProductPage - Product found:', product);
+
+  // Get seller info
   const { data: sellers = [], isLoading: loadingSeller } = useQuery({
     queryKey: ['seller', product?.seller_id],
-    queryFn: () => base44.entities.Seller.filter({ id: product?.seller_id }),
+    queryFn: async () => {
+      console.log('📡 Fetching seller with ID:', product?.seller_id);
+      const result = await base44.entities.Seller.filter({ id: product?.seller_id });
+      console.log('👤 Seller fetch result:', result);
+      return result;
+    },
     enabled: !!product?.seller_id
   });
 
   const seller = sellers[0];
 
+  console.log('🔍 ProductPage - Seller found:', seller);
+
   // Track product view
   useEffect(() => {
     if (product && seller) {
+      console.log('📊 Tracking analytics - Product view');
+      console.log('Product ID:', product.id);
+      console.log('Seller ID:', seller.id);
+      console.log('Public ID:', product.public_id);
+      
       base44.entities.Analytics.create({
         product_id: product.id,
         seller_id: seller.id,
         product_public_id: product.public_id,
         event_type: 'view_product',
         user_agent: navigator.userAgent
-      }).catch(() => {});
+      }).then(() => {
+        console.log('✅ Analytics tracked successfully');
+      }).catch((error) => {
+        console.error('❌ Analytics tracking error:', error);
+      });
     }
-  }, [product?.id, seller?.id]);
+  }, [product, seller]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('fr-FR').format(price);
   };
 
-  const getWhatsAppLink = () => {
-    if (!seller || !product) return '#';
-    const phone = seller.whatsapp_number?.replace(/[^0-9]/g, '');
-    const message = encodeURIComponent(
-      `Bonjour ! Je suis intéressé(e) par:\n\n` +
-      `📦 *${product.name}*\n` +
-      `💰 Prix: ${formatPrice(product.price)} FCFA\n\n` +
-      `Réf: ${product.public_id}`
-    );
-    return `https://wa.me/${phone}?text=${message}`;
-  };
-
   const handleWhatsAppClick = () => {
+    if (!seller || !product) return;
+
+    console.log('📱 WhatsApp click - Tracking analytics');
+    
+    // Track click
     base44.entities.Analytics.create({
       product_id: product.id,
       seller_id: seller.id,
       product_public_id: product.public_id,
       event_type: 'whatsapp_click',
       user_agent: navigator.userAgent
-    }).catch(() => {});
+    }).then(() => {
+      console.log('✅ WhatsApp click tracked');
+    }).catch((error) => {
+      console.error('❌ WhatsApp tracking error:', error);
+    });
+
+    // Redirect to WhatsApp
+    const message = `Bonjour, je suis intéressé par *${product.name}* à ${formatPrice(product.price)} FCFA. 
+
+Vu sur votre boutique QRSell 🛍️`;
+    
+    const whatsappUrl = `https://wa.me/${seller.whatsapp_number.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
-  const shareProduct = async () => {
-    const url = window.location.href;
+  const handleShare = async () => {
+    const shareUrl = window.location.href;
+    const shareText = `Découvrez ${product.name} à ${formatPrice(product.price)} FCFA sur QRSell`;
+
     if (navigator.share) {
-      await navigator.share({
-        title: product?.name,
-        text: `Découvrez ${product?.name} à ${formatPrice(product?.price)} FCFA`,
-        url
-      });
-    } else {
-      navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  // Generate QR code
-  useEffect(() => {
-    if (!qrCanvasRef.current) return;
-    
-    const canvas = qrCanvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const size = 120;
-    const moduleCount = 25;
-    const moduleSize = size / moduleCount;
-    
-    canvas.width = size;
-    canvas.height = size;
-    
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, size, size);
-    
-    const hash = (window.location.href || '').split('').reduce((acc, char, i) => {
-      return acc + char.charCodeAt(0) * (i + 1);
-    }, 0);
-    
-    ctx.fillStyle = '#1f2937';
-    
-    const drawPositionPattern = (x, y, s) => {
-      ctx.fillRect(x, y, s * 7, s * 7);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(x + s, y + s, s * 5, s * 5);
-      ctx.fillStyle = '#1f2937';
-      ctx.fillRect(x + s * 2, y + s * 2, s * 3, s * 3);
-    };
-    
-    drawPositionPattern(0, 0, moduleSize);
-    drawPositionPattern(moduleSize * 18, 0, moduleSize);
-    drawPositionPattern(0, moduleSize * 18, moduleSize);
-    
-    for (let row = 0; row < moduleCount; row++) {
-      for (let col = 0; col < moduleCount; col++) {
-        if ((row < 9 && col < 9) || (row < 9 && col > 15) || (row > 15 && col < 9)) continue;
-        
-        const seed = (hash + row * 31 + col * 17) % 100;
-        if (seed > 45) {
-          ctx.fillStyle = '#1f2937';
-          ctx.fillRect(col * moduleSize, row * moduleSize, moduleSize - 1, moduleSize - 1);
+      try {
+        await navigator.share({
+          title: product.name,
+          text: shareText,
+          url: shareUrl
+        });
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          setShowShareModal(true);
         }
       }
+    } else {
+      setShowShareModal(true);
     }
-  }, [product]);
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+  };
+
+  if (!publicId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="max-w-md w-full mx-4">
+          <CardContent className="pt-6 text-center">
+            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Produit introuvable</h2>
+            <p className="text-gray-600">L'identifiant du produit est manquant dans l'URL.</p>
+            <p className="text-sm text-gray-500 mt-2">URL actuelle: {window.location.href}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (loadingProduct || loadingSeller) {
     return (
@@ -145,137 +156,216 @@ export default function ProductPage() {
 
   if (!product) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
-        <Store className="w-16 h-16 text-gray-300 mb-4" />
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Produit introuvable</h1>
-        <p className="text-gray-500 mb-6">Ce produit n'existe pas ou a été supprimé.</p>
-        <Link to={createPageUrl('Home')}>
-          <Button variant="outline">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Retour à l'accueil
-          </Button>
-        </Link>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="max-w-md w-full mx-4">
+          <CardContent className="pt-6 text-center">
+            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Produit introuvable</h2>
+            <p className="text-gray-600">Ce produit n'existe pas ou a été supprimé.</p>
+            <p className="text-sm text-gray-500 mt-2">Public ID recherché: {publicId}</p>
+            <p className="text-sm text-gray-500">Vérifiez que le QR code est correct.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!seller) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="max-w-md w-full mx-4">
+          <CardContent className="pt-6 text-center">
+            <AlertCircle className="w-12 h-12 text-orange-500 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Vendeur introuvable</h2>
+            <p className="text-gray-600">Les informations du vendeur ne sont pas disponibles.</p>
+            <p className="text-sm text-gray-500 mt-2">Seller ID: {product.seller_id}</p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50/50 to-white">
-      {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            {seller && (
-              <Link to={createPageUrl(`Shop?slug=${seller.shop_slug}`)}>
-                <div className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                  <ArrowLeft className="w-5 h-5 text-gray-400" />
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2563eb] to-[#3b82f6] flex items-center justify-center text-white font-bold text-sm">
-                    {seller.shop_name?.[0]?.toUpperCase() || 'B'}
+    <div 
+      className="min-h-screen py-8 px-4"
+      style={{
+        background: `linear-gradient(135deg, ${seller.primary_color || '#ed477c'}15 0%, ${seller.secondary_color || '#ff6b9d'}15 100%)`
+      }}
+    >
+      <div className="max-w-2xl mx-auto">
+        {/* Product Card */}
+        <Card className="overflow-hidden">
+          {/* Product Image */}
+          <div className="relative h-80 bg-gray-100">
+            {product.image_url ? (
+              <img 
+                src={product.image_url} 
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <span className="text-4xl">📦</span>
                   </div>
-                  <span className="font-medium text-gray-900 hidden sm:inline">{seller.shop_name}</span>
+                  <p className="text-gray-500">Aucune image</p>
                 </div>
-              </Link>
-            )}
-            <Logo size="sm" />
-          </div>
-        </div>
-      </header>
-
-      {/* Product content */}
-      <main className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-2xl mx-auto"
-        >
-          <Card className="overflow-hidden">
-            {/* Product image */}
-            <div className="aspect-square bg-gray-100 relative">
-              {product.image_url ? (
-                <img 
-                  src={product.image_url} 
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-pink-50 to-pink-100">
-                  <Store className="w-24 h-24 text-pink-200" />
-                </div>
-              )}
-              
-              {/* QR overlay */}
-              <div className="absolute bottom-4 right-4 bg-white p-2 rounded-xl shadow-lg">
-                <canvas ref={qrCanvasRef} className="w-[60px] h-[60px]" />
               </div>
-
-              {/* Share button */}
+            )}
+            
+            {/* Share & QR buttons */}
+            <div className="absolute top-4 right-4 flex gap-2">
               <Button
                 size="icon"
                 variant="secondary"
-                className="absolute top-4 right-4 bg-white/90 hover:bg-white shadow-lg"
-                onClick={shareProduct}
+                className="rounded-full bg-white/90 hover:bg-white"
+                onClick={() => setShowQR(true)}
               >
-                {copied ? (
-                  <Check className="w-4 h-4 text-green-500" />
-                ) : (
-                  <Share2 className="w-4 h-4" />
-                )}
+                <QrCode className="w-5 h-5" />
+              </Button>
+              <Button
+                size="icon"
+                variant="secondary"
+                className="rounded-full bg-white/90 hover:bg-white"
+                onClick={handleShare}
+              >
+                <Share2 className="w-5 h-5" />
               </Button>
             </div>
+          </div>
 
-            {/* Product info */}
-            <div className="p-6">
-              <Badge variant="outline" className="mb-3 text-xs">
-                {product.public_id}
-              </Badge>
-              
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                {product.name}
-              </h1>
-              
-              <p className="text-3xl font-bold text-[#2563eb] mb-4">
+          {/* Product Info */}
+          <CardContent className="p-6 space-y-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">{product.name}</h1>
+              <p 
+                className="text-3xl font-bold mb-4"
+                style={{ color: seller.primary_color || '#ed477c' }}
+              >
                 {formatPrice(product.price)} FCFA
               </p>
-              
               {product.description && (
-                <p className="text-gray-600 mb-6">
-                  {product.description}
-                </p>
-              )}
-
-              {/* WhatsApp CTA */}
-              <a 
-                href={getWhatsAppLink()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block"
-                onClick={handleWhatsAppClick}
-              >
-                <Button className="w-full h-14 bg-[#25D366] hover:bg-[#1fb855] text-white text-lg">
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  Commander sur WhatsApp
-                </Button>
-              </a>
-
-              {seller && (
-                <p className="text-center text-sm text-gray-500 mt-4">
-                  Vendu par <span className="font-medium">{seller.shop_name}</span>
-                </p>
+                <p className="text-gray-600 leading-relaxed">{product.description}</p>
               )}
             </div>
-          </Card>
-        </motion.div>
-      </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t mt-12 py-6">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-sm text-gray-500 mb-2">
-            Propulsé par
-          </p>
-          <Logo size="sm" />
-        </div>
-      </footer>
+            {/* Seller Info */}
+            <div className="border-t pt-4">
+              <p className="text-sm text-gray-500 mb-1">Vendu par</p>
+              <div className="flex items-center gap-3">
+                {seller.logo_url && (
+                  <img 
+                    src={seller.logo_url} 
+                    alt={seller.shop_name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                )}
+                <div>
+                  <p className="font-semibold text-gray-900">{seller.shop_name || seller.full_name}</p>
+                  {seller.is_verified && (
+                    <span className="text-xs text-green-600">✓ Vendeur vérifié</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* WhatsApp CTA */}
+            <Button
+              onClick={handleWhatsAppClick}
+              className="w-full h-14 text-lg font-semibold"
+              style={{
+                background: `linear-gradient(135deg, ${seller.primary_color || '#ed477c'} 0%, ${seller.secondary_color || '#ff6b9d'} 100%)`
+              }}
+            >
+              <MessageCircle className="w-6 h-6 mr-2" />
+              Commander sur WhatsApp
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* QR Code Modal */}
+      {showQR && (
+        <QRCodeModal 
+          productUrl={window.location.href}
+          onClose={() => setShowQR(false)}
+        />
+      )}
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <ShareModal
+          url={window.location.href}
+          title={product.name}
+          onClose={() => setShowShareModal(false)}
+        />
+      )}
     </div>
+  );
+}
+
+// QR Code Modal Component
+function QRCodeModal({ productUrl, onClose }) {
+  const canvasRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (canvasRef.current) {
+      QRCode.toCanvas(canvasRef.current, productUrl, {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: '#1f2937',
+          light: '#ffffff'
+        }
+      });
+    }
+  }, [productUrl]);
+
+  return (
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>QR Code de ce produit</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col items-center py-4">
+          <div className="bg-white p-4 rounded-xl border">
+            <canvas ref={canvasRef} />
+          </div>
+          <p className="text-sm text-gray-500 mt-4 text-center">
+            Scannez ce code pour accéder directement à ce produit
+          </p>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// Share Modal Component
+function ShareModal({ url, title, onClose }) {
+  const [copied, setCopied] = React.useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Partager ce produit</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="p-3 bg-gray-50 rounded-lg">
+            <p className="text-sm text-gray-600 break-all">{url}</p>
+          </div>
+          <Button onClick={handleCopy} className="w-full">
+            {copied ? 'Lien copié !' : 'Copier le lien'}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
