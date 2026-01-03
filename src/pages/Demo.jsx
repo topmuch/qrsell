@@ -239,8 +239,8 @@ export default function Demo() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="mt-16 text-center bg-gradient-to-br from-[#ed477c] to-[#ff6b9d] rounded-3xl p-12 max-w-4xl mx-auto">
+            transition={{ delay: 0.8 }} className="bg-gray-700 mt-16 mx-auto p-12 text-center rounded-3xl from-[#ed477c] to-[#ff6b9d] max-w-4xl">
+
 
             <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Prêt à transformer vos vues en ventes ?
@@ -251,8 +251,8 @@ export default function Demo() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to={createPageUrl('Dashboard')}>
                 <Button
-                  size="lg"
-                  className="bg-white text-[#ed477c] hover:bg-gray-50 rounded-full px-8 py-6 text-lg font-bold shadow-xl">
+                  size="lg" className="bg-white text-[#ed4a7e] px-8 py-6 text-lg font-bold rounded-full inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 h-10 hover:bg-gray-50 shadow-xl">
+
 
                   Créer ma boutique — 5000 CFA/mois
                   <ArrowRight className="ml-2 w-5 h-5" />
