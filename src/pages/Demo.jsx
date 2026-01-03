@@ -9,28 +9,28 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils/index';
 
 const demoProducts = [
-  {
-    id: 'DEMO-001',
-    name: 'Robe Wax Élégante',
-    price: 25000,
-    image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=400&fit=crop',
-    description: 'Robe africaine moderne en tissu wax authentique'
-  },
-  {
-    id: 'DEMO-002',
-    name: 'Sac en Cuir Artisanal',
-    price: 18000,
-    image: 'https://images.unsplash.com/photo-1591561954557-26941169b49e?w=400&h=400&fit=crop',
-    description: 'Sac à main fait main, cuir véritable'
-  },
-  {
-    id: 'DEMO-003',
-    name: 'Montre Classique',
-    price: 12000,
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop',
-    description: 'Montre élégante pour toutes occasions'
-  }
-];
+{
+  id: 'DEMO-001',
+  name: 'Robe Wax Élégante',
+  price: 25000,
+  image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=400&fit=crop',
+  description: 'Robe africaine moderne en tissu wax authentique'
+},
+{
+  id: 'DEMO-002',
+  name: 'Sac en Cuir Artisanal',
+  price: 18000,
+  image: 'https://images.unsplash.com/photo-1591561954557-26941169b49e?w=400&h=400&fit=crop',
+  description: 'Sac à main fait main, cuir véritable'
+},
+{
+  id: 'DEMO-003',
+  name: 'Montre Classique',
+  price: 12000,
+  image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop',
+  description: 'Montre élégante pour toutes occasions'
+}];
+
 
 const demoWhatsApp = '+221771234567';
 
@@ -73,16 +73,16 @@ export default function Demo() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="max-w-4xl mx-auto text-center space-y-6"
-          >
+            className="max-w-4xl mx-auto text-center space-y-6">
+
             <Badge className="bg-[#ed477c]/10 text-[#ed477c] border-[#ed477c]/20 px-4 py-2">
               <Sparkles className="w-4 h-4 mr-2" />
               Démo interactive
             </Badge>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#222222]">
-              Découvrez Verdiq TikQR{' '}
-              <span className="text-[#ed477c]">en action</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#222222]">Découvrez QR sell en action
+
+
             </h1>
 
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -107,8 +107,8 @@ export default function Demo() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl p-8 shadow-sm border mb-8 max-w-5xl mx-auto"
-          >
+            className="bg-white rounded-2xl p-8 shadow-sm border mb-8 max-w-5xl mx-auto">
+
             <div className="flex items-center gap-4 mb-4">
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#ed477c] to-[#ff6b9d] flex items-center justify-center text-white text-2xl font-bold">
                 M
@@ -125,20 +125,20 @@ export default function Demo() {
 
           {/* Products grid */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {demoProducts.map((product, index) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + index * 0.1 }}
-              >
+            {demoProducts.map((product, index) =>
+            <motion.div
+              key={product.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + index * 0.1 }}>
+
                 <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group">
                   <div className="aspect-square bg-gray-100 relative overflow-hidden">
-                    <img 
-                      src={product.image} 
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                    <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+
                     <div className="absolute top-3 right-3">
                       <Badge className="bg-white/90 text-[#ed477c] border-white/50">
                         Démo
@@ -163,12 +163,12 @@ export default function Demo() {
                       {product.description}
                     </p>
 
-                    <a 
-                      href={getWhatsAppLink(product)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block"
-                    >
+                    <a
+                    href={getWhatsAppLink(product)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block">
+
                       <Button className="w-full bg-[#25D366] hover:bg-[#1fb855] text-white">
                         <MessageCircle className="w-4 h-4 mr-2" />
                         Commander sur WhatsApp
@@ -177,7 +177,7 @@ export default function Demo() {
                   </div>
                 </Card>
               </motion.div>
-            ))}
+            )}
           </div>
 
           {/* QR Code section */}
@@ -185,8 +185,8 @@ export default function Demo() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="mt-16 max-w-3xl mx-auto"
-          >
+            className="mt-16 max-w-3xl mx-auto">
+
             <Card className="p-8 text-center">
               <QrCode className="w-16 h-16 text-[#ed477c] mx-auto mb-4" />
               
@@ -249,8 +249,8 @@ export default function Demo() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
-            className="mt-16 text-center bg-gradient-to-br from-[#ed477c] to-[#ff6b9d] rounded-3xl p-12 max-w-4xl mx-auto"
-          >
+            className="mt-16 text-center bg-gradient-to-br from-[#ed477c] to-[#ff6b9d] rounded-3xl p-12 max-w-4xl mx-auto">
+
             <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Prêt à transformer vos vues en ventes ?
             </h3>
@@ -259,10 +259,10 @@ export default function Demo() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to={createPageUrl('Dashboard')}>
-                <Button 
+                <Button
                   size="lg"
-                  className="bg-white text-[#ed477c] hover:bg-gray-50 rounded-full px-8 py-6 text-lg font-bold shadow-xl"
-                >
+                  className="bg-white text-[#ed477c] hover:bg-gray-50 rounded-full px-8 py-6 text-lg font-bold shadow-xl">
+
                   Créer ma boutique — 5 €/mois
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
@@ -284,6 +284,6 @@ export default function Demo() {
           </p>
         </div>
       </footer>
-    </div>
-  );
+    </div>);
+
 }
