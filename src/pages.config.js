@@ -3,9 +3,12 @@ import AdminBanners from './pages/AdminBanners';
 import AdminCampaigns from './pages/AdminCampaigns';
 import AdminPanel from './pages/AdminPanel';
 import AllShops from './pages/AllShops';
+import Campagnes from './pages/Campagnes';
+import Campaigns from './pages/Campaigns';
 import Dashboard from './pages/Dashboard';
 import DebugProducts from './pages/DebugProducts';
 import Demo from './pages/Demo';
+import DevenirVendeur from './pages/DevenirVendeur';
 import Home from './pages/Home';
 import ProductPage from './pages/ProductPage';
 import ProfileSetup from './pages/ProfileSetup';
@@ -16,9 +19,6 @@ import SubscriptionExpired from './pages/SubscriptionExpired';
 import SubscriptionRequest from './pages/SubscriptionRequest';
 import TikTokGuide from './pages/TikTokGuide';
 import TikTokGuidePublic from './pages/TikTokGuidePublic';
-import Campaigns from './pages/Campaigns';
-import DevenirVendeur from './pages/DevenirVendeur';
-import Campagnes from './pages/Campagnes';
 import __Layout from './Layout.jsx';
 
 
@@ -28,9 +28,12 @@ export const PAGES = {
     "AdminCampaigns": AdminCampaigns,
     "AdminPanel": AdminPanel,
     "AllShops": AllShops,
+    "Campagnes": Campagnes,
+    "Campaigns": Campaigns,
     "Dashboard": Dashboard,
     "DebugProducts": DebugProducts,
     "Demo": Demo,
+    "DevenirVendeur": DevenirVendeur,
     "Home": Home,
     "ProductPage": ProductPage,
     "ProfileSetup": ProfileSetup,
@@ -41,9 +44,6 @@ export const PAGES = {
     "SubscriptionRequest": SubscriptionRequest,
     "TikTokGuide": TikTokGuide,
     "TikTokGuidePublic": TikTokGuidePublic,
-    "Campaigns": Campaigns,
-    "DevenirVendeur": DevenirVendeur,
-    "Campagnes": Campagnes,
 }
 
 export const pagesConfig = {

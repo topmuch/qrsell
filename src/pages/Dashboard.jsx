@@ -27,6 +27,7 @@ import PerformanceChart from '@/components/dashboard/PerformanceChart';
 import ActionCards from '@/components/dashboard/ActionCards';
 import SellerStatus from '@/components/dashboard/SellerStatus';
 import BannerDisplay from '@/components/dashboard/BannerDisplay';
+import Banner from '@/components/Banner';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Dashboard() {
@@ -247,7 +248,7 @@ export default function Dashboard() {
       {/* Main content */}
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Banner publicitaire */}
-        <BannerDisplay position="dashboard" />
+        <Banner position="dashboard" />
 
         {/* Welcome banner */}
         <motion.div
