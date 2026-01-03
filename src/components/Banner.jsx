@@ -10,23 +10,29 @@ export default function Banner({ position }) {
   const { data: banner, isLoading } = useQuery({
     queryKey: ['banner', position],
     queryFn: async () => {
-      const now = new Date();
-      const banners = await base44.entities.Banner.filter({
-        position: position,
-        is_active: true
-      });
+      try {
+        const now = new Date();
+        const banners = await base44.entities.Banner.list();
+        
+        // Filter for active banners with matching position and valid dates
+        const activeBanner = banners.find(b => {
+          if (!b.is_active || b.position !== position) return false;
+          
+          const startDate = new Date(b.start_date);
+          const endDate = new Date(b.end_date);
+          
+          return startDate <= now && endDate >= now;
+        });
 
-      // Filter by date range on client side
-      const activeBanner = banners.find(b => {
-        const startDate = new Date(b.start_date);
-        const endDate = new Date(b.end_date);
-        return startDate <= now && endDate >= now;
-      });
-
-      return activeBanner || null;
+        return activeBanner || null;
+      } catch (error) {
+        console.error('Error loading banner:', error);
+        return null;
+      }
     },
-    staleTime: 60000, // Cache for 1 minute
-    refetchInterval: 60000 // Refetch every minute
+    staleTime: 60000,
+    refetchInterval: 60000,
+    retry: false
   });
 
   if (isLoading || !banner || dismissed) return null;
