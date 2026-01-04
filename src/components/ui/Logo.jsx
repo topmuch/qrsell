@@ -8,3 +8,26 @@ export default function Logo({ size = 'md', showText = true, variant = 'light' }
   };
 
   const { width } = sizes[size];
+
+  // Ajuste le chemin selon où tu stockes ton logo
+  const logoSrc = variant === 'light' 
+    ? '/logo-light.png' 
+    : '/logo-dark.png';
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <img 
+        src={logoSrc} 
+        alt="Logo" 
+        width={width} 
+        height="auto"
+        style={{ display: 'block' }}
+      />
+      {showText && (
+        <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
+          QRsell
+        </span>
+      )}
+    </div>
+  );
+}
