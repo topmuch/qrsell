@@ -269,19 +269,19 @@ export default function Shop() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t mt-16 py-8">
+      <footer className="bg-white border-t mt-16 py-10">
         <div className="container mx-auto px-4">
           {/* Payment Methods */}
           {seller.payment_methods && seller.payment_methods.length > 0 && (
-            <div className="mb-8">
-              <h3 className="text-center font-semibold text-gray-700 mb-4">Méthodes de paiement</h3>
-              <div className="flex flex-wrap items-center justify-center gap-6">
+            <div className="mb-10">
+              <h3 className="text-center font-semibold text-gray-700 mb-6 text-lg">Méthodes de paiement</h3>
+              <div className="flex flex-wrap items-center justify-center gap-8">
                 {seller.payment_methods.map((logo, index) => (
                   <img 
                     key={index}
                     src={logo} 
-                    alt={`Méthode de paiement ${index + 1}`}
-                    className="h-8 object-contain grayscale hover:grayscale-0 transition-all"
+                    alt={`Paiement ${index + 1}`}
+                    className="h-10 object-contain hover:scale-110 transition-transform"
                   />
                 ))}
               </div>
@@ -290,15 +290,15 @@ export default function Shop() {
 
           {/* Partners */}
           {seller.partner_logos && seller.partner_logos.length > 0 && (
-            <div className="mb-8">
-              <h3 className="text-center font-semibold text-gray-700 mb-4">Nos partenaires</h3>
-              <div className="flex flex-wrap items-center justify-center gap-8">
+            <div className="mb-10">
+              <h3 className="text-center font-semibold text-gray-700 mb-6 text-lg">Nos partenaires</h3>
+              <div className="flex flex-wrap items-center justify-center gap-10">
                 {seller.partner_logos.map((logo, index) => (
                   <img 
                     key={index}
                     src={logo} 
                     alt={`Partenaire ${index + 1}`}
-                    className="h-12 object-contain grayscale hover:grayscale-0 transition-all"
+                    className="h-14 object-contain hover:scale-110 transition-transform"
                   />
                 ))}
               </div>
@@ -306,11 +306,11 @@ export default function Shop() {
           )}
 
           {/* Footer Info */}
-          <div className="border-t pt-6">
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
+          <div className="border-t pt-8">
+            <div className="grid md:grid-cols-2 gap-8 mb-6">
               <div>
-                <h3 className="font-bold text-gray-900 mb-3">{seller.shop_name}</h3>
-                <div className="space-y-2 text-sm text-gray-600">
+                <h3 className="font-bold text-gray-900 mb-4 text-lg">{seller.shop_name}</h3>
+                <div className="space-y-3 text-sm text-gray-600">
                   {seller.address && (
                     <p className="flex items-start gap-2">
                       <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" /> 
@@ -332,13 +332,17 @@ export default function Shop() {
                 </div>
               </div>
               
-              <div className="text-center md:text-right">
-                <p className="text-sm text-gray-500 mb-2">Boutique propulsée par</p>
-                <p className="text-lg font-bold text-[#2563eb]">QRSell</p>
+              <div className="flex flex-col items-end justify-end">
+                <p className="text-xs text-gray-400 mb-1">Propulsé par</p>
+                <img 
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6951cb5c7a9163102135b23b/bd5ee73bd_qrsell-logo.png" 
+                  alt="QRSell" 
+                  className="h-5 opacity-40 hover:opacity-60 transition-opacity"
+                />
               </div>
             </div>
             
-            <div className="border-t pt-4 text-center text-xs text-gray-500">
+            <div className="border-t pt-4 text-center text-xs text-gray-400">
               © {new Date().getFullYear()} {seller.shop_name}. Tous droits réservés.
             </div>
           </div>
