@@ -107,6 +107,7 @@ export default function BannerForm({ banner, onSubmit, onCancel }) {
                             <SelectItem value="footer">Pied de page</SelectItem>
                             <SelectItem value="sidebar">Barre latérale</SelectItem>
                             <SelectItem value="product-page">Page produit</SelectItem>
+                            <SelectItem value="dashboard">Dashboard</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
