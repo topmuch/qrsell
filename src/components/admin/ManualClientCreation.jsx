@@ -408,11 +408,11 @@ export default function ManualClientCreation() {
                         <SelectValue placeholder="Choisir la durée" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="1">1 mois</SelectItem>
-                        <SelectItem value="2">2 mois</SelectItem>
-                        <SelectItem value="3">3 mois</SelectItem>
-                        <SelectItem value="6">6 mois</SelectItem>
-                        <SelectItem value="12">12 mois</SelectItem>
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(month => (
+                          <SelectItem key={month} value={month.toString()}>
+                            {month} mois
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>

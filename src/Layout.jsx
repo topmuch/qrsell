@@ -90,10 +90,7 @@ export default function Layout({ children, currentPageName }) {
                   <Button 
                     variant="ghost" 
                     className="text-red-600 hover:text-red-700"
-                    onClick={async () => {
-                      await base44.auth.logout();
-                      window.location.href = createPageUrl('Home');
-                    }}
+                    onClick={() => base44.auth.logout(createPageUrl('Home'))}
                   >
                     Déconnexion
                   </Button>
