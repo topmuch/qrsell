@@ -297,6 +297,228 @@ export default function SubscriptionManagement() {
         )}
       </div>
 
+      {/* Dialog Créer abonnement */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Créer un abonnement</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Email de l'utilisateur *</Label>
+              <Input
+                type="email"
+                value={formData.user_email}
+                onChange={(e) => setFormData({ ...formData, user_email: e.target.value })}
+                placeholder="client@example.com"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Forfait *</Label>
+              <Select
+                value={formData.plan_code}
+                onValueChange={(value) => setFormData({ ...formData, plan_code: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {plans.map(plan => (
+                    <SelectItem key={plan.id} value={plan.code}>
+                      {plan.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Durée (mois) *</Label>
+                <Input
+                  type="number"
+                  value={formData.duration_months}
+                  onChange={(e) => setFormData({ ...formData, duration_months: e.target.value })}
+                  placeholder="3"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Date de début *</Label>
+                <Input
+                  type="date"
+                  value={formData.start_date}
+                  onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <Label>Paiement déjà reçu</Label>
+              <Switch
+                checked={formData.payment_recorded}
+                onCheckedChange={(checked) => setFormData({ ...formData, payment_recorded: checked })}
+              />
+            </div>
+
+            {formData.payment_recorded && (
+              <>
+                <div className="space-y-2">
+                  <Label>Méthode de paiement</Label>
+                  <Select
+                    value={formData.payment_method}
+                    onValueChange={(value) => setFormData({ ...formData, payment_method: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionnez..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="wave">Wave</SelectItem>
+                      <SelectItem value="cash">Cash</SelectItem>
+                      <SelectItem value="bank_transfer">Virement bancaire</SelectItem>
+                      <SelectItem value="mobile_money">Mobile Money</SelectItem>
+                      <SelectItem value="other">Autre</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Note de paiement</Label>
+                  <Textarea
+                    value={formData.payment_note}
+                    onChange={(e) => setFormData({ ...formData, payment_note: e.target.value })}
+                    placeholder="Détails du paiement..."
+                    rows={2}
+                  />
+                </div>
+              </>
+            )}
+
+            <div className="flex gap-2 justify-end pt-4 border-t">
+              <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+                Annuler
+              </Button>
+              <Button 
+                onClick={handleCreate}
+                className="bg-blue-600 hover:bg-blue-700"
+                disabled={!formData.user_email || !formData.plan_code || !formData.duration_months || !formData.start_date}
+              >
+                Créer l'abonnement
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Modifier abonnement */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Modifier l'abonnement</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Email de l'utilisateur</Label>
+              <Input
+                type="email"
+                value={formData.user_email}
+                disabled
+                className="bg-gray-100"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Forfait *</Label>
+              <Select
+                value={formData.plan_code}
+                onValueChange={(value) => setFormData({ ...formData, plan_code: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {plans.map(plan => (
+                    <SelectItem key={plan.id} value={plan.code}>
+                      {plan.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Durée (mois) *</Label>
+                <Input
+                  type="number"
+                  value={formData.duration_months}
+                  onChange={(e) => setFormData({ ...formData, duration_months: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Date de début *</Label>
+                <Input
+                  type="date"
+                  value={formData.start_date}
+                  onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <Label>Paiement reçu</Label>
+              <Switch
+                checked={formData.payment_recorded}
+                onCheckedChange={(checked) => setFormData({ ...formData, payment_recorded: checked })}
+              />
+            </div>
+
+            {formData.payment_recorded && (
+              <>
+                <div className="space-y-2">
+                  <Label>Méthode de paiement</Label>
+                  <Select
+                    value={formData.payment_method}
+                    onValueChange={(value) => setFormData({ ...formData, payment_method: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionnez..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="wave">Wave</SelectItem>
+                      <SelectItem value="cash">Cash</SelectItem>
+                      <SelectItem value="bank_transfer">Virement bancaire</SelectItem>
+                      <SelectItem value="mobile_money">Mobile Money</SelectItem>
+                      <SelectItem value="other">Autre</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Note de paiement</Label>
+                  <Textarea
+                    value={formData.payment_note}
+                    onChange={(e) => setFormData({ ...formData, payment_note: e.target.value })}
+                    placeholder="Détails du paiement..."
+                    rows={2}
+                  />
+                </div>
+              </>
+            )}
+
+            <div className="flex gap-2 justify-end pt-4 border-t">
+              <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+                Annuler
+              </Button>
+              <Button 
+                onClick={handleEdit}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                Enregistrer
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Dialog Enregistrer paiement */}
       <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
         <DialogContent>
