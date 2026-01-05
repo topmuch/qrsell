@@ -110,6 +110,47 @@ export default function ActivityLogs() {
     return `Il y a ${Math.floor(seconds / 86400)}j`;
   };
 
+  // Filtered and paginated logs
+  const filteredLogs = useMemo(() => {
+    let filtered = [...analytics];
+
+    // Filter by event type
+    if (eventTypeFilter !== 'all') {
+      filtered = filtered.filter(log => log.event_type === eventTypeFilter);
+    }
+
+    // Filter by seller
+    if (sellerFilter !== 'all') {
+      filtered = filtered.filter(log => log.seller_id === sellerFilter);
+    }
+
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(log => {
+        const sellerName = getSellerName(log.seller_id).toLowerCase();
+        const productName = log.product_id ? getProductName(log.product_id).toLowerCase() : '';
+        const publicId = log.product_public_id?.toLowerCase() || '';
+        return sellerName.includes(query) || productName.includes(query) || publicId.includes(query);
+      });
+    }
+
+    return filtered;
+  }, [analytics, eventTypeFilter, sellerFilter, searchQuery, products, sellers]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredLogs.length / logsPerPage);
+  const paginatedLogs = useMemo(() => {
+    const startIndex = (currentPage - 1) * logsPerPage;
+    return filteredLogs.slice(startIndex, startIndex + logsPerPage);
+  }, [filteredLogs, currentPage]);
+
+  // Get unique sellers for filter
+  const uniqueSellers = useMemo(() => {
+    const sellerIds = [...new Set(analytics.map(a => a.seller_id))];
+    return sellers.filter(s => sellerIds.includes(s.id));
+  }, [analytics, sellers]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
