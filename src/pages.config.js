@@ -19,6 +19,8 @@ import SubscriptionExpired from './pages/SubscriptionExpired';
 import SubscriptionRequest from './pages/SubscriptionRequest';
 import TikTokGuide from './pages/TikTokGuide';
 import TikTokGuidePublic from './pages/TikTokGuidePublic';
+import PromotionProduct from './pages/PromotionProduct';
+import CouponRedeem from './pages/CouponRedeem';
 import __Layout from './Layout.jsx';
 
 
@@ -44,6 +46,8 @@ export const PAGES = {
     "SubscriptionRequest": SubscriptionRequest,
     "TikTokGuide": TikTokGuide,
     "TikTokGuidePublic": TikTokGuidePublic,
+    "PromotionProduct": PromotionProduct,
+    "CouponRedeem": CouponRedeem,
 }
 
 export const pagesConfig = {
