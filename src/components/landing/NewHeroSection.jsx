@@ -110,7 +110,7 @@ export default function NewHeroSection() {
             className="relative">
 
             <img
-              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6951cb5c7a9163102135b23b/3411ce811_dead40d7-fc51-4c1c-8cca-18669f66b408.png"
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6951cb5c7a9163102135b23b/ae9deed86_724cf080-26c6-4723-8d29-1caf2d3fd097.png"
               alt="QRSell - Transformez vos produits en ventes en un scan"
               className="w-full h-auto rounded-2xl shadow-2xl" />
 
