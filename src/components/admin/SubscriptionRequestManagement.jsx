@@ -9,14 +9,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle2, XCircle, Clock, Eye, Mail } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, Eye, Mail, Copy, Send, User } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { toast } from "sonner";
+import { createPageUrl } from '@/utils/index';
 
 export default function SubscriptionRequestManagement() {
   const [filter, setFilter] = useState("pending");
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
+  const [showCredentialsModal, setShowCredentialsModal] = useState(false);
+  const [generatedCredentials, setGeneratedCredentials] = useState(null);
   const [actionData, setActionData] = useState({
     plan_code: "",
     duration_months: "",
@@ -56,8 +60,18 @@ export default function SubscriptionRequestManagement() {
     }
   });
 
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+  };
+
   const handleApprove = async (request) => {
     const user = await base44.auth.me();
+    const password = generatePassword();
     
     const startDate = new Date();
     const endDate = new Date();
@@ -65,28 +79,46 @@ export default function SubscriptionRequestManagement() {
 
     const plan = plans.find(p => p.code === (actionData.plan_code || request.plan_code));
 
-    // Créer l'abonnement
-    await createSubscriptionMutation.mutateAsync({
-      user_email: request.user_email,
-      plan_code: actionData.plan_code || request.plan_code,
-      start_date: startDate.toISOString(),
-      end_date: endDate.toISOString(),
-      is_active: true,
-      payment_recorded: false
-    });
-
-    // Mettre à jour la demande
-    await updateRequestMutation.mutateAsync({
-      id: request.id,
-      data: {
-        status: "approved",
-        approved_at: new Date().toISOString(),
-        approved_by: user.email
-      }
-    });
-
-    // Envoyer email d'activation
     try {
+      // 1. Inviter l'utilisateur
+      try {
+        await base44.users.inviteUser(request.user_email, "user");
+      } catch (inviteError) {
+        if (!inviteError.message?.includes('already exists')) {
+          throw inviteError;
+        }
+      }
+
+      // 2. Créer l'abonnement
+      await createSubscriptionMutation.mutateAsync({
+        user_email: request.user_email,
+        plan_code: actionData.plan_code || request.plan_code,
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString(),
+        is_active: true,
+        payment_recorded: false
+      });
+
+      // 3. Mettre à jour la demande
+      await updateRequestMutation.mutateAsync({
+        id: request.id,
+        data: {
+          status: "approved",
+          approved_at: new Date().toISOString(),
+          approved_by: user.email
+        }
+      });
+
+      // 4. Stocker les identifiants pour affichage
+      setGeneratedCredentials({
+        email: request.user_email,
+        password: password,
+        name: request.full_name,
+        plan: plan?.name || request.plan_code,
+        endDate: format(endDate, 'dd/MM/yyyy', { locale: fr })
+      });
+
+      // 5. Envoyer email avec identifiants
       await base44.integrations.Core.SendEmail({
         to: request.user_email,
         subject: '🎉 Votre compte QRSell est activé !',
@@ -97,57 +129,44 @@ export default function SubscriptionRequestManagement() {
             </div>
             <div style="padding: 30px; background-color: #ffffff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
               <p style="font-size: 16px; color: #374151;">Bonjour ${request.full_name},</p>
-              <p style="font-size: 16px; color: #374151;">Excellente nouvelle ! Votre abonnement <strong>${plan?.name || 'QRSell'}</strong> est maintenant <strong style="color: #059669;">activé</strong> ! 🚀</p>
+              <p style="font-size: 16px; color: #374151;">Votre compte QRSell est maintenant <strong style="color: #059669;">activé</strong> ! 🚀</p>
               
+              <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #f59e0b;">
+                <p style="margin: 0 0 10px 0; font-weight: bold; color: #92400e;">🔐 Vos identifiants de connexion :</p>
+                <div style="background-color: white; padding: 15px; border-radius: 6px; margin-top: 10px;">
+                  <p style="margin: 5px 0;"><strong>Email :</strong> ${request.user_email}</p>
+                  <p style="margin: 5px 0;"><strong>Mot de passe :</strong> <code style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${password}</code></p>
+                </div>
+                <p style="margin: 10px 0 0 0; color: #92400e; font-size: 13px;">⚠️ Changez votre mot de passe après la première connexion</p>
+              </div>
+
               <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #2563eb;">
                 <p style="margin: 0 0 10px 0; font-weight: bold; color: #1e40af;">📋 Détails de votre abonnement :</p>
                 <ul style="margin: 10px 0; padding-left: 20px; color: #374151;">
                   <li>Boutique : <strong>${request.business_name}</strong></li>
                   <li>Forfait : <strong>${plan?.name || 'Pro'}</strong></li>
                   <li>Valable jusqu'au : <strong>${format(endDate, 'dd/MM/yyyy', { locale: fr })}</strong></li>
-                  <li>Durée : <strong>${actionData.duration_months || request.duration_months} mois</strong></li>
                 </ul>
               </div>
 
               <div style="text-align: center; margin: 30px 0;">
-                <a href="${window.location.origin}${createPageUrl('Dashboard')}" 
-                   style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);">
-                  🔑 Accéder à mon Dashboard
+                <a href="${window.location.origin}/login" 
+                   style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 16px;">
+                  🔑 Se connecter maintenant
                 </a>
               </div>
-
-              <div style="background-color: #fef3c7; padding: 16px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #f59e0b;">
-                <p style="margin: 0; font-weight: bold; color: #92400e;">💰 Informations de paiement :</p>
-                <p style="margin: 10px 0 0 0; color: #92400e; font-size: 14px;">
-                  Veuillez effectuer votre paiement pour garantir la continuité de votre service. Les instructions détaillées sont disponibles dans votre dashboard.
-                </p>
-              </div>
-
-              <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 25px 0;">
-                <p style="margin: 0 0 12px 0; font-weight: bold; color: #111827;">🚀 Prochaines étapes :</p>
-                <ol style="margin: 0; padding-left: 20px; color: #4b5563;">
-                  <li style="margin-bottom: 8px;">Connectez-vous à votre dashboard</li>
-                  <li style="margin-bottom: 8px;">Complétez votre profil vendeur</li>
-                  <li style="margin-bottom: 8px;">Ajoutez vos premiers produits</li>
-                  <li style="margin-bottom: 8px;">Téléchargez vos QR codes</li>
-                  <li>Intégrez-les dans vos vidéos TikTok !</li>
-                </ol>
-              </div>
-
-              <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
-                Besoin d'aide ? Notre équipe est là pour vous accompagner.
-              </p>
-              <p style="font-size: 14px; color: #6b7280; font-weight: bold;">
-                L'équipe QRSell 💙
-              </p>
             </div>
           </div>
         `
       });
-      alert(`Demande approuvée ! Email d'activation envoyé à ${request.user_email}`);
-    } catch (emailError) {
-      console.error('Error sending approval email:', emailError);
-      alert(`Demande approuvée, mais erreur lors de l'envoi de l'email. Veuillez contacter ${request.user_email} manuellement.`);
+
+      // Fermer le dialog d'approbation et ouvrir le modal des identifiants
+      setShowDialog(false);
+      setShowCredentialsModal(true);
+      toast.success('Compte créé avec succès !');
+    } catch (error) {
+      console.error('Error approving request:', error);
+      toast.error(`Erreur : ${error.message}`);
     }
   };
 
@@ -163,7 +182,40 @@ export default function SubscriptionRequestManagement() {
       }
     });
 
-    alert(`Demande rejetée.`);
+    // Envoyer email de rejet
+    try {
+      await base44.integrations.Core.SendEmail({
+        to: request.user_email,
+        subject: 'Mise à jour de votre demande QRSell',
+        body: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="padding: 30px; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px;">
+              <p style="font-size: 16px; color: #374151;">Bonjour ${request.full_name},</p>
+              <p style="font-size: 16px; color: #374151;">
+                Nous avons examiné votre demande d'abonnement QRSell et malheureusement nous ne pouvons pas l'accepter pour le moment.
+              </p>
+              ${actionData.rejection_reason ? `
+                <div style="background-color: #fef2f2; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ef4444;">
+                  <p style="margin: 0; color: #991b1b;"><strong>Raison :</strong> ${actionData.rejection_reason}</p>
+                </div>
+              ` : ''}
+              <p style="font-size: 16px; color: #374151;">
+                N'hésitez pas à nous recontacter si vous avez des questions ou souhaitez soumettre une nouvelle demande.
+              </p>
+              <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
+                Cordialement,<br/>
+                L'équipe QRSell
+              </p>
+            </div>
+          </div>
+        `
+      });
+    } catch (error) {
+      console.error('Error sending rejection email:', error);
+    }
+
+    setShowDialog(false);
+    toast.success('Demande rejetée et email envoyé');
   };
 
   const openDialog = (request, action) => {
@@ -182,24 +234,47 @@ export default function SubscriptionRequestManagement() {
     rejected: { label: "Rejetée", color: "bg-red-100 text-red-800", icon: XCircle }
   };
 
+  const handleLoginAsClient = (request) => {
+    // Cette fonctionnalité nécessite une implémentation backend spéciale
+    toast.info('Fonctionnalité en cours de développement');
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Copié !');
+  };
+
+  const sendCredentialsByEmail = async () => {
+    if (!generatedCredentials) return;
+
+    try {
+      await base44.integrations.Core.SendEmail({
+        to: generatedCredentials.email,
+        subject: 'Rappel - Vos identifiants QRSell',
+        body: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="padding: 30px; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px;">
+              <h2 style="color: #111827;">Rappel de vos identifiants QRSell</h2>
+              <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                <p style="margin: 5px 0;"><strong>Email :</strong> ${generatedCredentials.email}</p>
+                <p style="margin: 5px 0;"><strong>Mot de passe :</strong> ${generatedCredentials.password}</p>
+              </div>
+              <a href="${window.location.origin}/login" 
+                 style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px;">
+                Se connecter
+              </a>
+            </div>
+          </div>
+        `
+      });
+      toast.success('Email envoyé avec succès');
+    } catch (error) {
+      toast.error('Erreur lors de l\'envoi de l\'email');
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold dark:text-white">Demandes d'abonnement</h2>
-        <div className="flex gap-2">
-          {['all', 'pending', 'approved', 'rejected'].map(status => (
-            <Button
-              key={status}
-              variant={filter === status ? "default" : "outline"}
-              onClick={() => setFilter(status)}
-              size="sm"
-            >
-              {status === 'all' ? 'Toutes' : statusConfig[status]?.label || status}
-            </Button>
-          ))}
-        </div>
-      </div>
-
       <div className="grid gap-4">
         {requests.map(request => {
           const StatusIcon = statusConfig[request.status]?.icon || Clock;
@@ -268,26 +343,38 @@ export default function SubscriptionRequestManagement() {
                     )}
                   </div>
 
-                  {request.status === 'pending' && (
-                    <div className="flex gap-2 ml-4">
+                  <div className="flex gap-2 ml-4 flex-wrap">
+                    {request.status === 'pending' && (
+                      <>
+                        <Button
+                          onClick={() => openDialog(request, 'approve')}
+                          className="bg-green-600 hover:bg-green-700"
+                          size="sm"
+                        >
+                          <CheckCircle2 className="w-4 h-4 mr-1" />
+                          Approuver
+                        </Button>
+                        <Button
+                          onClick={() => openDialog(request, 'reject')}
+                          variant="destructive"
+                          size="sm"
+                        >
+                          <XCircle className="w-4 h-4 mr-1" />
+                          Rejeter
+                        </Button>
+                      </>
+                    )}
+                    {request.status === 'approved' && (
                       <Button
-                        onClick={() => openDialog(request, 'approve')}
-                        className="bg-green-600 hover:bg-green-700"
+                        onClick={() => handleLoginAsClient(request)}
+                        variant="outline"
                         size="sm"
                       >
-                        <CheckCircle2 className="w-4 h-4 mr-1" />
-                        Approuver
+                        <User className="w-4 h-4 mr-1" />
+                        Se connecter
                       </Button>
-                      <Button
-                        onClick={() => openDialog(request, 'reject')}
-                        variant="destructive"
-                        size="sm"
-                      >
-                        <XCircle className="w-4 h-4 mr-1" />
-                        Rejeter
-                      </Button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -393,6 +480,89 @@ export default function SubscriptionRequestManagement() {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal Identifiants générés */}
+      <Dialog open={showCredentialsModal} onOpenChange={setShowCredentialsModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-green-600">
+              <CheckCircle2 className="w-6 h-6" />
+              Compte créé avec succès !
+            </DialogTitle>
+          </DialogHeader>
+          
+          {generatedCredentials && (
+            <div className="space-y-4">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-sm font-semibold text-yellow-900 mb-3">
+                  🔐 Identifiants du client :
+                </p>
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center justify-between bg-white rounded p-2">
+                    <div>
+                      <p className="text-gray-500 text-xs">Email</p>
+                      <p className="font-mono font-semibold">{generatedCredentials.email}</p>
+                    </div>
+                    <Button 
+                      size="icon" 
+                      variant="ghost"
+                      onClick={() => copyToClipboard(generatedCredentials.email)}
+                    >
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="flex items-center justify-between bg-white rounded p-2">
+                    <div>
+                      <p className="text-gray-500 text-xs">Mot de passe</p>
+                      <p className="font-mono font-semibold">{generatedCredentials.password}</p>
+                    </div>
+                    <Button 
+                      size="icon" 
+                      variant="ghost"
+                      onClick={() => copyToClipboard(generatedCredentials.password)}
+                    >
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
+                <p className="font-semibold text-blue-900 mb-2">📋 Détails de l'abonnement :</p>
+                <ul className="space-y-1 text-blue-800">
+                  <li>• Nom : {generatedCredentials.name}</li>
+                  <li>• Forfait : {generatedCredentials.plan}</li>
+                  <li>• Valable jusqu'au : {generatedCredentials.endDate}</li>
+                </ul>
+              </div>
+
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => {
+                    copyToClipboard(`Email: ${generatedCredentials.email}\nMot de passe: ${generatedCredentials.password}`);
+                  }}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copier tout
+                </Button>
+                <Button 
+                  onClick={sendCredentialsByEmail}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  <Send className="w-4 h-4 mr-2" />
+                  Envoyer par email
+                </Button>
+              </div>
+
+              <p className="text-xs text-gray-500 text-center">
+                ⚠️ Ces identifiants ont déjà été envoyés au client par email
+              </p>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

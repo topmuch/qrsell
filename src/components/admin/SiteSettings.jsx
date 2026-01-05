@@ -6,13 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Save, Settings as SettingsIcon } from 'lucide-react';
+import { Loader2, Save, Settings as SettingsIcon, Upload, Palette } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 export default function SiteSettings() {
   const [settings, setSettings] = useState({
     site_name: 'QRSell',
     logo_url: '',
+    primary_color: '#2563eb',
+    secondary_color: '#3b82f6',
     default_currency: 'FCFA',
     default_language: 'fr',
     smtp_host: '',
@@ -20,7 +23,7 @@ export default function SiteSettings() {
     smtp_email: '',
     smtp_api_key: ''
   });
-  const [success, setSuccess] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -40,6 +43,8 @@ export default function SiteSettings() {
         setSettings({
           site_name: data.site_name || 'QRSell',
           logo_url: data.logo_url || '',
+          primary_color: data.primary_color || '#2563eb',
+          secondary_color: data.secondary_color || '#3b82f6',
           default_currency: data.default_currency || 'FCFA',
           default_language: data.default_language || 'fr',
           smtp_host: data.smtp_host || '',
@@ -61,16 +66,35 @@ export default function SiteSettings() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['site-settings']);
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      toast.success('✅ Paramètres mis à jour avec succès !');
+      
+      // Appliquer les changements en temps réel
+      document.documentElement.style.setProperty('--primary-color', settings.primary_color);
+      document.documentElement.style.setProperty('--secondary-color', settings.secondary_color);
     },
     onError: (error) => {
-      alert(`❌ Échec de la sauvegarde : ${error.message}`);
+      toast.error(`❌ Échec de la sauvegarde : ${error.message}`);
     }
   });
 
   const handleSave = () => {
     saveMutation.mutate(settings);
+  };
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const result = await base44.integrations.Core.UploadFile({ file });
+      setSettings({ ...settings, logo_url: result.file_url });
+      toast.success('Logo uploadé avec succès');
+    } catch (error) {
+      toast.error('Erreur lors de l\'upload');
+    } finally {
+      setUploading(false);
+    }
   };
 
   if (isLoading) {
@@ -91,14 +115,6 @@ export default function SiteSettings() {
         </div>
       </div>
 
-      {success && (
-        <Alert className="bg-green-50 border-green-200 dark:bg-green-900/30 dark:border-green-800">
-          <AlertDescription className="text-green-800 dark:text-green-200">
-            ✅ Paramètres enregistrés avec succès !
-          </AlertDescription>
-        </Alert>
-      )}
-
       {/* Général */}
       <Card className="dark:bg-gray-800 dark:border-gray-700">
         <CardHeader>
@@ -116,13 +132,92 @@ export default function SiteSettings() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="logo_url">URL du logo</Label>
-            <Input
-              id="logo_url"
-              value={settings.logo_url}
-              onChange={(e) => setSettings({ ...settings, logo_url: e.target.value })}
-              placeholder="https://example.com/logo.png"
-            />
+            <Label htmlFor="logo_url">Logo du site</Label>
+            <div className="flex gap-3">
+              <Input
+                id="logo_url"
+                value={settings.logo_url}
+                onChange={(e) => setSettings({ ...settings, logo_url: e.target.value })}
+                placeholder="https://example.com/logo.png"
+                className="flex-1"
+              />
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                  id="logo-upload"
+                />
+                <label htmlFor="logo-upload">
+                  <Button type="button" variant="outline" disabled={uploading} asChild>
+                    <span>
+                      {uploading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Upload className="w-4 h-4" />
+                      )}
+                    </span>
+                  </Button>
+                </label>
+              </div>
+            </div>
+            {settings.logo_url && (
+              <div className="mt-2">
+                <img 
+                  src={settings.logo_url} 
+                  alt="Logo preview" 
+                  className="h-12 object-contain border rounded p-2"
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Palette className="w-4 h-4" />
+              Couleurs du site
+            </Label>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="primary_color" className="text-xs text-gray-500">Couleur principale</Label>
+                <div className="flex gap-2 mt-1">
+                  <Input
+                    type="color"
+                    id="primary_color"
+                    value={settings.primary_color}
+                    onChange={(e) => setSettings({ ...settings, primary_color: e.target.value })}
+                    className="w-16 h-10 p-1 cursor-pointer"
+                  />
+                  <Input
+                    type="text"
+                    value={settings.primary_color}
+                    onChange={(e) => setSettings({ ...settings, primary_color: e.target.value })}
+                    className="flex-1"
+                    placeholder="#2563eb"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="secondary_color" className="text-xs text-gray-500">Couleur secondaire</Label>
+                <div className="flex gap-2 mt-1">
+                  <Input
+                    type="color"
+                    id="secondary_color"
+                    value={settings.secondary_color}
+                    onChange={(e) => setSettings({ ...settings, secondary_color: e.target.value })}
+                    className="w-16 h-10 p-1 cursor-pointer"
+                  />
+                  <Input
+                    type="text"
+                    value={settings.secondary_color}
+                    onChange={(e) => setSettings({ ...settings, secondary_color: e.target.value })}
+                    className="flex-1"
+                    placeholder="#3b82f6"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
