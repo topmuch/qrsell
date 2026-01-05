@@ -22,8 +22,7 @@ import SellerProfileForm from '@/components/dashboard/SellerProfileForm';
 import ProductForm from '@/components/dashboard/ProductForm';
 import ProductCard from '@/components/dashboard/ProductCard';
 import TikTokGuide from '@/components/dashboard/TikTokGuide';
-import ShopCustomization from '@/components/dashboard/ShopCustomization';
-import ShopAppearance from '@/components/dashboard/ShopAppearance';
+import ShopSettings from '@/components/dashboard/ShopSettings';
 import ProductImportExport from '@/components/dashboard/ProductImportExport';
 import KPICards from '@/components/dashboard/KPICards';
 import PerformanceChart from '@/components/dashboard/PerformanceChart';
@@ -526,60 +525,32 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
-            <Tabs defaultValue="basic" className="space-y-6">
-              <TabsList className="bg-white border p-1 rounded-xl shadow-sm">
-                <TabsTrigger value="basic">Informations de base</TabsTrigger>
-                <TabsTrigger value="appearance">Apparence</TabsTrigger>
-                <TabsTrigger value="colors">Couleurs</TabsTrigger>
-              </TabsList>
+            <div className="max-w-5xl mx-auto">
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Paramètres de la boutique</h2>
+                <p className="text-gray-500">Personnalisez votre vitrine en ligne</p>
 
-              <TabsContent value="basic">
-                <div className="max-w-4xl space-y-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Paramètres de la boutique</h2>
-
-                  <div className="grid lg:grid-cols-2 gap-6">
-                    {/* Shop Customization */}
-                    <ShopCustomization seller={seller} />
-
-                    {/* Basic Info */}
-                    <div className="space-y-6">
-                      <div className="bg-white rounded-xl p-6 space-y-4">
-                        <h3 className="font-semibold text-gray-900">Informations</h3>
-                        <div>
-                          <label className="text-sm font-medium text-gray-700">Nom de la boutique</label>
-                          <p className="text-lg text-gray-900">{seller?.shop_name}</p>
-                        </div>
-
-                        <div>
-                          <label className="text-sm font-medium text-gray-700">Numéro WhatsApp</label>
-                          <p className="text-lg text-gray-900">{seller?.whatsapp_number}</p>
-                        </div>
-
-                        <div>
-                          <label className="text-sm font-medium text-gray-700">URL de la boutique</label>
-                          <div className="flex items-center gap-2 mt-1">
-                            <code className="flex-1 p-3 bg-gray-50 rounded-lg text-sm truncate">
-                              {shopUrl}
-                            </code>
-                            <Button variant="outline" onClick={copyShopLink}>
-                              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                {/* Shop URL */}
+                <div className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">URL de votre boutique</label>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 p-3 bg-white rounded-lg text-sm truncate shadow-sm">
+                      {shopUrl}
+                    </code>
+                    <Button variant="outline" onClick={copyShopLink} className="shadow-sm">
+                      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    </Button>
+                    <a href={shopUrl} target="_blank" rel="noopener noreferrer">
+                      <Button variant="outline" className="shadow-sm">
+                        <ExternalLink className="w-4 h-4" />
+                      </Button>
+                    </a>
                   </div>
                 </div>
-              </TabsContent>
+              </div>
 
-              <TabsContent value="appearance">
-                <ShopAppearance seller={seller} />
-              </TabsContent>
-
-              <TabsContent value="colors">
-                <ShopCustomization seller={seller} />
-              </TabsContent>
-            </Tabs>
+              <ShopSettings seller={seller} />
+            </div>
           </TabsContent>
         </Tabs>
       </main>

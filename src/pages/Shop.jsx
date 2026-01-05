@@ -125,25 +125,30 @@ export default function Shop() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+      <header className="bg-white border-b sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4">
-            {/* Logo & Shop Name */}
-            <div className="flex items-center gap-3 flex-shrink-0">
+            {/* Logo & Shop Name - centered on mobile */}
+            <div className="flex items-center gap-4 flex-1">
               {seller.logo_url ? (
                 <img 
                   src={seller.logo_url} 
                   alt={seller.shop_name}
-                  className="w-12 h-12 rounded-full object-cover"
+                  className="w-16 h-16 md:w-14 md:h-14 rounded-full object-cover border-2 border-gray-100"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#2563eb] to-[#3b82f6] flex items-center justify-center text-white font-bold text-lg">
+                <div 
+                  className="w-16 h-16 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg"
+                  style={{
+                    background: `linear-gradient(135deg, ${seller.primary_color || '#2563eb'} 0%, ${seller.secondary_color || '#3b82f6'} 100%)`
+                  }}
+                >
                   {seller.shop_name?.[0]?.toUpperCase() || 'B'}
                 </div>
               )}
-              <div className="hidden sm:block">
-                <h1 className="font-bold text-gray-900 text-lg">{seller.shop_name}</h1>
-                <p className="text-xs text-gray-500">{products.length} produit{products.length > 1 ? 's' : ''}</p>
+              <div>
+                <h1 className="font-bold text-gray-900 text-xl md:text-2xl">{seller.shop_name}</h1>
+                <p className="text-sm text-gray-500">{products.length} produit{products.length > 1 ? 's' : ''}</p>
               </div>
             </div>
 
@@ -210,7 +215,9 @@ export default function Shop() {
       </header>
 
       {/* Banner Slider */}
-      <BannerSlider images={seller.banner_images || []} />
+      {seller.banner_images && seller.banner_images.length > 0 && (
+        <BannerSlider images={seller.banner_images} />
+      )}
 
       {/* Categories */}
       <CategoryBar 
