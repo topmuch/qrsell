@@ -15,7 +15,9 @@ import {
   Loader2,
   Sparkles,
   Sun,
-  Moon
+  Moon,
+  Zap,
+  Ticket
 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import SellerProfileForm from '@/components/dashboard/SellerProfileForm';
