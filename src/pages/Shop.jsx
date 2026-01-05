@@ -124,21 +124,21 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header - Vendeur uniquement */}
+      {/* Header - Logo vendeur uniquement */}
       <header className="bg-white border-b sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4">
-            {/* Logo & Shop Name - côte à côte */}
-            <div className="flex items-center gap-4">
-              {seller.logo_url ? (
+            {/* Logo vendeur uniquement */}
+            <div className="flex items-center">
+              {seller?.logo_url ? (
                 <img 
                   src={seller.logo_url} 
                   alt={seller.shop_name}
-                  className="w-16 h-16 rounded-full object-cover border-2 border-gray-100"
+                  className="h-14 w-auto max-w-[200px] object-contain"
                 />
               ) : (
                 <div 
-                  className="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-2xl shadow-lg"
+                  className="w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg"
                   style={{
                     background: `linear-gradient(135deg, ${seller.primary_color || '#2563eb'} 0%, ${seller.secondary_color || '#3b82f6'} 100%)`
                   }}
@@ -146,10 +146,6 @@ export default function Shop() {
                   {seller.shop_name?.[0]?.toUpperCase() || 'B'}
                 </div>
               )}
-              <div>
-                <h1 className="font-bold text-gray-900 text-xl">{seller.shop_name}</h1>
-                <p className="text-sm text-gray-500">{products.length} produit{products.length > 1 ? 's' : ''}</p>
-              </div>
             </div>
 
             {/* Search Bar */}
@@ -346,12 +342,15 @@ export default function Shop() {
               </div>
               
               <div className="flex flex-col items-end justify-end">
-                <p className="text-xs text-gray-400 mb-1">Propulsé par</p>
-                <img 
-                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6951cb5c7a9163102135b23b/bd5ee73bd_qrsell-logo.png" 
-                  alt="QRSell" 
-                  className="h-5 opacity-40 hover:opacity-60 transition-opacity"
-                />
+                <p className="text-[10px] text-gray-300 mb-0.5">Powered by</p>
+                <a 
+                  href="https://qrsell.app" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-[10px] text-gray-300 hover:text-gray-400 transition-colors font-medium"
+                >
+                  QRSell
+                </a>
               </div>
             </div>
             
