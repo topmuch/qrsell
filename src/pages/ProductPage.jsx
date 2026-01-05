@@ -78,20 +78,16 @@ export default function ProductPage() {
   };
 
   const generateProfessionalWhatsAppMessage = () => {
-    const now = new Date();
-    const hour = now.getHours();
-    
-    let timePhrase = "";
-    if (hour >= 6 && hour < 12) timePhrase = "ce matin";
-    else if (hour >= 12 && hour < 18) timePhrase = "cet après-midi";
-    else if (hour >= 18 && hour < 22) timePhrase = "ce soir";
-    else timePhrase = "aujourd'hui";
+    return `Merci d'avoir scanné le QR Code pour le produit ${product.name} ! 😊
 
-    return `Bonjour, je souhaite commander le/la « ${product.name} » (${product.public_id}) à ${formatPrice(product.price)} FCFA.
+Voici un petit résumé du produit :
 
-${product.image_url || ''}
+Nom du produit : ${product.name}
+Prix : ${formatPrice(product.price)} FCFA
+${product.description ? `Description rapide : ${product.description}` : ''}
+${product.image_url ? `\nPhoto : ${product.image_url}` : ''}
 
-Est-ce toujours disponible ${timePhrase} ?`;
+Si vous souhaitez procéder à l'achat, il vous suffit de répondre avec "Oui, je veux l'acheter" ou poser toutes vos questions ! Je suis là pour vous aider à finaliser votre commande.`;
   };
 
   const handleWhatsAppClick = () => {
