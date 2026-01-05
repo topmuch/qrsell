@@ -6,18 +6,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Search, Eye, Trash2, ExternalLink, Loader2, Package, AlertCircle, RefreshCw } from 'lucide-react';
+import { Search, Eye, Trash2, ExternalLink, Loader2, Package, AlertCircle, RefreshCw, Download, Copy, Check, Filter } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 export default function ProductManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [sellerFilter, setSellerFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [priceFilter, setPriceFilter] = useState('all');
+  const [copiedId, setCopiedId] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: products = [], isLoading } = useQuery({
@@ -60,10 +66,24 @@ export default function ProductManagement() {
     }
   });
 
-  const filteredProducts = products.filter(product =>
-    product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.public_id?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.public_id?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesSeller = sellerFilter === 'all' || product.seller_id === sellerFilter;
+    
+    const matchesStatus = statusFilter === 'all' || 
+      (statusFilter === 'active' && product.is_active) ||
+      (statusFilter === 'inactive' && !product.is_active);
+    
+    const matchesPrice = priceFilter === 'all' ||
+      (priceFilter === '0-50000' && product.price < 50000) ||
+      (priceFilter === '50000-100000' && product.price >= 50000 && product.price < 100000) ||
+      (priceFilter === '100000-200000' && product.price >= 100000 && product.price < 200000) ||
+      (priceFilter === '200000+' && product.price >= 200000);
+    
+    return matchesSearch && matchesSeller && matchesStatus && matchesPrice;
+  });
 
   const getProductStats = (productId) => {
     const productAnalytics = analytics.filter(a => a.product_id === productId);
@@ -88,6 +108,44 @@ export default function ProductManagement() {
   const formatPrice = (price) => {
     return new Intl.NumberFormat('fr-FR').format(price);
   };
+
+  const handleCopyLink = (product) => {
+    const productUrl = `${window.location.origin}/ProductPage?id=${product.public_id}`;
+    navigator.clipboard.writeText(productUrl);
+    setCopiedId(product.id);
+    toast.success('Lien copié !');
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleExportCSV = () => {
+    const csvHeaders = ['Nom', 'Boutique', 'Prix (FCFA)', 'ID Public', 'Statut', 'Scans', 'Vues', 'Clics', 'Catégorie'];
+    const csvRows = filteredProducts.map(product => {
+      const stats = getProductStats(product.id);
+      return [
+        product.name,
+        getSellerName(product.seller_id),
+        product.price,
+        product.public_id || 'N/A',
+        product.is_active ? 'Actif' : 'Inactif',
+        stats.scans,
+        stats.views,
+        stats.clicks,
+        product.category || 'N/A'
+      ].map(cell => `"${cell}"`).join(',');
+    });
+
+    const csvContent = [csvHeaders.join(','), ...csvRows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `produits-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    toast.success('Export CSV réussi');
+  };
+
+  const uniqueSellers = [...new Set(products.map(p => p.seller_id))].map(sellerId => {
+    return sellers.find(s => s.id === sellerId);
+  }).filter(Boolean);
 
   if (isLoading) {
     return (
@@ -131,22 +189,95 @@ export default function ProductManagement() {
         </Alert>
       )}
 
-      {/* Search bar */}
+      {/* Filters */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                placeholder="Rechercher par nom, ID..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-gray-500" />
+                <span className="font-medium text-gray-700">Filtres</span>
+              </div>
+              <Button
+                onClick={handleExportCSV}
+                variant="outline"
+                size="sm"
+                className="gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Télécharger CSV
+              </Button>
             </div>
-            <Badge variant="outline" className="px-4 py-2">
-              {filteredProducts.length} produit{filteredProducts.length > 1 ? 's' : ''}
-            </Badge>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Rechercher par nom, ID..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              <Select value={sellerFilter} onValueChange={setSellerFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Tous les vendeurs" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les vendeurs</SelectItem>
+                  {uniqueSellers.map(seller => (
+                    <SelectItem key={seller.id} value={seller.id}>
+                      {seller.shop_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Tous les statuts" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  <SelectItem value="active">✅ Actif</SelectItem>
+                  <SelectItem value="inactive">❌ Inactif</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={priceFilter} onValueChange={setPriceFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Tous les prix" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les prix</SelectItem>
+                  <SelectItem value="0-50000">0 – 50 000 FCFA</SelectItem>
+                  <SelectItem value="50000-100000">50 000 – 100 000 FCFA</SelectItem>
+                  <SelectItem value="100000-200000">100 000 – 200 000 FCFA</SelectItem>
+                  <SelectItem value="200000+">200 000+ FCFA</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t">
+              <Badge variant="outline" className="px-4 py-2">
+                {filteredProducts.length} produit{filteredProducts.length > 1 ? 's' : ''}
+              </Badge>
+              {(sellerFilter !== 'all' || statusFilter !== 'all' || priceFilter !== 'all' || searchTerm) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setSellerFilter('all');
+                    setStatusFilter('all');
+                    setPriceFilter('all');
+                  }}
+                >
+                  Réinitialiser
+                </Button>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -228,11 +359,12 @@ export default function ProductManagement() {
                         )}
                       </td>
                       <td className="py-3 px-4">
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="flex items-center justify-end gap-1">
                           <Button
                             size="sm"
                             variant="ghost"
                             onClick={() => setSelectedProduct({ ...product, stats })}
+                            title="Voir les détails"
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
@@ -240,13 +372,27 @@ export default function ProductManagement() {
                             size="sm"
                             variant="ghost"
                             onClick={() => window.open(`/ProductPage?id=${product.public_id}`, '_blank')}
+                            title="Voir la page publique"
                           >
-                            <ExternalLink className="w-4 h-4" />
+                            <ExternalLink className="w-4 h-4 text-blue-500" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleCopyLink(product)}
+                            title="Copier le lien"
+                          >
+                            {copiedId === product.id ? (
+                              <Check className="w-4 h-4 text-green-500" />
+                            ) : (
+                              <Copy className="w-4 h-4" />
+                            )}
                           </Button>
                           <Button
                             size="sm"
                             variant="ghost"
                             onClick={() => handleDelete(product)}
+                            title="Supprimer"
                           >
                             <Trash2 className="w-4 h-4 text-red-500" />
                           </Button>
