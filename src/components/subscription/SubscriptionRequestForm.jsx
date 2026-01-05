@@ -227,9 +227,9 @@ export default function SubscriptionRequestForm() {
                       <SelectValue placeholder="Sélectionnez la durée" />
                     </SelectTrigger>
                     <SelectContent>
-                      {selectedPlan.durations_available?.map(duration => (
-                        <SelectItem key={duration} value={duration.toString()}>
-                          {duration} mois {selectedPlan.price ? `(${duration * selectedPlan.price} FCFA)` : ""}
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(month => (
+                        <SelectItem key={month} value={month.toString()}>
+                          {month} mois {selectedPlan.price ? `(${month * selectedPlan.price} FCFA)` : ""}
                         </SelectItem>
                       ))}
                     </SelectContent>
