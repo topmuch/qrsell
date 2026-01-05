@@ -36,6 +36,7 @@ import PromotionForm from '@/components/dashboard/PromotionForm';
 import PromotionCard from '@/components/dashboard/PromotionCard';
 import CouponForm from '@/components/dashboard/CouponForm';
 import CouponCard from '@/components/dashboard/CouponCard';
+import EnhancedQRCode from '@/components/ui/EnhancedQRCode';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Dashboard() {
@@ -409,21 +410,13 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="bg-white p-6 rounded-2xl shadow-xl">
-                    <canvas 
-                      ref={(canvas) => {
-                        if (canvas && seller) {
-                          import('qrcode').then(QRCode => {
-                            QRCode.toCanvas(canvas, shopUrl, {
-                              width: 300,
-                              margin: 2,
-                              color: {
-                                dark: '#2563eb',
-                                light: '#ffffff'
-                              }
-                            });
-                          });
-                        }
-                      }}
+                    <EnhancedQRCode
+                      url={shopUrl}
+                      size={300}
+                      color={seller.primary_color || '#2563eb'}
+                      logo={seller.logo_url}
+                      showText={true}
+                      text="Scanner pour voir la boutique"
                     />
                   </div>
                 </div>
