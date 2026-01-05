@@ -21,16 +21,47 @@ import {
 import { motion } from 'framer-motion';
 import QRCodeDisplay from './QRCodeDisplay';
 
-export default function ProductCard({ product, seller, onEdit, onDelete }) {
+export default function ProductCard({ product, seller, onEdit, onDelete, analytics = [] }) {
   const [showQR, setShowQR] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   
   const productUrl = `${window.location.origin}/ProductPage?id=${product.public_id}`;
+
+  // Calculate stats from analytics
+  const scanCount = analytics.filter(a => a.product_id === product.id && a.event_type === 'scan').length;
+  const clickCount = analytics.filter(a => a.product_id === product.id && a.event_type === 'whatsapp_click').length;
+  const isHotProduct = scanCount > 20;
 
   const copyLink = () => {
     navigator.clipboard.writeText(productUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const downloadQRCode = async () => {
+    setDownloading(true);
+    try {
+      const QRCode = await import('qrcode');
+      const canvas = document.createElement('canvas');
+      await QRCode.toCanvas(canvas, productUrl, {
+        width: 1000,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#ffffff'
+        }
+      });
+      
+      const link = document.createElement('a');
+      link.download = `QR_${product.public_id}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (error) {
+      console.error('Error downloading QR:', error);
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const formatPrice = (price) => {
@@ -114,32 +145,81 @@ export default function ProductCard({ product, seller, onEdit, onDelete }) {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Status badge */}
-            <Badge 
-              className={`absolute top-2 left-2 ${
-                product.is_active 
-                  ? 'bg-green-100 text-green-700 border-green-200' 
-                  : 'bg-gray-100 text-gray-600 border-gray-200'
-              }`}
-              variant="outline"
-            >
-              {product.is_active ? 'Actif' : 'Inactif'}
-            </Badge>
+            {/* Badges */}
+            <div className="absolute top-2 left-2 flex flex-col gap-1">
+              <Badge 
+                className={`${
+                  product.is_active 
+                    ? 'bg-green-100 text-green-700 border-green-200' 
+                    : 'bg-gray-100 text-gray-600 border-gray-200'
+                }`}
+                variant="outline"
+              >
+                {product.is_active ? 'Actif' : 'Inactif'}
+              </Badge>
+              {isHotProduct && (
+                <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 animate-pulse">
+                  🔥 Forte demande
+                </Badge>
+              )}
+            </div>
           </div>
 
-          <CardContent className="p-4">
-            <h3 className="font-semibold text-gray-900 mb-1 truncate">
-              {product.name}
-            </h3>
-            <p className="text-lg font-bold text-[#ed477c]">
-              {formatPrice(product.price)} FCFA
-            </p>
-            {product.description && (
-              <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                {product.description}
+          <CardContent className="p-4 space-y-3">
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-1 truncate">
+                {product.name}
+              </h3>
+              <p className="text-lg font-bold text-[#2563eb]">
+                {formatPrice(product.price)} FCFA
               </p>
-            )}
-            <p className="text-xs text-gray-400 mt-2 font-mono">
+              {product.description && (
+                <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                  {product.description}
+                </p>
+              )}
+            </div>
+
+            {/* Stats */}
+            <div className="flex items-center gap-3 text-xs text-gray-500 pt-2 border-t">
+              <span>📊 {scanCount} scans</span>
+              <span className="text-gray-300">|</span>
+              <span>👆 {clickCount} clics</span>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-2">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={downloadQRCode}
+                disabled={downloading}
+                className="flex-1"
+              >
+                <Download className="w-3 h-3 mr-1" />
+                {downloading ? 'Téléchargement...' : 'QR TikTok'}
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={copyLink}
+                className="flex-1"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-3 h-3 mr-1 text-green-500" />
+                    Copié
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3 h-3 mr-1" />
+                    Lien
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <p className="text-xs text-gray-400 font-mono">
               {product.public_id}
             </p>
           </CardContent>

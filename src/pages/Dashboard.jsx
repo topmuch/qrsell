@@ -30,6 +30,7 @@ import ActionCards from '@/components/dashboard/ActionCards';
 import SellerStatus from '@/components/dashboard/SellerStatus';
 import BannerDisplay from '@/components/dashboard/BannerDisplay';
 import Banner from '@/components/Banner';
+import HotDemandAlert from '@/components/dashboard/HotDemandAlert';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Dashboard() {
@@ -329,6 +330,9 @@ export default function Dashboard() {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-8">
+            {/* Hot Demand Alert */}
+            <HotDemandAlert sellerId={seller?.id} products={products} />
+
             {/* KPIs */}
             <KPICards analytics={analytics} />
 
@@ -464,6 +468,7 @@ export default function Dashboard() {
                       key={product.id}
                       product={product}
                       seller={seller}
+                      analytics={analytics}
                       onEdit={handleEditProduct}
                       onDelete={handleDeleteProduct}
                     />
