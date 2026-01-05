@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Logo({ size = 'md', showText = true, variant = 'light' }) {
+export default function Logo({ size = 'md', showText = false, variant = 'light' }) {
   const sizes = {
     sm: { width: 160, height: 'auto' },
     md: { width: 200, height: 'auto' },
@@ -9,16 +9,14 @@ export default function Logo({ size = 'md', showText = true, variant = 'light' }
 
   const { width } = sizes[size];
 
-  // Ajuste le chemin selon où tu stockes ton logo
-  const logoSrc = variant === 'light' 
-    ? '/logo-light.png' 
-    : '/logo-dark.png';
+  // URL du logo QRSell officiel
+  const logoSrc = 'https://drive.google.com/uc?export=view&id=1eveFkGHiW-tM5vck1UDR00SaO42huoKU';
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       <img 
         src={logoSrc} 
-        alt="Logo" 
+        alt="QRSell Logo" 
         width={width} 
         height="auto"
         style={{ display: 'block' }}

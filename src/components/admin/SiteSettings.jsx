@@ -13,7 +13,7 @@ import { toast } from "sonner";
 export default function SiteSettings() {
   const [settings, setSettings] = useState({
     site_name: 'QRSell',
-    logo_url: '',
+    logo_url: 'https://drive.google.com/uc?export=view&id=1eveFkGHiW-tM5vck1UDR00SaO42huoKU',
     primary_color: '#2563eb',
     secondary_color: '#3b82f6',
     default_currency: 'FCFA',
@@ -42,7 +42,7 @@ export default function SiteSettings() {
       if (data) {
         setSettings({
           site_name: data.site_name || 'QRSell',
-          logo_url: data.logo_url || '',
+          logo_url: data.logo_url || 'https://drive.google.com/uc?export=view&id=1eveFkGHiW-tM5vck1UDR00SaO42huoKU',
           primary_color: data.primary_color || '#2563eb',
           secondary_color: data.secondary_color || '#3b82f6',
           default_currency: data.default_currency || 'FCFA',
