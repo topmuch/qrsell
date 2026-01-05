@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, TrendingUp, Calendar, Euro, ExternalLink } from 'lucide-react';
+import { Loader2, TrendingUp, Calendar, Euro, ExternalLink, Users, Target } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils/index';
 import { format } from 'date-fns';
@@ -23,6 +23,12 @@ export default function Campaigns() {
         new Date(c.end_date) >= now
       );
     }
+  });
+
+  // Fetch participations for each campaign
+  const { data: participations = [] } = useQuery({
+    queryKey: ['all-participations'],
+    queryFn: () => base44.entities.CampaignParticipation.list()
   });
 
   return (
@@ -89,6 +95,28 @@ export default function Campaigns() {
                 <CardContent className="space-y-4">
                   <p className="text-gray-700">{campaign.product_description}</p>
                   
+                  {/* Statistics */}
+                  <div className="grid grid-cols-2 gap-2 p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm font-medium">
+                        {participations.filter(p => p.campaign_id === campaign.id && p.status !== 'rejected').length} participants
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Euro className="w-4 h-4 text-green-600" />
+                      <span className="text-sm font-medium">
+                        {campaign.budget_total?.toLocaleString()} € total
+                      </span>
+                    </div>
+                    <div className="col-span-2 flex items-center gap-2">
+                      <Target className="w-4 h-4 text-purple-600" />
+                      <span className="text-sm font-medium">
+                        {campaign.total_conversions || 0} conversions ({campaign.total_scans > 0 ? ((campaign.total_conversions || 0) / campaign.total_scans * 100).toFixed(1) : 0}%)
+                      </span>
+                    </div>
+                  </div>
+                  
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     <Calendar className="w-4 h-4" />
                     <span>Jusqu'au {format(new Date(campaign.end_date), 'dd MMMM yyyy', { locale: fr })}</span>
@@ -97,7 +125,7 @@ export default function Campaigns() {
                   {campaign.budget_remaining && (
                     <div className="flex items-center gap-2 text-sm text-gray-500">
                       <Euro className="w-4 h-4" />
-                      <span>Budget restant : {campaign.budget_remaining} €</span>
+                      <span>Budget restant : {campaign.budget_remaining?.toLocaleString()} €</span>
                     </div>
                   )}
 

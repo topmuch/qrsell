@@ -618,47 +618,73 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="campaigns" className="space-y-6">
-            <div className="bg-white p-6 rounded-xl shadow">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
+              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 dark:text-white">
                 <Sparkles className="w-6 h-6 text-green-500" />
                 🔥 Campagnes sponsorisées
               </h2>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
                 Participez à des campagnes et gagnez jusqu'à 5 € par intégration.
               </p>
-              
+
               {campaigns.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {campaigns.map(camp => (
-                    <div key={camp.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                      {camp.product_image && (
-                        <img 
-                          src={camp.product_image} 
-                          alt={camp.product_name} 
-                          className="w-full h-32 object-cover rounded mb-3" 
-                        />
-                      )}
-                      <h3 className="font-bold text-lg mb-1">{camp.product_name}</h3>
-                      <p className="text-sm text-gray-600 mb-2">{camp.partner_name}</p>
-                      <p className="text-sm text-gray-500 mb-3">{camp.product_description}</p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-green-600 font-bold">
-                          {camp.commission_value} {camp.commission_type === 'percentage' ? '%' : '€'}
-                        </span>
-                        <Button 
-                          onClick={() => window.location.href = '/SellerCampaigns'}
-                          className="bg-green-500 hover:bg-green-600 text-white"
-                        >
-                          Participer
-                        </Button>
+                  {campaigns.map(camp => {
+                    const participationCount = queryClient.getQueryData(['all-participations'])?.filter(p => 
+                      p.campaign_id === camp.id && p.status !== 'rejected'
+                    ).length || 0;
+                    const conversionRate = camp.total_scans > 0 
+                      ? ((camp.total_conversions || 0) / camp.total_scans * 100).toFixed(1) 
+                      : 0;
+
+                    return (
+                      <div key={camp.id} className="border dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        {camp.product_image && (
+                          <img 
+                            src={camp.product_image} 
+                            alt={camp.product_name} 
+                            className="w-full h-32 object-cover rounded mb-3" 
+                          />
+                        )}
+                        <h3 className="font-bold text-lg mb-1 dark:text-white">{camp.product_name}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{camp.partner_name}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-500 mb-3 line-clamp-2">{camp.product_description}</p>
+
+                        {/* Campaign Stats */}
+                        <div className="grid grid-cols-3 gap-2 mb-3 p-2 bg-gray-50 dark:bg-gray-700 rounded text-xs">
+                          <div className="text-center">
+                            <div className="font-bold text-blue-600 dark:text-blue-400">{participationCount}</div>
+                            <div className="text-gray-500 dark:text-gray-400">Participants</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="font-bold text-green-600 dark:text-green-400">{camp.budget_total}€</div>
+                            <div className="text-gray-500 dark:text-gray-400">Budget</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="font-bold text-purple-600 dark:text-purple-400">{conversionRate}%</div>
+                            <div className="text-gray-500 dark:text-gray-400">Conv.</div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span className="text-green-600 dark:text-green-400 font-bold">
+                            {camp.commission_value} {camp.commission_type === 'percentage' ? '%' : '€'}
+                          </span>
+                          <Button 
+                            onClick={() => window.location.href = '/SellerCampaigns'}
+                            className="bg-green-500 hover:bg-green-600 text-white"
+                          >
+                            Participer
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                  <Sparkles className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500">Aucune campagne disponible pour l'instant.</p>
+                <div className="text-center py-12 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <Sparkles className="w-12 h-12 text-gray-300 dark:text-gray-500 mx-auto mb-3" />
+                  <p className="text-gray-500 dark:text-gray-400">Aucune campagne disponible pour l'instant.</p>
                 </div>
               )}
             </div>
