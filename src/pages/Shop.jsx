@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { MessageCircle, Store, Loader2, MapPin, Mail, Phone, Instagram, Facebook } from 'lucide-react';
-import Logo from '@/components/ui/Logo';
-import { motion } from 'framer-motion';
+import { Input } from "@/components/ui/input";
+import { MessageCircle, Store, Loader2, Search, Instagram, Facebook, Phone, MapPin, Mail } from 'lucide-react';
+import BannerSlider from '@/components/shop/BannerSlider';
+import CategoryBar from '@/components/shop/CategoryBar';
+import ProductGrid from '@/components/shop/ProductGrid';
 
 export default function Shop() {
   const urlParams = new URLSearchParams(window.location.search);
   const slug = urlParams.get('slug');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   // Get seller by slug
   const { data: sellers = [], isLoading: loadingSeller } = useQuery({
@@ -38,32 +41,12 @@ export default function Shop() {
     enabled: !!slug
   });
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('fr-FR').format(price);
-  };
-
-  const generateProfessionalWhatsAppMessage = (product) => {
-    const now = new Date();
-    const hour = now.getHours();
-    
-    let timePhrase = "";
-    if (hour >= 6 && hour < 12) timePhrase = "ce matin";
-    else if (hour >= 12 && hour < 18) timePhrase = "cet après-midi";
-    else if (hour >= 18 && hour < 22) timePhrase = "ce soir";
-    else timePhrase = "aujourd'hui";
-
-    return `Bonjour, je souhaite commander le/la « ${product.name} » (${product.public_id}) à ${formatPrice(product.price)} FCFA.
-
-${product.image_url || ''}
-
-Est-ce toujours disponible ${timePhrase} ?`;
-  };
-
-  const getWhatsAppLink = (product) => {
-    const phone = seller?.whatsapp_number?.replace(/[^0-9]/g, '');
-    const message = encodeURIComponent(generateProfessionalWhatsAppMessage(product));
-    return `https://wa.me/${phone}?text=${message}`;
-  };
+  // Get analytics for featured products
+  const { data: analytics = [] } = useQuery({
+    queryKey: ['shop-analytics', seller?.id],
+    queryFn: () => base44.entities.Analytics.filter({ seller_id: seller?.id }),
+    enabled: !!seller?.id
+  });
 
   const handleWhatsAppClick = (product) => {
     base44.entities.Analytics.create({
@@ -75,10 +58,56 @@ Est-ce toujours disponible ${timePhrase} ?`;
     }).catch(() => {});
   };
 
+  // Get available categories
+  const availableCategories = React.useMemo(() => {
+    return [...new Set(products.map(p => p.category).filter(Boolean))];
+  }, [products]);
+
+  // Filter products
+  const filteredProducts = React.useMemo(() => {
+    let filtered = products;
+
+    // Filter by category
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(p => p.category === selectedCategory);
+    }
+
+    // Filter by search
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(p => 
+        p.name.toLowerCase().includes(query) ||
+        p.description?.toLowerCase().includes(query)
+      );
+    }
+
+    return filtered;
+  }, [products, selectedCategory, searchQuery]);
+
+  // Get featured products (top 4 by scans or most recent)
+  const featuredProducts = React.useMemo(() => {
+    if (!seller?.show_featured_products) return [];
+    
+    const productScans = products.map(product => ({
+      product,
+      scans: analytics.filter(a => 
+        a.product_id === product.id && a.event_type === 'scan'
+      ).length
+    }));
+
+    return productScans
+      .sort((a, b) => {
+        if (b.scans !== a.scans) return b.scans - a.scans;
+        return new Date(b.product.created_date) - new Date(a.product.created_date);
+      })
+      .slice(0, 4)
+      .map(item => item.product);
+  }, [products, analytics, seller]);
+
   if (loadingSeller) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="w-8 h-8 animate-spin text-[#ed477c]" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#2563eb]" />
       </div>
     );
   }
@@ -94,185 +123,217 @@ Est-ce toujours disponible ${timePhrase} ?`;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50/50 to-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2563eb] to-[#3b82f6] flex items-center justify-center text-white font-bold">
-                {seller.shop_name?.[0]?.toUpperCase() || 'B'}
-              </div>
-              <div>
-                <h1 className="font-bold text-gray-900">{seller.shop_name}</h1>
+          <div className="flex items-center justify-between gap-4">
+            {/* Logo & Shop Name */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              {seller.logo_url ? (
+                <img 
+                  src={seller.logo_url} 
+                  alt={seller.shop_name}
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#2563eb] to-[#3b82f6] flex items-center justify-center text-white font-bold text-lg">
+                  {seller.shop_name?.[0]?.toUpperCase() || 'B'}
+                </div>
+              )}
+              <div className="hidden sm:block">
+                <h1 className="font-bold text-gray-900 text-lg">{seller.shop_name}</h1>
                 <p className="text-xs text-gray-500">{products.length} produit{products.length > 1 ? 's' : ''}</p>
               </div>
             </div>
-            <Logo size="sm" />
+
+            {/* Search Bar */}
+            <div className="flex-1 max-w-md">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Input
+                  placeholder="Rechercher un produit..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            {/* Social Icons */}
+            <div className="hidden md:flex items-center gap-2 flex-shrink-0">
+              {seller.whatsapp_number && (
+                <a 
+                  href={`https://wa.me/${seller.whatsapp_number.replace(/[^0-9]/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 bg-[#25D366] rounded-full flex items-center justify-center hover:opacity-90 transition-opacity"
+                >
+                  <MessageCircle className="w-5 h-5 text-white" />
+                </a>
+              )}
+              {seller.instagram && (
+                <a 
+                  href={`https://instagram.com/${seller.instagram.replace('@', '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity"
+                >
+                  <Instagram className="w-5 h-5 text-white" />
+                </a>
+              )}
+              {seller.tiktok && (
+                <a 
+                  href={`https://tiktok.com/@${seller.tiktok.replace('@', '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 bg-gray-900 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity"
+                >
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                  </svg>
+                </a>
+              )}
+              {seller.facebook && (
+                <a 
+                  href={seller.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity"
+                >
+                  <Facebook className="w-5 h-5 text-white" />
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Banner (if exists) */}
-      {seller.banner_url && (
-        <div className="w-full h-48 md:h-64 overflow-hidden">
-          <img 
-            src={seller.banner_url} 
-            alt={seller.shop_name}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
+      {/* Banner Slider */}
+      <BannerSlider images={seller.banner_images || []} />
 
-      {/* About section */}
-      {(seller.address || seller.email || seller.tiktok || seller.instagram || seller.facebook) && (
-        <div className="bg-white border-b">
-          <div className="container mx-auto px-4 py-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">À propos de {seller.shop_name}</h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              {seller.address && (
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-[#2563eb] flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-gray-900">Adresse</p>
-                    <p className="text-gray-600">{seller.address}</p>
-                  </div>
-                </div>
-              )}
-              {seller.whatsapp_number && (
-                <div className="flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-[#25D366] flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-gray-900">Téléphone</p>
-                    <p className="text-gray-600">{seller.whatsapp_number}</p>
-                  </div>
-                </div>
-              )}
-              {seller.email && (
-                <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-[#2563eb] flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-gray-900">Email</p>
-                    <p className="text-gray-600">{seller.email}</p>
-                  </div>
-                </div>
-              )}
-              {(seller.tiktok || seller.instagram || seller.facebook) && (
-                <div className="flex items-start gap-3">
-                  <div className="flex gap-3">
-                    {seller.tiktok && (
-                      <a href={`https://tiktok.com/@${seller.tiktok.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-                        </svg>
-                      </a>
-                    )}
-                    {seller.instagram && (
-                      <a href={`https://instagram.com/${seller.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity">
-                        <Instagram className="w-5 h-5 text-white" />
-                      </a>
-                    )}
-                    {seller.facebook && (
-                      <a href={seller.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors">
-                        <Facebook className="w-5 h-5 text-white" />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Categories */}
+      <CategoryBar 
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+        availableCategories={availableCategories}
+      />
 
-      {/* Products grid */}
       <main className="container mx-auto px-4 py-8">
-        {loadingProducts ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-[#ed477c]" />
-          </div>
-        ) : products.length === 0 ? (
-          <div className="text-center py-20">
-            <Store className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Aucun produit disponible</h2>
-            <p className="text-gray-500">Cette boutique n'a pas encore de produits.</p>
-          </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map((product, index) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
-                <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group">
-                  <div className="aspect-square bg-gray-100 relative overflow-hidden">
-                    {product.image_url ? (
-                      <img 
-                        src={product.image_url} 
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-pink-50 to-pink-100">
-                        <Store className="w-12 h-12 text-pink-200" />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">
-                      {product.name}
-                    </h3>
-                    <p className="text-xl font-bold text-[#2563eb] mb-2">
-                      {formatPrice(product.price)} FCFA
-                    </p>
-                    {product.description && (
-                      <p className="text-sm text-gray-500 mb-4 line-clamp-2">
-                        {product.description}
-                      </p>
-                    )}
-                    
-                    <a 
-                      href={getWhatsAppLink(product)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block"
-                      onClick={() => handleWhatsAppClick(product)}
-                    >
-                      <Button className="w-full bg-[#25D366] hover:bg-[#1fb855] text-white">
-                        <MessageCircle className="w-4 h-4 mr-2" />
-                        Commander sur WhatsApp
-                      </Button>
-                    </a>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
+        {/* Featured Products */}
+        {featuredProducts.length > 0 && selectedCategory === 'all' && !searchQuery && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <span>🔥</span>
+              <span>Produits populaires</span>
+            </h2>
+            <ProductGrid 
+              products={featuredProducts}
+              seller={seller}
+              onWhatsAppClick={handleWhatsAppClick}
+            />
           </div>
         )}
+
+        {/* All Products */}
+        <div>
+          {selectedCategory !== 'all' || searchQuery ? (
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              {searchQuery ? `Résultats pour "${searchQuery}"` : `Catégorie: ${selectedCategory}`}
+            </h2>
+          ) : featuredProducts.length > 0 ? (
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Tous nos produits</h2>
+          ) : (
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Nos produits</h2>
+          )}
+
+          {loadingProducts ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-[#2563eb]" />
+            </div>
+          ) : (
+            <ProductGrid 
+              products={filteredProducts}
+              seller={seller}
+              onWhatsAppClick={handleWhatsAppClick}
+            />
+          )}
+        </div>
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t mt-12 py-8">
+      <footer className="bg-white border-t mt-16 py-8">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-8 mb-6">
-            <div>
-              <h3 className="font-bold text-gray-900 mb-3">{seller.shop_name}</h3>
-              <div className="space-y-2 text-sm text-gray-600">
-                {seller.address && <p className="flex items-start gap-2"><MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" /> {seller.address}</p>}
-                {seller.whatsapp_number && <p className="flex items-center gap-2"><Phone className="w-4 h-4" /> {seller.whatsapp_number}</p>}
-                {seller.email && <p className="flex items-center gap-2"><Mail className="w-4 h-4" /> {seller.email}</p>}
+          {/* Payment Methods */}
+          {seller.payment_methods && seller.payment_methods.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-center font-semibold text-gray-700 mb-4">Méthodes de paiement</h3>
+              <div className="flex flex-wrap items-center justify-center gap-6">
+                {seller.payment_methods.map((logo, index) => (
+                  <img 
+                    key={index}
+                    src={logo} 
+                    alt={`Méthode de paiement ${index + 1}`}
+                    className="h-8 object-contain grayscale hover:grayscale-0 transition-all"
+                  />
+                ))}
               </div>
             </div>
-            <div className="text-center md:text-right">
-              <p className="text-sm text-gray-500 mb-3">Boutique propulsée par</p>
-              <Logo size="sm" />
+          )}
+
+          {/* Partners */}
+          {seller.partner_logos && seller.partner_logos.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-center font-semibold text-gray-700 mb-4">Nos partenaires</h3>
+              <div className="flex flex-wrap items-center justify-center gap-8">
+                {seller.partner_logos.map((logo, index) => (
+                  <img 
+                    key={index}
+                    src={logo} 
+                    alt={`Partenaire ${index + 1}`}
+                    className="h-12 object-contain grayscale hover:grayscale-0 transition-all"
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="border-t pt-4 text-center text-xs text-gray-500">
-            © {new Date().getFullYear()} {seller.shop_name}. Tous droits réservés.
+          )}
+
+          {/* Footer Info */}
+          <div className="border-t pt-6">
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <h3 className="font-bold text-gray-900 mb-3">{seller.shop_name}</h3>
+                <div className="space-y-2 text-sm text-gray-600">
+                  {seller.address && (
+                    <p className="flex items-start gap-2">
+                      <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" /> 
+                      {seller.address}
+                    </p>
+                  )}
+                  {seller.whatsapp_number && (
+                    <p className="flex items-center gap-2">
+                      <Phone className="w-4 h-4" /> 
+                      {seller.whatsapp_number}
+                    </p>
+                  )}
+                  {seller.email && (
+                    <p className="flex items-center gap-2">
+                      <Mail className="w-4 h-4" /> 
+                      {seller.email}
+                    </p>
+                  )}
+                </div>
+              </div>
+              
+              <div className="text-center md:text-right">
+                <p className="text-sm text-gray-500 mb-2">Boutique propulsée par</p>
+                <p className="text-lg font-bold text-[#2563eb]">QRSell</p>
+              </div>
+            </div>
+            
+            <div className="border-t pt-4 text-center text-xs text-gray-500">
+              © {new Date().getFullYear()} {seller.shop_name}. Tous droits réservés.
+            </div>
           </div>
         </div>
       </footer>
