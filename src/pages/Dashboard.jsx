@@ -22,7 +22,7 @@ import SellerProfileForm from '@/components/dashboard/SellerProfileForm';
 import ProductForm from '@/components/dashboard/ProductForm';
 import ProductCard from '@/components/dashboard/ProductCard';
 import TikTokGuide from '@/components/dashboard/TikTokGuide';
-import ShopSettings from '@/components/dashboard/ShopSettings';
+import SettingsTabs from '@/components/dashboard/SettingsTabs';
 import ProductImportExport from '@/components/dashboard/ProductImportExport';
 import KPICards from '@/components/dashboard/KPICards';
 import PerformanceChart from '@/components/dashboard/PerformanceChart';
@@ -525,7 +525,7 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-6xl mx-auto">
               <div className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Paramètres de la boutique</h2>
                 <p className="text-gray-500">Personnalisez votre vitrine en ligne</p>
@@ -549,7 +549,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <ShopSettings seller={seller} />
+              <SettingsTabs seller={seller} />
             </div>
           </TabsContent>
         </Tabs>
