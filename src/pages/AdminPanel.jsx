@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
+import { createPageUrl } from '@/utils/index';
 import { Button } from "@/components/ui/button";
 import { Shield, Users, Package, Activity, LogOut, Loader2, Megaphone, CreditCard, FileText, Moon, Sun, ChevronLeft, ChevronRight, BarChart3, Bug } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
