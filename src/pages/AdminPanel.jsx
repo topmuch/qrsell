@@ -67,7 +67,7 @@ export default function AdminPanel() {
   };
 
   const handleLogout = () => {
-    base44.auth.logout(createPageUrl('Home'));
+    base44.auth.logout('/Home');
   };
 
   if (loading) {
