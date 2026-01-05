@@ -89,7 +89,8 @@ export default function AdminBannersPage() {
         header: "En-tête",
         footer: "Pied de page",
         sidebar: "Barre latérale",
-        "product-page": "Page produit"
+        "product-page": "Page produit",
+        dashboard: "Dashboard"
     };
 
     const targetLabels = {
@@ -102,7 +103,8 @@ export default function AdminBannersPage() {
         header: "bg-amber-100 text-amber-800",
         footer: "bg-blue-100 text-blue-800",
         sidebar: "bg-purple-100 text-purple-800",
-        "product-page": "bg-green-100 text-green-800"
+        "product-page": "bg-green-100 text-green-800",
+        dashboard: "bg-sky-100 text-sky-800"
     };
 
     if (!user) {
