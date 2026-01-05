@@ -32,6 +32,10 @@ import BannerDisplay from '@/components/dashboard/BannerDisplay';
 import Banner from '@/components/Banner';
 import HotDemandAlert from '@/components/dashboard/HotDemandAlert';
 import SubscriptionStatus from '@/components/dashboard/SubscriptionStatus';
+import PromotionForm from '@/components/dashboard/PromotionForm';
+import PromotionCard from '@/components/dashboard/PromotionCard';
+import CouponForm from '@/components/dashboard/CouponForm';
+import CouponCard from '@/components/dashboard/CouponCard';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Dashboard() {
@@ -40,6 +44,8 @@ export default function Dashboard() {
   const [editProduct, setEditProduct] = useState(null);
   const [copied, setCopied] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [showPromotionForm, setShowPromotionForm] = useState(false);
+  const [showCouponForm, setShowCouponForm] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -113,6 +119,34 @@ export default function Dashboard() {
     queryFn: async () => {
       const all = await base44.entities.Campaign.list();
       return all.filter(c => c.status === 'active');
+    }
+  });
+
+  // Fetch promotions
+  const { data: promotions = [] } = useQuery({
+    queryKey: ['promotions', seller?.id],
+    queryFn: () => base44.entities.Promotion.filter({ seller_id: seller?.id }),
+    enabled: !!seller?.id
+  });
+
+  // Fetch coupons
+  const { data: coupons = [] } = useQuery({
+    queryKey: ['coupons', seller?.id],
+    queryFn: () => base44.entities.Coupon.filter({ seller_id: seller?.id }),
+    enabled: !!seller?.id
+  });
+
+  const deletePromotionMutation = useMutation({
+    mutationFn: (promotionId) => base44.entities.Promotion.delete(promotionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['promotions']);
+    }
+  });
+
+  const deleteCouponMutation = useMutation({
+    mutationFn: (couponId) => base44.entities.Coupon.delete(couponId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['coupons']);
     }
   });
 
@@ -316,6 +350,10 @@ export default function Dashboard() {
               <Package className="w-4 h-4" />
               Produits
             </TabsTrigger>
+            <TabsTrigger value="promotions" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
+              <Zap className="w-4 h-4" />
+              Promotions
+            </TabsTrigger>
             <TabsTrigger value="campaigns" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
               <Sparkles className="w-4 h-4" />
               Campagnes
@@ -480,6 +518,110 @@ export default function Dashboard() {
             )}
           </TabsContent>
 
+          <TabsContent value="promotions" className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Promotions Flash */}
+              <div className="bg-white p-6 rounded-xl shadow">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-2xl font-bold flex items-center gap-2">
+                      <Zap className="w-6 h-6 text-orange-500" />
+                      Promotions Flash
+                    </h2>
+                    <p className="text-gray-600 text-sm mt-1">
+                      Offres limitées à 30 minutes après scan
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={() => setShowPromotionForm(true)}
+                    className="bg-orange-500 hover:bg-orange-600"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Créer
+                  </Button>
+                </div>
+
+                {promotions.length === 0 ? (
+                  <div className="text-center py-12 bg-orange-50 rounded-lg border-2 border-dashed border-orange-200">
+                    <Zap className="w-12 h-12 text-orange-300 mx-auto mb-3" />
+                    <p className="text-gray-600">Aucune promotion flash</p>
+                    <Button 
+                      onClick={() => setShowPromotionForm(true)}
+                      className="mt-4 bg-orange-500 hover:bg-orange-600"
+                      size="sm"
+                    >
+                      Créer ma première promo
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {promotions.map(promo => (
+                      <PromotionCard 
+                        key={promo.id}
+                        promotion={promo}
+                        onDelete={(p) => {
+                          if (confirm('Supprimer cette promotion ?')) {
+                            deletePromotionMutation.mutate(p.id);
+                          }
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Coupons */}
+              <div className="bg-white p-6 rounded-xl shadow">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-2xl font-bold flex items-center gap-2">
+                      <Ticket className="w-6 h-6 text-purple-500" />
+                      Coupons
+                    </h2>
+                    <p className="text-gray-600 text-sm mt-1">
+                      Valables 7 jours, utilisables une fois
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={() => setShowCouponForm(true)}
+                    className="bg-purple-500 hover:bg-purple-600"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Créer
+                  </Button>
+                </div>
+
+                {coupons.length === 0 ? (
+                  <div className="text-center py-12 bg-purple-50 rounded-lg border-2 border-dashed border-purple-200">
+                    <Ticket className="w-12 h-12 text-purple-300 mx-auto mb-3" />
+                    <p className="text-gray-600">Aucun coupon</p>
+                    <Button 
+                      onClick={() => setShowCouponForm(true)}
+                      className="mt-4 bg-purple-500 hover:bg-purple-600"
+                      size="sm"
+                    >
+                      Créer mon premier coupon
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {coupons.map(coupon => (
+                      <CouponCard 
+                        key={coupon.id}
+                        coupon={coupon}
+                        onDelete={(c) => {
+                          if (confirm('Supprimer ce coupon ?')) {
+                            deleteCouponMutation.mutate(c.id);
+                          }
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+
           <TabsContent value="campaigns" className="space-y-6">
             <div className="bg-white p-6 rounded-xl shadow">
               <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
@@ -573,6 +715,25 @@ export default function Dashboard() {
           seller={seller}
           editProduct={editProduct}
           onSuccess={handleProductSuccess}
+        />
+      )}
+
+      {/* Promotion form modal */}
+      {showPromotionForm && seller && (
+        <PromotionForm 
+          open={showPromotionForm}
+          onClose={() => setShowPromotionForm(false)}
+          seller={seller}
+          products={products}
+        />
+      )}
+
+      {/* Coupon form modal */}
+      {showCouponForm && seller && (
+        <CouponForm 
+          open={showCouponForm}
+          onClose={() => setShowCouponForm(false)}
+          seller={seller}
         />
       )}
     </div>
