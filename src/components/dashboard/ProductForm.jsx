@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { base44 } from '@/api/base44Client';
 import { Loader2, Upload, X, Image as ImageIcon } from 'lucide-react';
@@ -155,6 +157,56 @@ export default function ProductForm({ open, onClose, seller, onSuccess, editProd
             <p className="text-xs text-gray-500 text-right">
               {formData.description.length}/100
             </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="category">Catégorie</Label>
+            <Select 
+              value={formData.category} 
+              onValueChange={(value) => setFormData(prev => ({...prev, category: value}))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner une catégorie" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Mode">👔 Mode</SelectItem>
+                <SelectItem value="Électroménager">🔌 Électroménager</SelectItem>
+                <SelectItem value="Beauté">💄 Beauté</SelectItem>
+                <SelectItem value="Accessoires">👜 Accessoires</SelectItem>
+                <SelectItem value="Alimentation">🍎 Alimentation</SelectItem>
+                <SelectItem value="Électronique">📱 Électronique</SelectItem>
+                <SelectItem value="Maison">🏠 Maison</SelectItem>
+                <SelectItem value="Sport">⚽ Sport</SelectItem>
+                <SelectItem value="Autre">📦 Autre</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-3 pt-2 border-t">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="is_new" className="cursor-pointer">Badge "Nouveauté"</Label>
+              <Switch
+                id="is_new"
+                checked={formData.is_new}
+                onCheckedChange={(checked) => setFormData(prev => ({...prev, is_new: checked}))}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="is_on_promo" className="cursor-pointer">Badge "Promo"</Label>
+              <Switch
+                id="is_on_promo"
+                checked={formData.is_on_promo}
+                onCheckedChange={(checked) => setFormData(prev => ({...prev, is_on_promo: checked}))}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="is_out_of_stock" className="cursor-pointer">En rupture de stock</Label>
+              <Switch
+                id="is_out_of_stock"
+                checked={formData.is_out_of_stock}
+                onCheckedChange={(checked) => setFormData(prev => ({...prev, is_out_of_stock: checked}))}
+              />
+            </div>
           </div>
 
           <div className="flex gap-3 pt-2">
