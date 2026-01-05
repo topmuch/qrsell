@@ -20,6 +20,7 @@ export default function SubscriptionRequestManagement() {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [showCredentialsModal, setShowCredentialsModal] = useState(false);
+  const [showModifyDialog, setShowModifyDialog] = useState(false);
   const [generatedCredentials, setGeneratedCredentials] = useState(null);
   const [actionData, setActionData] = useState({
     plan_code: "",
@@ -228,6 +229,28 @@ export default function SubscriptionRequestManagement() {
     setShowDialog(action);
   };
 
+  const openModifyDialog = (request) => {
+    setSelectedRequest(request);
+    setActionData({
+      plan_code: request.plan_code,
+      duration_months: request.duration_months.toString(),
+      rejection_reason: ""
+    });
+    setShowModifyDialog(true);
+  };
+
+  const handleModify = async () => {
+    await updateRequestMutation.mutateAsync({
+      id: selectedRequest.id,
+      data: {
+        plan_code: actionData.plan_code,
+        duration_months: parseInt(actionData.duration_months)
+      }
+    });
+    setShowModifyDialog(false);
+    toast.success('Demande modifiée avec succès');
+  };
+
   const statusConfig = {
     pending: { label: "En attente", color: "bg-yellow-100 text-yellow-800", icon: Clock },
     approved: { label: "Approuvée", color: "bg-green-100 text-green-800", icon: CheckCircle2 },
@@ -275,40 +298,6 @@ export default function SubscriptionRequestManagement() {
 
   return (
     <div className="space-y-6">
-      {/* Filter tabs */}
-      <div className="flex gap-2">
-        <Button
-          variant={filter === 'pending' ? 'default' : 'outline'}
-          onClick={() => setFilter('pending')}
-          className="flex items-center gap-2"
-        >
-          <Clock className="w-4 h-4" />
-          En attente
-        </Button>
-        <Button
-          variant={filter === 'approved' ? 'default' : 'outline'}
-          onClick={() => setFilter('approved')}
-          className="flex items-center gap-2"
-        >
-          <CheckCircle2 className="w-4 h-4" />
-          Approuvées
-        </Button>
-        <Button
-          variant={filter === 'rejected' ? 'default' : 'outline'}
-          onClick={() => setFilter('rejected')}
-          className="flex items-center gap-2"
-        >
-          <XCircle className="w-4 h-4" />
-          Rejetées
-        </Button>
-        <Button
-          variant={filter === 'all' ? 'default' : 'outline'}
-          onClick={() => setFilter('all')}
-        >
-          Toutes
-        </Button>
-      </div>
-
       <div className="grid gap-4">
         {requests.map(request => {
           const StatusIcon = statusConfig[request.status]?.icon || Clock;
@@ -377,7 +366,7 @@ export default function SubscriptionRequestManagement() {
                     )}
                   </div>
 
-                  <div className="flex gap-2 ml-4 flex-wrap">
+                  <div className="flex gap-2 ml-4 flex-wrap flex-col">
                     {request.status === 'pending' && (
                       <>
                         <Button
@@ -387,6 +376,14 @@ export default function SubscriptionRequestManagement() {
                         >
                           <CheckCircle2 className="w-4 h-4 mr-1" />
                           Approuver
+                        </Button>
+                        <Button
+                          onClick={() => openModifyDialog(request)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          Modifier
                         </Button>
                         <Button
                           onClick={() => openDialog(request, 'reject')}
