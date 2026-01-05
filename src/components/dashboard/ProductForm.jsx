@@ -69,7 +69,7 @@ export default function ProductForm({ open, onClose, seller, onSuccess, editProd
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {editProduct ? 'Modifier le produit' : 'Ajouter un produit'}
@@ -209,7 +209,7 @@ export default function ProductForm({ open, onClose, seller, onSuccess, editProd
             </div>
           </div>
 
-          <div className="flex gap-3 pt-4 sticky bottom-0 bg-white pb-2">
+          <div className="flex gap-3 pt-4 border-t sticky bottom-0 bg-white pb-2">
             <Button 
               type="button" 
               variant="outline" 
@@ -220,15 +220,15 @@ export default function ProductForm({ open, onClose, seller, onSuccess, editProd
             </Button>
             <Button 
               type="submit"
-              className="flex-1 bg-gradient-to-r from-[#2563eb] to-[#3b82f6] hover:opacity-90 text-white shadow-lg"
+              className="flex-1 bg-gradient-to-r from-[#2563eb] to-[#3b82f6] hover:opacity-90 text-white shadow-lg font-semibold"
               disabled={loading || uploading}
             >
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : editProduct ? (
-                '💾 Sauvegarder'
+                'Sauvegarder les modifications'
               ) : (
-                '✨ Ajouter'
+                'Ajouter le produit'
               )}
             </Button>
           </div>
