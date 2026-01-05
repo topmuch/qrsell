@@ -275,6 +275,40 @@ export default function SubscriptionRequestManagement() {
 
   return (
     <div className="space-y-6">
+      {/* Filter tabs */}
+      <div className="flex gap-2">
+        <Button
+          variant={filter === 'pending' ? 'default' : 'outline'}
+          onClick={() => setFilter('pending')}
+          className="flex items-center gap-2"
+        >
+          <Clock className="w-4 h-4" />
+          En attente
+        </Button>
+        <Button
+          variant={filter === 'approved' ? 'default' : 'outline'}
+          onClick={() => setFilter('approved')}
+          className="flex items-center gap-2"
+        >
+          <CheckCircle2 className="w-4 h-4" />
+          Approuvées
+        </Button>
+        <Button
+          variant={filter === 'rejected' ? 'default' : 'outline'}
+          onClick={() => setFilter('rejected')}
+          className="flex items-center gap-2"
+        >
+          <XCircle className="w-4 h-4" />
+          Rejetées
+        </Button>
+        <Button
+          variant={filter === 'all' ? 'default' : 'outline'}
+          onClick={() => setFilter('all')}
+        >
+          Toutes
+        </Button>
+      </div>
+
       <div className="grid gap-4">
         {requests.map(request => {
           const StatusIcon = statusConfig[request.status]?.icon || Clock;

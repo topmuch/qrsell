@@ -1,15 +1,25 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Activity, QrCode, Eye, MessageCircle, Loader2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Activity, QrCode, Eye, MessageCircle, Loader2, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+const ITEMS_PER_PAGE = 10;
+
 export default function ActivityLogs() {
+  const [filterType, setFilterType] = useState('all');
+  const [filterSeller, setFilterSeller] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+
   const { data: analytics = [], isLoading } = useQuery({
     queryKey: ['admin-analytics'],
-    queryFn: () => base44.entities.Analytics.list('-created_date', 100)
+    queryFn: () => base44.entities.Analytics.list('-created_date', 500)
   });
 
   const { data: products = [] } = useQuery({
@@ -50,13 +60,13 @@ export default function ActivityLogs() {
   const getEventLabel = (eventType) => {
     switch (eventType) {
       case 'scan':
-        return 'QR scanné';
+        return '📲 Scan QR';
       case 'view_product':
-        return 'Produit vu';
+        return '👁️ Produit vu';
       case 'whatsapp_click':
-        return 'Clic WhatsApp';
+        return '💬 Clic WhatsApp';
       case 'view_shop':
-        return 'Boutique visitée';
+        return '📌 Visite boutique';
       default:
         return eventType;
     }
@@ -86,6 +96,46 @@ export default function ActivityLogs() {
     return `Il y a ${Math.floor(seconds / 86400)}j`;
   };
 
+  // Filter and search logic
+  const filteredAnalytics = useMemo(() => {
+    let filtered = analytics;
+
+    // Filter by type
+    if (filterType !== 'all') {
+      filtered = filtered.filter(a => a.event_type === filterType);
+    }
+
+    // Filter by seller
+    if (filterSeller !== 'all') {
+      filtered = filtered.filter(a => a.seller_id === filterSeller);
+    }
+
+    // Search by shop name or product ID
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(a => {
+        const seller = sellers.find(s => s.id === a.seller_id);
+        const shopName = seller?.shop_name?.toLowerCase() || '';
+        const productId = a.product_public_id?.toLowerCase() || '';
+        return shopName.includes(query) || productId.includes(query);
+      });
+    }
+
+    return filtered;
+  }, [analytics, filterType, filterSeller, searchQuery, sellers]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredAnalytics.length / ITEMS_PER_PAGE);
+  const paginatedAnalytics = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredAnalytics.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredAnalytics, currentPage]);
+
+  // Reset page when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [filterType, filterSeller, searchQuery]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -95,13 +145,90 @@ export default function ActivityLogs() {
   }
 
   // Group by event type
-  const eventCounts = analytics.reduce((acc, event) => {
+  const eventCounts = filteredAnalytics.reduce((acc, event) => {
     acc[event.event_type] = (acc[event.event_type] || 0) + 1;
     return acc;
   }, {});
 
+  // Get unique sellers for filter
+  const uniqueSellers = [...new Set(analytics.map(a => a.seller_id))].map(id => 
+    sellers.find(s => s.id === id)
+  ).filter(Boolean);
+
   return (
     <div className="space-y-6">
+      {/* Filters */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="grid md:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Type d'événement</label>
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les types</SelectItem>
+                  <SelectItem value="view_shop">📌 Visite boutique</SelectItem>
+                  <SelectItem value="scan">📲 Scan QR</SelectItem>
+                  <SelectItem value="whatsapp_click">💬 Clic WhatsApp</SelectItem>
+                  <SelectItem value="view_product">👁️ Produit vu</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Vendeur</label>
+              <Select value={filterSeller} onValueChange={setFilterSeller}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les vendeurs</SelectItem>
+                  {uniqueSellers.map(seller => (
+                    <SelectItem key={seller.id} value={seller.id}>
+                      {seller.shop_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="md:col-span-2 space-y-2">
+              <label className="text-sm font-medium">Rechercher</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Nom de boutique ou ID produit..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mt-4 pt-4 border-t">
+            <p className="text-sm text-gray-600">
+              {filteredAnalytics.length} événement{filteredAnalytics.length > 1 ? 's' : ''} trouvé{filteredAnalytics.length > 1 ? 's' : ''}
+            </p>
+            {(filterType !== 'all' || filterSeller !== 'all' || searchQuery) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setFilterType('all');
+                  setFilterSeller('all');
+                  setSearchQuery('');
+                }}
+              >
+                Réinitialiser les filtres
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Event summary */}
       <div className="grid md:grid-cols-4 gap-4">
         {Object.entries(eventCounts).map(([type, count], index) => (
@@ -131,11 +258,36 @@ export default function ActivityLogs() {
       {/* Activity feed */}
       <Card>
         <CardHeader>
-          <CardTitle>Activité récente</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Activité récente</CardTitle>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-500">
+                Page {currentPage} / {totalPages}
+              </span>
+              <div className="flex gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4 max-h-[600px] overflow-y-auto">
-            {analytics.map((event, index) => (
+          <div className="space-y-4">
+            {paginatedAnalytics.map((event, index) => (
               <motion.div
                 key={`${event.id}-${index}`}
                 initial={{ opacity: 0, x: -20 }}
@@ -185,6 +337,13 @@ export default function ActivityLogs() {
                 </div>
               </motion.div>
             ))}
+
+            {paginatedAnalytics.length === 0 && (
+              <div className="text-center py-12 text-gray-500">
+                <Filter className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p>Aucun événement trouvé avec ces filtres</p>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
