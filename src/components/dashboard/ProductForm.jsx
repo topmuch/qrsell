@@ -12,7 +12,11 @@ export default function ProductForm({ open, onClose, seller, onSuccess, editProd
     name: editProduct?.name || '',
     price: editProduct?.price || '',
     description: editProduct?.description || '',
-    image_url: editProduct?.image_url || ''
+    image_url: editProduct?.image_url || '',
+    category: editProduct?.category || 'Autre',
+    is_new: editProduct?.is_new || false,
+    is_on_promo: editProduct?.is_on_promo || false,
+    is_out_of_stock: editProduct?.is_out_of_stock || false
   });
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
