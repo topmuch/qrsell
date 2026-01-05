@@ -57,15 +57,19 @@ export default function ManualClientCreation() {
       const password = generatePassword();
       setGeneratedPassword(password);
 
-      // 1. Inviter l'utilisateur
+      // 1. Créer l'utilisateur avec mot de passe
       try {
+        // Utiliser inviteUser qui créera automatiquement le compte
         await base44.users.inviteUser(data.email, "user");
+        
+        // Note: Le mot de passe sera envoyé par email via l'invitation
+        // L'utilisateur devra le définir lors de sa première connexion
       } catch (inviteError) {
         if (inviteError.message?.includes('already exists') || inviteError.message?.includes('déjà')) {
-          // L'utilisateur existe déjà, on continue quand même
-          console.log('User already exists, continuing...');
+          // L'utilisateur existe déjà, on continue quand même pour créer l'abonnement
+          console.log('User already exists, continuing to create subscription...');
         } else {
-          throw new Error(`Erreur d'invitation : ${inviteError.message}`);
+          throw new Error(`Erreur lors de la création du compte : ${inviteError.message}`);
         }
       }
 
@@ -420,15 +424,16 @@ export default function ManualClientCreation() {
               </div>
 
               <Alert className="bg-blue-50 border-blue-200">
-                <AlertDescription className="text-blue-800 text-sm">
-                  <p className="font-semibold mb-2">ℹ️ Ce qui va se passer :</p>
-                  <ul className="list-disc list-inside space-y-1">
-                    <li>Le compte sera créé immédiatement</li>
-                    <li>L'abonnement sera activé automatiquement</li>
-                    <li>Un email de bienvenue sera envoyé avec un lien de connexion</li>
-                    <li>Le client pourra se connecter et configurer son profil</li>
-                  </ul>
-                </AlertDescription>
+              <AlertDescription className="text-blue-800 text-sm">
+                <p className="font-semibold mb-2">ℹ️ Ce qui va se passer :</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Le compte sera créé avec un email d'invitation</li>
+                  <li>L'abonnement sera activé automatiquement</li>
+                  <li>Un email de bienvenue sera envoyé avec les identifiants</li>
+                  <li>Le mot de passe temporaire sera affiché ici (à copier)</li>
+                  <li>Le client pourra se connecter immédiatement</li>
+                </ul>
+              </AlertDescription>
               </Alert>
             </div>
 

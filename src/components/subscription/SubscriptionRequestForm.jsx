@@ -13,6 +13,9 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 
 export default function SubscriptionRequestForm() {
   const navigate = useNavigate();
+  const [user, setUser] = React.useState(null);
+  const [isEditMode, setIsEditMode] = React.useState(false);
+
   const [formData, setFormData] = useState({
     full_name: "",
     user_email: "",
@@ -25,6 +28,43 @@ export default function SubscriptionRequestForm() {
     message: ""
   });
 
+  React.useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const currentUser = await base44.auth.me();
+        setUser(currentUser);
+
+        // Check if edit mode
+        const urlParams = new URLSearchParams(window.location.search);
+        const editMode = urlParams.get('edit') === 'true';
+        const currentPlan = urlParams.get('current_plan');
+
+        setIsEditMode(editMode);
+
+        if (editMode && currentUser) {
+          // Pre-fill with current user data
+          const sellers = await base44.entities.Seller.filter({ created_by: currentUser.email });
+          const seller = sellers[0];
+
+          setFormData({
+            full_name: seller?.full_name || currentUser.full_name || "",
+            user_email: currentUser.email,
+            phone: seller?.whatsapp_number || "",
+            business_name: seller?.shop_name || "",
+            country: "",
+            city: "",
+            plan_code: currentPlan || "",
+            duration_months: "",
+            message: "Demande de modification d'abonnement"
+          });
+        }
+      } catch (error) {
+        console.error('Error loading user:', error);
+      }
+    };
+    loadUser();
+  }, []);
+
   const { data: plans = [] } = useQuery({
     queryKey: ['plans'],
     queryFn: async () => {
@@ -36,6 +76,19 @@ export default function SubscriptionRequestForm() {
   const createRequestMutation = useMutation({
     mutationFn: async (data) => {
       try {
+        // Check if user has existing subscription (edit mode)
+        if (isEditMode && user) {
+          const existingSubs = await base44.entities.Subscription.filter({ 
+            user_email: user.email,
+            is_active: true 
+          });
+
+          if (existingSubs.length > 0) {
+            // Create a request for modification, not a new subscription
+            data.message = `Modification d'abonnement demandée. Forfait actuel: ${existingSubs[0].plan_code}. Nouveau forfait souhaité: ${data.plan_code} pour ${data.duration_months} mois.`;
+          }
+        }
+
         const request = await base44.entities.SubscriptionRequest.create(data);
         
         // Envoyer email de confirmation
@@ -112,9 +165,14 @@ export default function SubscriptionRequestForm() {
       <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle className="text-3xl">Demande d'abonnement QRSell</CardTitle>
+            <CardTitle className="text-3xl">
+              {isEditMode ? 'Modifier mon abonnement' : 'Demande d\'abonnement QRSell'}
+            </CardTitle>
             <CardDescription>
-              Remplissez ce formulaire pour accéder à votre vitrine digitale. Notre équipe validera votre demande sous 24h.
+              {isEditMode 
+                ? 'Choisissez votre nouveau forfait et la durée souhaitée. Notre équipe traitera votre demande sous 24h.'
+                : 'Remplissez ce formulaire pour accéder à votre vitrine digitale. Notre équipe validera votre demande sous 24h.'
+              }
             </CardDescription>
           </CardHeader>
 

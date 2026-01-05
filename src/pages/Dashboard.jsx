@@ -31,6 +31,7 @@ import SellerStatus from '@/components/dashboard/SellerStatus';
 import BannerDisplay from '@/components/dashboard/BannerDisplay';
 import Banner from '@/components/Banner';
 import HotDemandAlert from '@/components/dashboard/HotDemandAlert';
+import SubscriptionStatus from '@/components/dashboard/SubscriptionStatus';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Dashboard() {
@@ -402,13 +403,14 @@ export default function Dashboard() {
                 />
               </div>
 
-              {/* Right: Seller Status */}
-              <div>
+              {/* Right: Seller Status + Subscription */}
+              <div className="space-y-6">
                 <SellerStatus 
                   seller={seller}
                   productsCount={products.length}
                   totalScans={totalScans}
                 />
+                <SubscriptionStatus user={user} />
               </div>
             </div>
           </TabsContent>
