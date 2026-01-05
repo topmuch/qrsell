@@ -10,14 +10,26 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { CheckCircle2, XCircle, DollarSign, Calendar } from "lucide-react";
+import { CheckCircle2, XCircle, DollarSign, Calendar, Plus, Edit } from "lucide-react";
 import { format, isPast } from "date-fns";
 import { fr } from "date-fns/locale";
+import { toast } from "sonner";
 
 export default function SubscriptionManagement() {
   const [selectedSubscription, setSelectedSubscription] = useState(null);
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const [paymentData, setPaymentData] = useState({
+    payment_method: "",
+    payment_note: ""
+  });
+  const [formData, setFormData] = useState({
+    user_email: "",
+    plan_code: "",
+    duration_months: "",
+    start_date: "",
+    payment_recorded: false,
     payment_method: "",
     payment_note: ""
   });
@@ -39,6 +51,26 @@ export default function SubscriptionManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries(['subscriptions']);
       setShowPaymentDialog(false);
+      setShowEditDialog(false);
+      toast.success('Abonnement mis à jour');
+    }
+  });
+
+  const createSubscriptionMutation = useMutation({
+    mutationFn: (data) => base44.entities.Subscription.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['subscriptions']);
+      setShowCreateDialog(false);
+      setFormData({
+        user_email: "",
+        plan_code: "",
+        duration_months: "",
+        start_date: "",
+        payment_recorded: false,
+        payment_method: "",
+        payment_note: ""
+      });
+      toast.success('Abonnement créé avec succès');
     }
   });
 
@@ -60,6 +92,69 @@ export default function SubscriptionManagement() {
     });
   };
 
+  const openCreateDialog = () => {
+    setFormData({
+      user_email: "",
+      plan_code: plans[0]?.code || "",
+      duration_months: "3",
+      start_date: format(new Date(), 'yyyy-MM-dd'),
+      payment_recorded: false,
+      payment_method: "",
+      payment_note: ""
+    });
+    setShowCreateDialog(true);
+  };
+
+  const openEditDialog = (subscription) => {
+    setSelectedSubscription(subscription);
+    const durationMonths = Math.ceil((new Date(subscription.end_date) - new Date(subscription.start_date)) / (1000 * 60 * 60 * 24 * 30));
+    setFormData({
+      user_email: subscription.user_email,
+      plan_code: subscription.plan_code,
+      duration_months: durationMonths.toString(),
+      start_date: format(new Date(subscription.start_date), 'yyyy-MM-dd'),
+      payment_recorded: subscription.payment_recorded,
+      payment_method: subscription.payment_method || "",
+      payment_note: subscription.payment_note || ""
+    });
+    setShowEditDialog(true);
+  };
+
+  const handleCreate = () => {
+    const startDate = new Date(formData.start_date);
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + parseInt(formData.duration_months));
+
+    createSubscriptionMutation.mutate({
+      user_email: formData.user_email,
+      plan_code: formData.plan_code,
+      start_date: startDate.toISOString(),
+      end_date: endDate.toISOString(),
+      is_active: true,
+      payment_recorded: formData.payment_recorded,
+      payment_method: formData.payment_method || null,
+      payment_note: formData.payment_note || null
+    });
+  };
+
+  const handleEdit = () => {
+    const startDate = new Date(formData.start_date);
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + parseInt(formData.duration_months));
+
+    updateSubscriptionMutation.mutate({
+      id: selectedSubscription.id,
+      data: {
+        plan_code: formData.plan_code,
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString(),
+        payment_recorded: formData.payment_recorded,
+        payment_method: formData.payment_method || null,
+        payment_note: formData.payment_note || null
+      }
+    });
+  };
+
   const openPaymentDialog = (subscription) => {
     setSelectedSubscription(subscription);
     setPaymentData({
@@ -77,13 +172,16 @@ export default function SubscriptionManagement() {
     return { label: "Actif", color: "bg-green-100 text-green-800" };
   };
 
+  const activeSubscriptions = subscriptions.filter(s => s.is_active && !isPast(new Date(s.end_date)));
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Abonnements actifs</h2>
-        <div className="text-sm text-gray-600">
-          Total : {subscriptions.length} abonnements
-        </div>
+        <h2 className="text-2xl font-bold">Abonnements</h2>
+        <Button onClick={openCreateDialog} className="bg-blue-600 hover:bg-blue-700">
+          <Plus className="w-4 h-4 mr-2" />
+          Créer un abonnement
+        </Button>
       </div>
 
       <div className="grid gap-4">
@@ -146,6 +244,14 @@ export default function SubscriptionManagement() {
                   </div>
 
                   <div className="flex flex-col gap-2 ml-4">
+                    <Button
+                      onClick={() => openEditDialog(subscription)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Edit className="w-4 h-4 mr-1" />
+                      Modifier
+                    </Button>
                     {!subscription.payment_recorded && (
                       <Button
                         onClick={() => openPaymentDialog(subscription)}
@@ -182,8 +288,10 @@ export default function SubscriptionManagement() {
 
         {subscriptions.length === 0 && (
           <Card>
-            <CardContent className="py-12 text-center text-gray-500">
-              Aucun abonnement actif
+            <CardContent className="py-12 text-center">
+              <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-600 font-medium mb-2">Aucun abonnement actif.</p>
+              <p className="text-gray-500 text-sm">Commencez par créer un nouveau compte.</p>
             </CardContent>
           </Card>
         )}
