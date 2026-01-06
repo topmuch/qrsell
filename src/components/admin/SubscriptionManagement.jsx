@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { CheckCircle2, XCircle, DollarSign, Calendar, Plus, Edit } from "lucide-react";
+import { CheckCircle2, XCircle, DollarSign, Calendar, Plus, Edit, Key, Copy, Check, Mail } from "lucide-react";
 import { format, isPast } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -20,6 +20,10 @@ export default function SubscriptionManagement() {
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [resetPasswordUser, setResetPasswordUser] = useState(null);
+  const [generatedPassword, setGeneratedPassword] = useState('');
+  const [copied, setCopied] = useState(false);
   const [paymentData, setPaymentData] = useState({
     payment_method: "",
     payment_note: ""
@@ -277,6 +281,15 @@ export default function SubscriptionManagement() {
                   </div>
 
                   <div className="flex flex-col gap-2 ml-4">
+                    <Button
+                      onClick={() => handleResetPassword(subscription)}
+                      variant="outline"
+                      size="sm"
+                      className="border-purple-300 text-purple-600 hover:bg-purple-50"
+                    >
+                      <Key className="w-4 h-4 mr-1" />
+                      Reset MDP
+                    </Button>
                     <Button
                       onClick={() => openEditDialog(subscription)}
                       variant="outline"
@@ -600,6 +613,59 @@ export default function SubscriptionManagement() {
                 Confirmer le paiement
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Reset Password */}
+      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Key className="w-5 h-5 text-purple-600" />
+              Réinitialisation du mot de passe
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-xs text-gray-600">Email</Label>
+                  <p className="font-mono text-sm font-medium text-gray-900 select-all">
+                    {resetPasswordUser?.user_email}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-xs text-gray-600">Mot de passe</Label>
+                  <p className="font-mono text-lg font-bold text-purple-700 select-all break-all">
+                    {generatedPassword}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                onClick={copyAll}
+                className="flex-1"
+                variant={copied ? "default" : "outline"}
+              >
+                {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+                📋 {copied ? 'Copié !' : 'Copier tout'}
+              </Button>
+              <Button
+                onClick={sendByEmail}
+                className="flex-1 bg-blue-600 hover:bg-blue-700"
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                📧 Envoyer par email
+              </Button>
+            </div>
+
+            <p className="text-xs text-gray-500 text-center">
+              ⚠️ Attention : ces identifiants devront être utilisés pour la prochaine connexion
+            </p>
           </div>
         </DialogContent>
       </Dialog>
