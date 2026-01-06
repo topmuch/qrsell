@@ -51,9 +51,9 @@ export default function PromotionProduct() {
 
   const seller = sellers[0];
 
-  // Initialize or get session
+  // Initialize or get session + Track scan
   useEffect(() => {
-    if (!promotion) return;
+    if (!promotion || !product) return;
 
     const existingSession = scanSessions.find(s => !s.is_expired);
     
@@ -68,8 +68,17 @@ export default function PromotionProduct() {
         scan_timestamp: new Date().toISOString(),
         session_id: newSessionId
       });
+
+      // Track scan in analytics
+      base44.entities.Analytics.create({
+        product_id: product.id,
+        seller_id: promotion.seller_id,
+        product_public_id: product.public_id,
+        event_type: 'scan',
+        user_agent: navigator.userAgent
+      }).catch(() => {});
     }
-  }, [promotion, scanSessions]);
+  }, [promotion, scanSessions, product]);
 
   // Countdown timer
   useEffect(() => {

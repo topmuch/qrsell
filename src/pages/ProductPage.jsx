@@ -51,14 +51,28 @@ export default function ProductPage() {
 
   console.log('🔍 ProductPage - Seller found:', seller);
 
-  // Track product view
+  // Track scan and product view
   useEffect(() => {
     if (product && seller) {
-      console.log('📊 Tracking analytics - Product view');
+      console.log('📊 Tracking analytics - Scan + Product view');
       console.log('Product ID:', product.id);
       console.log('Seller ID:', seller.id);
       console.log('Public ID:', product.public_id);
       
+      // Track QR scan
+      base44.entities.Analytics.create({
+        product_id: product.id,
+        seller_id: seller.id,
+        product_public_id: product.public_id,
+        event_type: 'scan',
+        user_agent: navigator.userAgent
+      }).then(() => {
+        console.log('✅ Scan tracked successfully');
+      }).catch((error) => {
+        console.error('❌ Scan tracking error:', error);
+      });
+
+      // Track product view
       base44.entities.Analytics.create({
         product_id: product.id,
         seller_id: seller.id,
@@ -66,9 +80,9 @@ export default function ProductPage() {
         event_type: 'view_product',
         user_agent: navigator.userAgent
       }).then(() => {
-        console.log('✅ Analytics tracked successfully');
+        console.log('✅ Product view tracked successfully');
       }).catch((error) => {
-        console.error('❌ Analytics tracking error:', error);
+        console.error('❌ Product view tracking error:', error);
       });
     }
   }, [product, seller]);
