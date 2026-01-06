@@ -19,6 +19,7 @@ import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import TestimonialSection from '@/components/landing/TestimonialSection';
+import MiniShop from '@/components/landing/MiniShop';
 import Footer from '@/components/landing/Footer';
 import { createPageUrl } from '@/utils/index';
 
