@@ -12,14 +12,18 @@ export default function SellerStatus({ seller, productsCount, totalScans }) {
     : 0;
 
   const criteria = {
-    age: accountAge >= 14,
-    products: productsCount >= 5,
+    age: accountAge >= 1,
+    products: productsCount >= 8,
     scans: totalScans >= 20,
     subscription: seller?.is_subscribed
   };
 
   const completedCriteria = Object.values(criteria).filter(Boolean).length;
   const progress = (completedCriteria / 4) * 100;
+
+  // Check if all criteria met and show message
+  const allCriteriaMet = completedCriteria === 4;
+  const scansReached = totalScans >= 20;
 
   return (
     <Card className="bg-gradient-to-br from-[#2563eb]/5 to-blue-50/30 border-[#2563eb]/20">
@@ -61,11 +65,11 @@ export default function SellerStatus({ seller, productsCount, totalScans }) {
             <div className="space-y-2 mb-4">
               <CriteriaItem 
                 completed={criteria.age}
-                text={`Compte actif ${accountAge >= 14 ? '✓' : `depuis ${accountAge}j (14j requis)`}`}
+                text={`Compte actif ${accountAge >= 1 ? '✓' : `depuis ${accountAge}j (1j requis)`}`}
               />
               <CriteriaItem 
                 completed={criteria.products}
-                text={`${productsCount} produit${productsCount > 1 ? 's' : ''} ${productsCount >= 5 ? '✓' : '(5 requis)'}`}
+                text={`${productsCount} produit${productsCount > 1 ? 's' : ''} ${productsCount >= 8 ? '✓' : '(8 requis)'}`}
               />
               <CriteriaItem 
                 completed={criteria.scans}
@@ -76,6 +80,14 @@ export default function SellerStatus({ seller, productsCount, totalScans }) {
                 text={`Abonnement Pro ${criteria.subscription ? '✓' : '(requis)'}`}
               />
             </div>
+
+            {scansReached && !allCriteriaMet && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                <p className="text-sm text-blue-800 font-medium">
+                  🎉 Vous avez atteint 20 scans — continuez à vendre pour débloquer le badge !
+                </p>
+              </div>
+            )}
           </>
         )}
 

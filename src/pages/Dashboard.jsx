@@ -232,7 +232,7 @@ export default function Dashboard() {
   };
 
   const handleLogout = () => {
-    base44.auth.logout(createPageUrl('Home'));
+    base44.auth.logout('/');
   };
 
   if (!user || loadingSubscription) {

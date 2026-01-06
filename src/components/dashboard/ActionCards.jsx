@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Bell, TrendingUp, Download, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils/index';
 
 export default function ActionCards({ recentActivity, onExport }) {
   const actions = [
@@ -14,14 +16,16 @@ export default function ActionCards({ recentActivity, onExport }) {
       cta: 'Voir le détail',
       color: 'bg-blue-50 text-blue-600',
       badge: recentActivity ? 'Nouveau' : null,
-      badgeColor: 'bg-blue-500'
+      badgeColor: 'bg-blue-500',
+      link: createPageUrl('RecentActivity')
     },
     {
       icon: TrendingUp,
       title: 'Gagnez plus',
       description: 'Optimisez vos produits pour augmenter vos ventes',
       cta: 'Voir les conseils',
-      color: 'bg-green-50 text-green-600'
+      color: 'bg-green-50 text-green-600',
+      link: createPageUrl('GrowthTips')
     },
     {
       icon: Download,
@@ -63,14 +67,26 @@ export default function ActionCards({ recentActivity, onExport }) {
                 {action.description}
               </p>
               
-              <Button 
-                variant="ghost" 
-                className="w-full justify-between group-hover:bg-gray-50"
-                onClick={action.onClick}
-              >
-                {action.cta}
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Button>
+              {action.link ? (
+                <Link to={action.link} className="w-full">
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-between group-hover:bg-gray-50"
+                  >
+                    {action.cta}
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+              ) : (
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-between group-hover:bg-gray-50"
+                  onClick={action.onClick}
+                >
+                  {action.cta}
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              )}
             </CardContent>
           </Card>
         </motion.div>
