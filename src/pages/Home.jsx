@@ -21,12 +21,22 @@ import { useQuery } from '@tanstack/react-query';
 import TestimonialSection from '@/components/landing/TestimonialSection';
 import MiniShop from '@/components/landing/MiniShop';
 import Footer from '@/components/landing/Footer';
+import FloatingWhatsAppButton from '@/components/ui/FloatingWhatsAppButton';
 import { createPageUrl } from '@/utils/index';
 
 export default function Home() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showScanModal, setShowScanModal] = useState(false);
+
+  // Fetch site settings for WhatsApp support number
+  const { data: siteSettings } = useQuery({
+    queryKey: ['site-settings'],
+    queryFn: async () => {
+      const settings = await base44.entities.SiteSettings.list();
+      return settings[0] || null;
+    }
+  });
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -372,6 +382,14 @@ export default function Home() {
       <TestimonialSection />
       <MiniShop />
       <Footer />
+
+      {/* WhatsApp Floating Button */}
+      {siteSettings?.whatsapp_support && (
+        <FloatingWhatsAppButton 
+          phoneNumber={siteSettings.whatsapp_support}
+          message="Bonjour, je viens de QRSell et j'ai une question."
+        />
+      )}
 
       {/* Scan Modal */}
       <Dialog open={showScanModal} onOpenChange={setShowScanModal}>

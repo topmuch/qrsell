@@ -21,7 +21,8 @@ export default function SiteSettings() {
     smtp_host: '',
     smtp_port: '587',
     smtp_email: '',
-    smtp_api_key: ''
+    smtp_api_key: '',
+    whatsapp_support: ''
   });
   const [uploading, setUploading] = useState(false);
 
@@ -50,7 +51,8 @@ export default function SiteSettings() {
           smtp_host: data.smtp_host || '',
           smtp_port: data.smtp_port || '587',
           smtp_email: data.smtp_email || '',
-          smtp_api_key: data.smtp_api_key || ''
+          smtp_api_key: data.smtp_api_key || '',
+          whatsapp_support: data.whatsapp_support || ''
         });
       }
     }
@@ -256,6 +258,27 @@ export default function SiteSettings() {
                 </SelectContent>
               </Select>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* WhatsApp Support */}
+      <Card className="dark:bg-gray-800 dark:border-gray-700">
+        <CardHeader>
+          <CardTitle className="dark:text-white">Support WhatsApp</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="whatsapp_support">Numéro WhatsApp du support</Label>
+            <Input
+              id="whatsapp_support"
+              value={settings.whatsapp_support}
+              onChange={(e) => setSettings({ ...settings, whatsapp_support: e.target.value })}
+              placeholder="+221771234567"
+            />
+            <p className="text-xs text-gray-500">
+              Ce numéro sera utilisé pour le bouton WhatsApp flottant sur la page d'accueil. Format international requis (ex: +221771234567)
+            </p>
           </div>
         </CardContent>
       </Card>
