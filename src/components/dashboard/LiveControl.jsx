@@ -5,7 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Radio, Zap, Play, Square, ExternalLink, Copy, Check, TrendingUp, Eye, MessageCircle } from 'lucide-react';
+import { Radio, Zap, Play, Square, ExternalLink, Copy, Check, TrendingUp, Eye, MessageCircle, Settings } from 'lucide-react';
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import LiveReport from './LiveReport';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -25,19 +28,28 @@ export default function LiveControl({ seller, products }) {
   const { data: analytics = [] } = useQuery({
     queryKey: ['live-analytics', seller?.id],
     queryFn: () => base44.entities.Analytics.filter({ seller_id: seller?.id }),
-    enabled: !!seller?.id
+    enabled: !!seller?.id,
+    refetchInterval: 5000 // Auto-refresh every 5 seconds
+  });
+
+  const { data: productStats = [] } = useQuery({
+    queryKey: ['live-product-stats', liveSession?.id],
+    queryFn: () => base44.entities.LiveProductStats.filter({ live_session_id: liveSession?.id }),
+    enabled: !!liveSession?.id,
+    refetchInterval: 5000
   });
 
   const startLiveMutation = useMutation({
     mutationFn: async (productId) => {
+      let session;
       if (liveSession) {
-        return base44.entities.LiveSession.update(liveSession.id, {
+        session = await base44.entities.LiveSession.update(liveSession.id, {
           active_product_id: productId,
           is_live: true,
           live_started_at: new Date().toISOString()
         });
       } else {
-        return base44.entities.LiveSession.create({
+        session = await base44.entities.LiveSession.create({
           seller_id: seller.id,
           shop_slug: seller.shop_slug,
           active_product_id: productId,
@@ -45,21 +57,47 @@ export default function LiveControl({ seller, products }) {
           live_started_at: new Date().toISOString()
         });
       }
+
+      // Create initial product stats
+      await base44.entities.LiveProductStats.create({
+        live_session_id: session.id,
+        product_id: productId,
+        time_started: new Date().toISOString()
+      });
+
+      return session;
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['live-session']);
+      queryClient.invalidateQueries(['live-product-stats']);
       toast.success('Live démarré !');
     }
   });
 
   const changeProductMutation = useMutation({
-    mutationFn: (productId) => {
+    mutationFn: async (productId) => {
+      // End stats for current product
+      const currentStats = productStats.find(s => s.product_id === liveSession.active_product_id && !s.time_ended);
+      if (currentStats) {
+        await base44.entities.LiveProductStats.update(currentStats.id, {
+          time_ended: new Date().toISOString()
+        });
+      }
+
+      // Create new stats for next product
+      await base44.entities.LiveProductStats.create({
+        live_session_id: liveSession.id,
+        product_id: productId,
+        time_started: new Date().toISOString()
+      });
+
       return base44.entities.LiveSession.update(liveSession.id, {
         active_product_id: productId
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['live-session']);
+      queryClient.invalidateQueries(['live-product-stats']);
       toast.success('Produit changé !');
     }
   });
@@ -106,6 +144,14 @@ export default function LiveControl({ seller, products }) {
 
   return (
     <div className="space-y-6">
+      {/* Live Report */}
+      <LiveReport 
+        liveSession={liveSession}
+        analytics={analytics}
+        products={products}
+        productStats={productStats}
+      />
+
       {/* Live Status & URL */}
       <Card className={liveSession?.is_live ? 'border-2 border-red-500' : ''}>
         <CardHeader>
@@ -189,6 +235,37 @@ export default function LiveControl({ seller, products }) {
                 </div>
               )}
 
+              {/* Public Counter Toggle */}
+              <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Settings className="w-5 h-5 text-blue-600" />
+                      <div>
+                        <Label htmlFor="public-counter" className="text-base font-medium text-gray-900 cursor-pointer">
+                          Afficher le compteur aux clients
+                        </Label>
+                        <p className="text-sm text-gray-600">
+                          Les clients verront le nombre de scans en temps réel
+                        </p>
+                      </div>
+                    </div>
+                    <Switch
+                      id="public-counter"
+                      checked={seller.show_live_public_counter || false}
+                      onCheckedChange={(checked) => {
+                        base44.entities.Seller.update(seller.id, {
+                          show_live_public_counter: checked
+                        }).then(() => {
+                          queryClient.invalidateQueries(['seller']);
+                          toast.success(checked ? 'Compteur public activé' : 'Compteur public désactivé');
+                        });
+                      }}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
               <Button
                 onClick={() => stopLiveMutation.mutate()}
                 variant="destructive"
@@ -225,6 +302,14 @@ export default function LiveControl({ seller, products }) {
               {products.map(product => {
                 const isActive = liveSession?.is_live && liveSession?.active_product_id === product.id;
                 
+                // Get product stats
+                const productStat = productStats.find(s => s.product_id === product.id && !s.time_ended);
+                const productScans = productStat ? 
+                  analytics.filter(a => 
+                    a.product_id === product.id && 
+                    new Date(a.created_date) >= new Date(productStat.time_started)
+                  ).filter(a => a.event_type === 'scan').length : 0;
+                
                 return (
                   <motion.div
                     key={product.id}
@@ -259,9 +344,15 @@ export default function LiveControl({ seller, products }) {
                         <h4 className="font-bold text-sm mb-2 line-clamp-2">
                           {product.name}
                         </h4>
-                        <p className="text-lg font-bold text-blue-600 mb-3">
+                        <p className="text-lg font-bold text-blue-600 mb-2">
                           {new Intl.NumberFormat('fr-FR').format(product.price)} FCFA
                         </p>
+                        {liveSession?.is_live && productScans > 0 && (
+                          <div className="text-sm text-gray-600 mb-3 flex items-center justify-center gap-1">
+                            <Eye className="w-4 h-4 text-blue-500" />
+                            <span className="font-semibold">{productScans} scans</span>
+                          </div>
+                        )}
                         <Button
                           onClick={() => {
                             if (liveSession?.is_live) {

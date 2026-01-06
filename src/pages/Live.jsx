@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2, Sparkles, Eye, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import EnhancedQRCode from '@/components/ui/EnhancedQRCode';
 import FloatingWhatsAppButton from '@/components/ui/FloatingWhatsAppButton';
@@ -39,6 +39,32 @@ export default function Live() {
   });
 
   const seller = sellers[0];
+
+  // Fetch live analytics with auto-refresh
+  const { data: liveAnalytics = [] } = useQuery({
+    queryKey: ['live-analytics', liveSession?.seller_id],
+    queryFn: () => base44.entities.Analytics.filter({ seller_id: liveSession?.seller_id }),
+    enabled: !!liveSession?.seller_id,
+    refetchInterval: 5000
+  });
+
+  // Calculate live stats
+  const getLiveStats = () => {
+    if (!liveSession?.live_started_at) return { scans: 0, views: 0, clicks: 0 };
+
+    const liveStartTime = new Date(liveSession.live_started_at);
+    const relevantAnalytics = liveAnalytics.filter(a => 
+      new Date(a.created_date) >= liveStartTime
+    );
+
+    return {
+      scans: relevantAnalytics.filter(a => a.event_type === 'scan').length,
+      views: relevantAnalytics.filter(a => a.event_type === 'view_product').length,
+      clicks: relevantAnalytics.filter(a => a.event_type === 'whatsapp_click').length
+    };
+  };
+
+  const liveStats = getLiveStats();
 
   // Track scan
   useEffect(() => {
@@ -196,6 +222,39 @@ export default function Live() {
         onClick={handleWhatsAppClick}
         text="Commander maintenant"
       />
+
+      {/* Public Live Counter - Sticky Bottom Banner */}
+      {seller?.show_live_public_counter && (
+        <motion.div
+          initial={{ y: 100 }}
+          animate={{ y: 0 }}
+          className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 shadow-2xl z-40"
+        >
+          <div className="max-w-4xl mx-auto flex items-center justify-center gap-6 text-sm font-bold">
+            <div className="flex items-center gap-2">
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+                className="w-2 h-2 bg-white rounded-full"
+              />
+              <span>Scans: {liveStats.scans}</span>
+            </div>
+            <span className="text-white/60">•</span>
+            <div className="flex items-center gap-2">
+              <Eye className="w-4 h-4" />
+              <span>Vues: {liveStats.views}</span>
+            </div>
+            <span className="text-white/60">•</span>
+            <div className="flex items-center gap-2">
+              <MessageCircle className="w-4 h-4" />
+              <span>Clics: {liveStats.clicks}</span>
+            </div>
+          </div>
+          <p className="text-center text-xs mt-1 text-white/80">
+            {liveStats.scans} personnes ont déjà scanné ce produit !
+          </p>
+        </motion.div>
+      )}
     </div>
   );
 }
