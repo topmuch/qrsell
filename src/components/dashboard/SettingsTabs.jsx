@@ -20,6 +20,11 @@ import {
 import { toast } from 'sonner';
 
 export default function SettingsTabs({ seller }) {
+  const { data: products = [] } = useQuery({
+    queryKey: ['settings-products', seller?.id],
+    queryFn: () => base44.entities.Product.filter({ seller_id: seller?.id, is_active: true }),
+    enabled: !!seller?.id
+  });
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('basic');
   const [uploading, setUploading] = useState({
