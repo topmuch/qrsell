@@ -90,7 +90,7 @@ export default function AdminPanel() {
     { id: 'plans', label: 'Forfaits', icon: FileText },
     { id: 'requests', label: 'Demandes', icon: CreditCard },
     { id: 'subscriptions', label: 'Abonnements', icon: CreditCard },
-    { id: 'settings', label: 'Paramètres', icon: SettingsIcon },
+    { id: 'settings', label: 'Paramètres', icon: Settings },
   ];
 
   // Calculate stats
