@@ -82,13 +82,14 @@ export default function PromotionProduct() {
 
   // Countdown timer
   useEffect(() => {
-    if (!sessionId || scanSessions.length === 0) return;
+    if (!sessionId || scanSessions.length === 0 || !promotion) return;
 
     const session = scanSessions.find(s => s.session_id === sessionId);
     if (!session) return;
 
     const scanTime = new Date(session.scan_timestamp);
-    const expiryTime = new Date(scanTime.getTime() + 30 * 60 * 1000); // 30 minutes
+    const durationMs = (promotion.duration_minutes || 30) * 60 * 1000;
+    const expiryTime = new Date(scanTime.getTime() + durationMs);
 
     const interval = setInterval(() => {
       const now = new Date();
@@ -105,7 +106,7 @@ export default function PromotionProduct() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [sessionId, scanSessions]);
+  }, [sessionId, scanSessions, promotion]);
 
   const discountedPrice = product ? 
     Math.round(product.price * (1 - promotion.discount_percentage / 100)) : 0;
@@ -139,14 +140,20 @@ export default function PromotionProduct() {
     );
   }
 
+  const formatDuration = (minutes) => {
+    if (minutes >= 1440) return `${minutes/1440} jour${minutes/1440 > 1 ? 's' : ''}`;
+    if (minutes >= 60) return `${minutes/60} heure${minutes/60 > 1 ? 's' : ''}`;
+    return `${minutes} minutes`;
+  };
+
   if (timeLeft === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white p-4">
         <div className="text-center max-w-md">
           <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Offre expirée</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Cette offre est terminée</h2>
           <p className="text-gray-600 mb-6">
-            Cette promotion flash était valable 30 minutes et a maintenant expiré.
+            Cette promotion flash était valable {formatDuration(promotion?.duration_minutes || 30)} et a maintenant expiré.
           </p>
           <Button onClick={() => window.location.href = `/Shop?slug=${seller.shop_slug}`}>
             Voir tous les produits
@@ -249,7 +256,7 @@ export default function PromotionProduct() {
 
         <div className="mt-6 bg-orange-100 border-2 border-orange-300 rounded-xl p-4">
           <p className="text-sm text-orange-800 text-center">
-            ⚠️ Cette offre n'est accessible que via ce QR code et expire automatiquement après 30 minutes.
+            ⚠️ Promo du jour — Valable jusqu'à {new Date(new Date(scanSessions.find(s => s.session_id === sessionId)?.scan_timestamp).getTime() + (promotion.duration_minutes || 30) * 60 * 1000).toLocaleString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
       </motion.div>

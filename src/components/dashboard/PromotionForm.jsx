@@ -11,6 +11,7 @@ import { Loader2, Zap } from 'lucide-react';
 export default function PromotionForm({ open, onClose, seller, products }) {
   const [productId, setProductId] = useState('');
   const [discount, setDiscount] = useState('10');
+  const [duration, setDuration] = useState('30');
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
@@ -30,6 +31,7 @@ export default function PromotionForm({ open, onClose, seller, products }) {
       onClose();
       setProductId('');
       setDiscount('10');
+      setDuration('30');
     }
   });
 
@@ -40,7 +42,8 @@ export default function PromotionForm({ open, onClose, seller, products }) {
     createMutation.mutate({
       seller_id: seller.id,
       product_id: productId,
-      discount_percentage: parseFloat(discount)
+      discount_percentage: parseFloat(discount),
+      duration_minutes: parseInt(duration)
     });
   };
 
@@ -86,9 +89,26 @@ export default function PromotionForm({ open, onClose, seller, products }) {
             </p>
           </div>
 
+          <div>
+            <Label>Durée de validité</Label>
+            <Select value={duration} onValueChange={setDuration}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="30">30 minutes</SelectItem>
+                <SelectItem value="60">1 heure</SelectItem>
+                <SelectItem value="360">6 heures</SelectItem>
+                <SelectItem value="1440">1 jour</SelectItem>
+                <SelectItem value="4320">3 jours</SelectItem>
+                <SelectItem value="10080">7 jours</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
             <p className="text-sm text-orange-800">
-              ⏱️ L'offre sera valable 30 minutes après le premier scan du QR code
+              ⏱️ L'offre sera valable {duration >= 1440 ? `${duration/1440} jour${duration/1440 > 1 ? 's' : ''}` : duration >= 60 ? `${duration/60} heure${duration/60 > 1 ? 's' : ''}` : `${duration} minutes`} après le premier scan du QR code
             </p>
           </div>
 

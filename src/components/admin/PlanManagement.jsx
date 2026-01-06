@@ -21,7 +21,15 @@ export default function PlanManagement() {
     price: "",
     durations_available: "1,2,3,6,12",
     features: "",
-    is_active: true
+    is_active: true,
+    max_products: "",
+    feature_options: {
+      qr_codes_tiktok: true,
+      analytics_realtime: true,
+      campaigns_access: false,
+      verified_badge: false,
+      team_management: false
+    }
   });
 
   const queryClient = useQueryClient();
@@ -64,7 +72,15 @@ export default function PlanManagement() {
       price: "",
       durations_available: "1,2,3,6,12",
       features: "",
-      is_active: true
+      is_active: true,
+      max_products: "",
+      feature_options: {
+        qr_codes_tiktok: true,
+        analytics_realtime: true,
+        campaigns_access: false,
+        verified_badge: false,
+        team_management: false
+      }
     });
     setEditingPlan(null);
   };
@@ -79,7 +95,15 @@ export default function PlanManagement() {
         price: plan.price || "",
         durations_available: plan.durations_available?.join(",") || "1,2,3,6,12",
         features: plan.features?.join("\n") || "",
-        is_active: plan.is_active
+        is_active: plan.is_active,
+        max_products: plan.max_products || "",
+        feature_options: plan.feature_options || {
+          qr_codes_tiktok: true,
+          analytics_realtime: true,
+          campaigns_access: false,
+          verified_badge: false,
+          team_management: false
+        }
       });
     } else {
       resetForm();
@@ -94,7 +118,9 @@ export default function PlanManagement() {
       ...formData,
       price: formData.price ? parseFloat(formData.price) : null,
       durations_available: formData.durations_available.split(",").map(d => parseInt(d.trim())),
-      features: formData.features.split("\n").filter(f => f.trim())
+      features: formData.features.split("\n").filter(f => f.trim()),
+      max_products: formData.max_products ? parseInt(formData.max_products) : null,
+      feature_options: formData.feature_options
     };
 
     if (editingPlan) {
@@ -136,6 +162,21 @@ export default function PlanManagement() {
               )}
               
               <p className="text-sm text-gray-600">{plan.description}</p>
+
+              {plan.max_products && (
+                <div className="bg-blue-50 p-2 rounded text-center">
+                  <p className="text-xs text-blue-700 font-medium">
+                    Max {plan.max_products} produits
+                  </p>
+                </div>
+              )}
+              {plan.max_products === null && (
+                <div className="bg-purple-50 p-2 rounded text-center">
+                  <p className="text-xs text-purple-700 font-medium">
+                    ♾️ Produits illimités
+                  </p>
+                </div>
+              )}
 
               <div>
                 <p className="text-xs text-gray-500 mb-1">Durées disponibles :</p>
@@ -264,6 +305,79 @@ export default function PlanManagement() {
                 required
               />
               <p className="text-xs text-gray-500">Ex: 1,2,3,6,12</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="max_products">Nombre maximum de produits (vide = illimité)</Label>
+              <Input
+                id="max_products"
+                type="number"
+                min="1"
+                value={formData.max_products}
+                onChange={(e) => setFormData({ ...formData, max_products: e.target.value })}
+                placeholder="Ex: 30, 100 ou vide pour illimité"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Options de fonctionnalités</Label>
+              <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="qr_tiktok" className="cursor-pointer">QR codes TikTok optimisés</Label>
+                  <Switch
+                    id="qr_tiktok"
+                    checked={formData.feature_options.qr_codes_tiktok}
+                    onCheckedChange={(checked) => setFormData({ 
+                      ...formData, 
+                      feature_options: { ...formData.feature_options, qr_codes_tiktok: checked }
+                    })}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="analytics" className="cursor-pointer">Analytics en temps réel</Label>
+                  <Switch
+                    id="analytics"
+                    checked={formData.feature_options.analytics_realtime}
+                    onCheckedChange={(checked) => setFormData({ 
+                      ...formData, 
+                      feature_options: { ...formData.feature_options, analytics_realtime: checked }
+                    })}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="campaigns" className="cursor-pointer">Accès aux campagnes sponsorisées</Label>
+                  <Switch
+                    id="campaigns"
+                    checked={formData.feature_options.campaigns_access}
+                    onCheckedChange={(checked) => setFormData({ 
+                      ...formData, 
+                      feature_options: { ...formData.feature_options, campaigns_access: checked }
+                    })}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="verified" className="cursor-pointer">Badge "Vendeur vérifié"</Label>
+                  <Switch
+                    id="verified"
+                    checked={formData.feature_options.verified_badge}
+                    onCheckedChange={(checked) => setFormData({ 
+                      ...formData, 
+                      feature_options: { ...formData.feature_options, verified_badge: checked }
+                    })}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="team" className="cursor-pointer">Gestion d'équipe</Label>
+                  <Switch
+                    id="team"
+                    checked={formData.feature_options.team_management}
+                    onCheckedChange={(checked) => setFormData({ 
+                      ...formData, 
+                      feature_options: { ...formData.feature_options, team_management: checked }
+                    })}
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="space-y-2">

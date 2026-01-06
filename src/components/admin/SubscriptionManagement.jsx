@@ -36,6 +36,39 @@ export default function SubscriptionManagement() {
 
   const queryClient = useQueryClient();
 
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%&*';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+  };
+
+  const handleResetPassword = (subscription) => {
+    const newPassword = generatePassword();
+    setGeneratedPassword(newPassword);
+    setResetPasswordUser(subscription);
+    setShowPasswordDialog(true);
+    setCopied(false);
+  };
+
+  const copyAll = () => {
+    const text = `Email: ${resetPasswordUser.user_email}\nMot de passe: ${generatedPassword}`;
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const sendByEmail = async () => {
+    await base44.integrations.Core.SendEmail({
+      to: resetPasswordUser.user_email,
+      subject: 'Réinitialisation de votre mot de passe QRSell',
+      body: `Bonjour,\n\nVotre mot de passe a été réinitialisé.\n\nEmail: ${resetPasswordUser.user_email}\nNouveau mot de passe: ${generatedPassword}\n\nVous pouvez vous connecter sur https://qrsell.app\n\nCordialement,\nL'équipe QRSell`
+    });
+    alert('Email envoyé avec succès !');
+  };
+
   const { data: subscriptions = [] } = useQuery({
     queryKey: ['subscriptions'],
     queryFn: () => base44.entities.Subscription.list('-created_date')
