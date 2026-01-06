@@ -38,25 +38,26 @@ export default function SiteSettings() {
         console.error('Error loading settings:', error);
         return null;
       }
-    },
-    onSuccess: (data) => {
-      if (data) {
-        setSettings({
-          site_name: data.site_name || 'QRSell',
-          logo_url: data.logo_url || 'https://drive.google.com/uc?export=view&id=1eveFkGHiW-tM5vck1UDR00SaO42huoKU',
-          primary_color: data.primary_color || '#2563eb',
-          secondary_color: data.secondary_color || '#3b82f6',
-          default_currency: data.default_currency || 'FCFA',
-          default_language: data.default_language || 'fr',
-          smtp_host: data.smtp_host || '',
-          smtp_port: data.smtp_port || '587',
-          smtp_email: data.smtp_email || '',
-          smtp_api_key: data.smtp_api_key || '',
-          whatsapp_support: data.whatsapp_support || ''
-        });
-      }
     }
   });
+
+  React.useEffect(() => {
+    if (siteSettings) {
+      setSettings({
+        site_name: siteSettings.site_name || 'QRSell',
+        logo_url: siteSettings.logo_url || 'https://drive.google.com/uc?export=view&id=1eveFkGHiW-tM5vck1UDR00SaO42huoKU',
+        primary_color: siteSettings.primary_color || '#2563eb',
+        secondary_color: siteSettings.secondary_color || '#3b82f6',
+        default_currency: siteSettings.default_currency || 'FCFA',
+        default_language: siteSettings.default_language || 'fr',
+        smtp_host: siteSettings.smtp_host || '',
+        smtp_port: siteSettings.smtp_port || '587',
+        smtp_email: siteSettings.smtp_email || '',
+        smtp_api_key: siteSettings.smtp_api_key || '',
+        whatsapp_support: siteSettings.whatsapp_support || ''
+      });
+    }
+  }, [siteSettings]);
 
   const saveMutation = useMutation({
     mutationFn: async (data) => {
@@ -75,8 +76,12 @@ export default function SiteSettings() {
     }
   });
 
-  const handleSave = () => {
-    saveMutation.mutate(settings);
+  const handleSave = async () => {
+    try {
+      await saveMutation.mutateAsync(settings);
+    } catch (error) {
+      console.error('Save error:', error);
+    }
   };
 
   const handleLogoUpload = async (e) => {
