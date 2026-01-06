@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { CheckCircle2, XCircle, DollarSign, Calendar, Plus, Edit, Key, Copy, Check, Mail, Trash2 } from "lucide-react";
+import { CheckCircle2, XCircle, DollarSign, Calendar, Plus, Edit, Key, Copy, Check, Mail, Trash2, Loader2 } from "lucide-react";
 import { format, isPast } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
@@ -21,11 +21,11 @@ export default function SubscriptionManagement() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [resetPasswordUser, setResetPasswordUser] = useState(null);
   const [generatedPassword, setGeneratedPassword] = useState('');
   const [copied, setCopied] = useState(false);
+  const [deletingSubscription, setDeletingSubscription] = useState(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [paymentData, setPaymentData] = useState({
     payment_method: "",
     payment_note: ""
@@ -95,6 +95,62 @@ export default function SubscriptionManagement() {
     }
   });
 
+  const deleteSubscriptionMutation = useMutation({
+    mutationFn: async (subscription) => {
+      // Delete seller and all related data
+      const sellers = await base44.entities.Seller.filter({ created_by: subscription.user_email });
+      
+      for (const seller of sellers) {
+        // Delete products
+        const products = await base44.entities.Product.filter({ seller_id: seller.id });
+        for (const product of products) {
+          await base44.entities.Product.delete(product.id);
+        }
+        
+        // Delete analytics
+        const analytics = await base44.entities.Analytics.filter({ seller_id: seller.id });
+        for (const analytic of analytics) {
+          await base44.entities.Analytics.delete(analytic.id);
+        }
+        
+        // Delete promotions
+        const promotions = await base44.entities.Promotion.filter({ seller_id: seller.id });
+        for (const promo of promotions) {
+          await base44.entities.Promotion.delete(promo.id);
+        }
+        
+        // Delete coupons
+        const coupons = await base44.entities.Coupon.filter({ seller_id: seller.id });
+        for (const coupon of coupons) {
+          await base44.entities.Coupon.delete(coupon.id);
+        }
+        
+        // Delete live sessions
+        const liveSessions = await base44.entities.LiveSession.filter({ seller_id: seller.id });
+        for (const session of liveSessions) {
+          await base44.entities.LiveSession.delete(session.id);
+        }
+        
+        // Delete seller
+        await base44.entities.Seller.delete(seller.id);
+      }
+      
+      // Delete subscription
+      await base44.entities.Subscription.delete(subscription.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['subscriptions']);
+      queryClient.invalidateQueries(['sellers']);
+      queryClient.invalidateQueries(['products']);
+      setDeletingSubscription(null);
+      setDeleteConfirmText('');
+      toast.success('Abonnement et toutes les données associées supprimés');
+    },
+    onError: (error) => {
+      toast.error('Erreur lors de la suppression');
+    }
+  });
+
   const createSubscriptionMutation = useMutation({
     mutationFn: (data) => base44.entities.Subscription.create(data),
     onSuccess: () => {
@@ -110,40 +166,6 @@ export default function SubscriptionManagement() {
         payment_note: ""
       });
       toast.success('Abonnement créé avec succès');
-    }
-  });
-
-  const deleteSubscriptionMutation = useMutation({
-    mutationFn: async (subscription) => {
-      // Delete all related data
-      const sellers = await base44.entities.Seller.filter({ created_by: subscription.user_email });
-      for (const seller of sellers) {
-        // Delete products
-        const products = await base44.entities.Product.filter({ seller_id: seller.id });
-        for (const product of products) {
-          await base44.entities.Product.delete(product.id);
-        }
-        // Delete analytics
-        const analytics = await base44.entities.Analytics.filter({ seller_id: seller.id });
-        for (const analytic of analytics) {
-          await base44.entities.Analytics.delete(analytic.id);
-        }
-        // Delete seller
-        await base44.entities.Seller.delete(seller.id);
-      }
-      // Delete subscription
-      await base44.entities.Subscription.delete(subscription.id);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['subscriptions']);
-      setShowDeleteDialog(false);
-      setSelectedSubscription(null);
-      setDeleteConfirmText('');
-      toast.success('Abonnement et données supprimés');
-      window.location.href = '/AdminPanel';
-    },
-    onError: (error) => {
-      toast.error(`Erreur lors de la suppression : ${error.message}`);
     }
   });
 
@@ -237,20 +259,6 @@ export default function SubscriptionManagement() {
     setShowPaymentDialog(true);
   };
 
-  const openDeleteDialog = (subscription) => {
-    setSelectedSubscription(subscription);
-    setDeleteConfirmText('');
-    setShowDeleteDialog(true);
-  };
-
-  const handleDelete = () => {
-    if (deleteConfirmText === 'SUPPRIMER') {
-      deleteSubscriptionMutation.mutate(selectedSubscription);
-    } else {
-      toast.error('Veuillez taper "SUPPRIMER" pour confirmer');
-    }
-  };
-
   const getSubscriptionStatus = (subscription) => {
     const isExpired = isPast(new Date(subscription.end_date));
     
@@ -271,7 +279,7 @@ export default function SubscriptionManagement() {
         </Button>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-2 gap-6">
         {subscriptions.map(subscription => {
           const status = getSubscriptionStatus(subscription);
           const plan = plans.find(p => p.code === subscription.plan_code);
@@ -338,7 +346,7 @@ export default function SubscriptionManagement() {
                       className="border-purple-300 text-purple-600 hover:bg-purple-50"
                     >
                       <Key className="w-4 h-4 mr-1" />
-                      Mot de passe
+                      Reset MDP
                     </Button>
                     <Button
                       onClick={() => openEditDialog(subscription)}
@@ -360,9 +368,8 @@ export default function SubscriptionManagement() {
                     )}
                     <Button
                       onClick={() => toggleActiveStatus(subscription)}
-                      variant={subscription.is_active ? "outline" : "default"}
+                      variant={subscription.is_active ? "destructive" : "default"}
                       size="sm"
-                      className={subscription.is_active ? "border-red-300 text-red-600 hover:bg-red-50" : ""}
                     >
                       {subscription.is_active ? (
                         <>
@@ -377,10 +384,10 @@ export default function SubscriptionManagement() {
                       )}
                     </Button>
                     <Button
-                      onClick={() => openDeleteDialog(subscription)}
-                      variant="outline"
+                      onClick={() => setDeletingSubscription(subscription)}
+                      variant="destructive"
                       size="sm"
-                      className="border-red-300 text-red-600 hover:bg-red-50"
+                      className="bg-red-600 hover:bg-red-700"
                     >
                       <Trash2 className="w-4 h-4 mr-1" />
                       Supprimer
@@ -677,57 +684,67 @@ export default function SubscriptionManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog Delete Subscription */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="sm:max-w-md">
+      {/* Delete subscription dialog */}
+      <Dialog open={!!deletingSubscription} onOpenChange={() => {
+        setDeletingSubscription(null);
+        setDeleteConfirmText('');
+      }}>
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-red-600">
+            <DialogTitle className="text-red-600 flex items-center gap-2">
               <Trash2 className="w-5 h-5" />
-              Supprimer l'abonnement
+              Supprimer cet abonnement
             </DialogTitle>
           </DialogHeader>
-          
           <div className="space-y-4">
-            <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4">
-              <p className="font-bold text-red-900 mb-3">
-                ⚠️ Êtes-vous sûr de vouloir supprimer cet abonnement ?
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-sm text-red-800 font-semibold mb-3">
+                ⚠️ Cette action est irréversible et supprimera :
               </p>
-              <p className="text-sm text-red-800 mb-3">
-                Cette action est <strong>irréversible</strong> et supprimera :
-              </p>
-              <ul className="text-sm text-red-800 space-y-1 ml-4">
-                <li>• Tous les produits</li>
-                <li>• Toutes les statistiques</li>
-                <li>• Toutes les campagnes associées</li>
-                <li>• La page vitrine</li>
+              <ul className="text-sm text-red-700 space-y-1 ml-4 list-disc">
+                <li>Tous les produits</li>
+                <li>Toutes les statistiques</li>
+                <li>Toutes les promotions et coupons</li>
+                <li>Toutes les sessions live</li>
+                <li>La page vitrine (/shop/[slug])</li>
               </ul>
             </div>
-
-            <div className="space-y-2">
+            
+            <div>
               <Label>Tapez "SUPPRIMER" pour confirmer</Label>
               <Input
                 value={deleteConfirmText}
                 onChange={(e) => setDeleteConfirmText(e.target.value)}
                 placeholder="SUPPRIMER"
-                className="font-mono"
+                className="mt-2 font-mono"
               />
             </div>
 
-            <div className="flex gap-2 pt-4 border-t">
+            <div className="flex gap-2">
               <Button
                 variant="outline"
-                onClick={() => setShowDeleteDialog(false)}
+                onClick={() => {
+                  setDeletingSubscription(null);
+                  setDeleteConfirmText('');
+                }}
                 className="flex-1"
               >
                 Annuler
               </Button>
               <Button
-                onClick={handleDelete}
+                variant="destructive"
+                onClick={() => deleteSubscriptionMutation.mutate(deletingSubscription)}
+                disabled={deleteConfirmText !== 'SUPPRIMER' || deleteSubscriptionMutation.isLoading}
                 className="flex-1 bg-red-600 hover:bg-red-700"
-                disabled={deleteConfirmText !== 'SUPPRIMER'}
               >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Confirmer la suppression
+                {deleteSubscriptionMutation.isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Suppression...
+                  </>
+                ) : (
+                  'Confirmer'
+                )}
               </Button>
             </div>
           </div>
