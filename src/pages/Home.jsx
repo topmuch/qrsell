@@ -63,8 +63,20 @@ export default function Home() {
     enabled: !!demoPetShop?.id
   });
 
+  // Shuffle and select 3 random products
+  const shuffleArray = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  const randomProducts = demoProducts.length > 0 ? shuffleArray(demoProducts).slice(0, 3) : [];
+
   // Demo products with real data or fallback
-  const products = demoProducts.slice(0, 3).length > 0 ? demoProducts.slice(0, 3) : [
+  const products = randomProducts.length > 0 ? randomProducts : [
     {
       id: '1',
       name: 'Robe Wax Élégante',
