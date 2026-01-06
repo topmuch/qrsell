@@ -23,8 +23,8 @@ export default function Layout({ children, currentPageName }) {
     checkAuth();
   }, []);
 
-  // Pages qui n'ont pas besoin du menu (pages authentifiées)
-  const hideMenu = ['Dashboard', 'AdminPanel', 'ProfileSetup', 'SubscriptionExpired'].includes(currentPageName);
+  // Pages qui n'ont pas besoin du menu (pages authentifiées + boutiques publiques)
+  const hideMenu = ['Dashboard', 'AdminPanel', 'ProfileSetup', 'SubscriptionExpired', 'Shop'].includes(currentPageName);
 
   if (hideMenu) {
     return <>{children}</>;
