@@ -61,21 +61,17 @@ export default function SiteSettings() {
   const saveMutation = useMutation({
     mutationFn: async (data) => {
       if (siteSettings?.id) {
-        return base44.entities.SiteSettings.update(siteSettings.id, data);
+        return await base44.entities.SiteSettings.update(siteSettings.id, data);
       } else {
-        return base44.entities.SiteSettings.create(data);
+        return await base44.entities.SiteSettings.create(data);
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['site-settings']);
-      toast.success('✅ Paramètres mis à jour avec succès !');
-      
-      // Appliquer les changements en temps réel
-      document.documentElement.style.setProperty('--primary-color', settings.primary_color);
-      document.documentElement.style.setProperty('--secondary-color', settings.secondary_color);
+      toast.success('✅ Paramètres sauvegardés avec succès !');
     },
     onError: (error) => {
-      toast.error(`❌ Échec de la sauvegarde : ${error.message}`);
+      toast.error('❌ Erreur lors de la sauvegarde');
     }
   });
 
@@ -338,13 +334,13 @@ export default function SiteSettings() {
       <div className="flex justify-end">
         <Button
           onClick={handleSave}
-          disabled={saveMutation.isLoading}
-          className="bg-[#2563eb] hover:bg-[#1d4ed8]"
+          disabled={saveMutation.isPending}
+          className="bg-[#10B770] hover:bg-[#0e9d5f] text-white shadow-lg"
         >
-          {saveMutation.isLoading ? (
+          {saveMutation.isPending ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Enregistrement...
+              En cours...
             </>
           ) : (
             <>
