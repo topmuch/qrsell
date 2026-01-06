@@ -40,6 +40,7 @@ import CouponForm from '@/components/dashboard/CouponForm';
 import CouponCard from '@/components/dashboard/CouponCard';
 import EnhancedQRCode from '@/components/ui/EnhancedQRCode';
 import LiveControl from '@/components/dashboard/LiveControl';
+import CatalogGenerator from '@/components/dashboard/CatalogGenerator';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Dashboard() {
@@ -458,12 +459,18 @@ export default function Dashboard() {
 
           <TabsContent value="products" className="space-y-6">
 
-            {/* Import/Export */}
-            <ProductImportExport 
-              seller={seller}
-              products={products}
-              onImportComplete={refetchProducts}
-            />
+            {/* Import/Export & Catalog */}
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <ProductImportExport 
+                seller={seller}
+                products={products}
+                onImportComplete={refetchProducts}
+              />
+              <CatalogGenerator 
+                seller={seller}
+                products={products.filter(p => p.is_active)}
+              />
+            </div>
 
             <div className="flex items-center justify-between">
               <div>
