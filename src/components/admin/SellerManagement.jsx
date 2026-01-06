@@ -114,8 +114,99 @@ export default function SellerManagement() {
         </CardContent>
       </Card>
 
-      {/* Sellers table */}
-      <Card className="dark:bg-gray-800 dark:border-gray-700">
+      {/* Sellers grid */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {filteredSellers.map((seller, index) => {
+          const stats = getSellerStats(seller.id);
+          return (
+            <motion.div
+              key={seller.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+            >
+              <Card className="dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-all">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="dark:text-white text-lg">{seller.shop_name}</CardTitle>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{seller.full_name}</p>
+                    </div>
+                    {seller.is_verified && (
+                      <Badge className="bg-green-100 text-green-700">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Vérifié
+                      </Badge>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-500 dark:text-gray-400">WhatsApp</p>
+                      <p className="font-medium dark:text-white">{seller.whatsapp_number}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 dark:text-gray-400">Slug</p>
+                      <code className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded dark:text-gray-300">
+                        {seller.shop_slug}
+                      </code>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4 pt-2 border-t dark:border-gray-700">
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-gray-900 dark:text-white">{stats.products}</div>
+                      <div className="text-xs text-gray-500">Produits</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-gray-900 dark:text-white">{stats.scans}</div>
+                      <div className="text-xs text-gray-500">Scans</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-gray-900 dark:text-white">{stats.clicks}</div>
+                      <div className="text-xs text-gray-500">Clics</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSelectedSeller({ ...seller, stats })}
+                      className="flex-1"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      Voir
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => window.open(`/Shop?slug=${seller.shop_slug}`, '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={seller.is_verified ? "destructive" : "default"}
+                      onClick={() => handleToggleVerification(seller)}
+                    >
+                      {seller.is_verified ? (
+                        <XCircle className="w-4 h-4" />
+                      ) : (
+                        <CheckCircle className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Old table structure for reference - remove this comment block */}
+      <Card className="dark:bg-gray-800 dark:border-gray-700 hidden">
         <CardHeader>
           <CardTitle className="dark:text-white">Liste des vendeurs</CardTitle>
         </CardHeader>
@@ -211,6 +302,7 @@ export default function SellerManagement() {
           </div>
         </CardContent>
       </Card>
+      {/* End hidden old table */}
 
       {/* Seller details dialog */}
       {selectedSeller && (
