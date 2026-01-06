@@ -1,3 +1,4 @@
+import ActivityDetail from './pages/ActivityDetail';
 import AddProduct from './pages/AddProduct';
 import AdminBanners from './pages/AdminBanners';
 import AdminCampaigns from './pages/AdminCampaigns';
@@ -10,10 +11,13 @@ import Dashboard from './pages/Dashboard';
 import DebugProducts from './pages/DebugProducts';
 import Demo from './pages/Demo';
 import DevenirVendeur from './pages/DevenirVendeur';
+import GrowthTips from './pages/GrowthTips';
 import Home from './pages/Home';
+import Live from './pages/Live';
 import ProductPage from './pages/ProductPage';
 import ProfileSetup from './pages/ProfileSetup';
 import PromotionProduct from './pages/PromotionProduct';
+import RecentActivity from './pages/RecentActivity';
 import SellerCampaigns from './pages/SellerCampaigns';
 import Shop from './pages/Shop';
 import ShopPage from './pages/ShopPage';
@@ -21,14 +25,11 @@ import SubscriptionExpired from './pages/SubscriptionExpired';
 import SubscriptionRequest from './pages/SubscriptionRequest';
 import TikTokGuide from './pages/TikTokGuide';
 import TikTokGuidePublic from './pages/TikTokGuidePublic';
-import RecentActivity from './pages/RecentActivity';
-import GrowthTips from './pages/GrowthTips';
-import ActivityDetail from './pages/ActivityDetail';
-import Live from './pages/Live';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "ActivityDetail": ActivityDetail,
     "AddProduct": AddProduct,
     "AdminBanners": AdminBanners,
     "AdminCampaigns": AdminCampaigns,
@@ -41,10 +42,13 @@ export const PAGES = {
     "DebugProducts": DebugProducts,
     "Demo": Demo,
     "DevenirVendeur": DevenirVendeur,
+    "GrowthTips": GrowthTips,
     "Home": Home,
+    "Live": Live,
     "ProductPage": ProductPage,
     "ProfileSetup": ProfileSetup,
     "PromotionProduct": PromotionProduct,
+    "RecentActivity": RecentActivity,
     "SellerCampaigns": SellerCampaigns,
     "Shop": Shop,
     "ShopPage": ShopPage,
@@ -52,10 +56,6 @@ export const PAGES = {
     "SubscriptionRequest": SubscriptionRequest,
     "TikTokGuide": TikTokGuide,
     "TikTokGuidePublic": TikTokGuidePublic,
-    "RecentActivity": RecentActivity,
-    "GrowthTips": GrowthTips,
-    "ActivityDetail": ActivityDetail,
-    "Live": Live,
 }
 
 export const pagesConfig = {

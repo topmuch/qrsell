@@ -11,6 +11,7 @@ import {
   QrCode
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import FloatingWhatsAppButton from '@/components/ui/FloatingWhatsAppButton';
 import QRCode from 'qrcode';
 
 export default function ProductPage() {
@@ -307,6 +308,12 @@ Si vous souhaitez procéder à l'achat, il vous suffit de répondre avec "Oui, j
           onClose={() => setShowShareModal(false)}
         />
       )}
+
+      {/* Floating WhatsApp Button */}
+      <FloatingWhatsAppButton 
+        onClick={handleWhatsAppClick}
+        text="Je veux ce produit"
+      />
     </div>
   );
 }

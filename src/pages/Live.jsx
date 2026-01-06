@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import EnhancedQRCode from '@/components/ui/EnhancedQRCode';
+import FloatingWhatsAppButton from '@/components/ui/FloatingWhatsAppButton';
 
 export default function Live() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -183,20 +184,18 @@ export default function Live() {
               </motion.p>
             </div>
 
-            {/* WhatsApp Button for mobile */}
-            <button
-              onClick={handleWhatsAppClick}
-              className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90 text-white font-bold text-xl py-6 rounded-2xl shadow-lg flex items-center justify-center gap-3 transition-opacity"
-            >
-              💬 Commander sur WhatsApp
-            </button>
-
             <p className="text-sm text-gray-500">
               Offre disponible pendant le live uniquement
             </p>
           </div>
         </div>
       </motion.div>
+
+      {/* Floating WhatsApp Button */}
+      <FloatingWhatsAppButton 
+        onClick={handleWhatsAppClick}
+        text="Commander maintenant"
+      />
     </div>
   );
 }
