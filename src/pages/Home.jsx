@@ -370,6 +370,7 @@ export default function Home() {
       </section>
 
       <TestimonialSection />
+      <MiniShop />
       <Footer />
 
       {/* Scan Modal */}
