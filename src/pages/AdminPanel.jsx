@@ -13,6 +13,7 @@ import SubscriptionManagement from '@/components/admin/SubscriptionManagement';
 import ManualClientCreation from '@/components/admin/ManualClientCreation';
 import SiteSettings from '@/components/admin/SiteSettings';
 import { motion } from 'framer-motion';
+import { Settings } from 'lucide-react';
 
 export default function AdminPanel() {
   const [user, setUser] = useState(null);
@@ -89,6 +90,7 @@ export default function AdminPanel() {
     { id: 'plans', label: 'Forfaits', icon: FileText },
     { id: 'requests', label: 'Demandes', icon: CreditCard },
     { id: 'subscriptions', label: 'Abonnements', icon: CreditCard },
+    { id: 'settings', label: 'Paramètres', icon: Bug },
   ];
 
   // Calculate stats
@@ -406,9 +408,24 @@ export default function AdminPanel() {
           </div>
         ) : (
           <div className="p-6">
-            {activeTab === 'sellers' && <SellerManagement />}
-            {activeTab === 'products' && <ProductManagement />}
-            {activeTab === 'logs' && <ActivityLogs />}
+            {activeTab === 'sellers' && (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Gestion des vendeurs</h2>
+                <SellerManagement />
+              </div>
+            )}
+            {activeTab === 'products' && (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Gestion des produits</h2>
+                <ProductManagement />
+              </div>
+            )}
+            {activeTab === 'logs' && (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Journaux d'activité</h2>
+                <ActivityLogs />
+              </div>
+            )}
             {activeTab === 'banners' && (
               <iframe 
                 src="/AdminBanners" 
@@ -423,7 +440,12 @@ export default function AdminPanel() {
                 title="Gestion des campagnes"
               />
             )}
-            {activeTab === 'plans' && <PlanManagement />}
+            {activeTab === 'plans' && (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Gestion des forfaits</h2>
+                <PlanManagement />
+              </div>
+            )}
             {activeTab === 'requests' && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
@@ -436,10 +458,16 @@ export default function AdminPanel() {
                 <SubscriptionRequestManagement />
               </div>
             )}
-            {activeTab === 'subscriptions' && <SubscriptionManagement />}
-          </div>
-        )}
-      </main>
+            {activeTab === 'subscriptions' && (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Gestion des abonnements</h2>
+                <SubscriptionManagement />
+              </div>
+            )}
+            {activeTab === 'settings' && <SiteSettings />}
+            </div>
+            )}
+            </main>
     </div>
   );
 }
