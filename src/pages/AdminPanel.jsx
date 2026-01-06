@@ -13,7 +13,7 @@ import SubscriptionManagement from '@/components/admin/SubscriptionManagement';
 import ManualClientCreation from '@/components/admin/ManualClientCreation';
 import SiteSettings from '@/components/admin/SiteSettings';
 import { motion } from 'framer-motion';
-import { Settings } from 'lucide-react';
+
 
 export default function AdminPanel() {
   const [user, setUser] = useState(null);
@@ -90,7 +90,7 @@ export default function AdminPanel() {
     { id: 'plans', label: 'Forfaits', icon: FileText },
     { id: 'requests', label: 'Demandes', icon: CreditCard },
     { id: 'subscriptions', label: 'Abonnements', icon: CreditCard },
-    { id: 'settings', label: 'Paramètres', icon: Bug },
+    { id: 'settings', label: 'Paramètres', icon: SettingsIcon },
   ];
 
   // Calculate stats
