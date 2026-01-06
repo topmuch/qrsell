@@ -282,130 +282,123 @@ export default function ProductManagement() {
         </CardContent>
       </Card>
 
-      {/* Products table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Liste des produits</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">Produit</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">Boutique</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-700">Prix</th>
-                  <th className="text-center py-3 px-4 font-medium text-gray-700">Scans</th>
-                  <th className="text-center py-3 px-4 font-medium text-gray-700">Clics</th>
-                  <th className="text-center py-3 px-4 font-medium text-gray-700">Statut</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-700">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredProducts.map((product, index) => {
-                  const stats = getProductStats(product.id);
-                  return (
-                    <motion.tr
-                      key={product.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="border-b hover:bg-gray-50"
-                    >
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-3">
-                          {product.image_url ? (
-                            <img 
-                              src={product.image_url} 
-                              alt={product.name}
-                              className="w-10 h-10 rounded object-cover"
-                            />
-                          ) : (
-                            <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center">
-                              <Package className="w-5 h-5 text-gray-400" />
-                            </div>
-                          )}
-                          <div>
-                            <div className="font-medium text-gray-900">{product.name}</div>
-                            {product.public_id ? (
-                              <code className="text-xs text-gray-400">{product.public_id}</code>
-                            ) : (
-                              <span className="text-xs text-red-500">❌ ID manquant</span>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="text-sm text-gray-600">
-                          {getSellerName(product.seller_id)}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <span className="font-semibold text-gray-900">
-                          {formatPrice(product.price)} FCFA
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-center">
-                        <Badge variant="secondary">{stats.scans}</Badge>
-                      </td>
-                      <td className="py-3 px-4 text-center">
-                        <Badge variant="secondary">{stats.clicks}</Badge>
-                      </td>
-                      <td className="py-3 px-4 text-center">
-                        {product.is_active ? (
-                          <Badge className="bg-green-100 text-green-700">Actif</Badge>
-                        ) : (
-                          <Badge variant="outline" className="text-gray-500">Inactif</Badge>
-                        )}
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setSelectedProduct({ ...product, stats })}
-                            title="Voir les détails"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => window.open(`/ProductPage?id=${product.public_id}`, '_blank')}
-                            title="Voir la page publique"
-                          >
-                            <ExternalLink className="w-4 h-4 text-blue-500" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleCopyLink(product)}
-                            title="Copier le lien"
-                          >
-                            {copiedId === product.id ? (
-                              <Check className="w-4 h-4 text-green-500" />
-                            ) : (
-                              <Copy className="w-4 h-4" />
-                            )}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDelete(product)}
-                            title="Supprimer"
-                          >
-                            <Trash2 className="w-4 h-4 text-red-500" />
-                          </Button>
-                        </div>
-                      </td>
-                    </motion.tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Products Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {filteredProducts.map((product, index) => {
+          const stats = getProductStats(product.id);
+          return (
+            <motion.div
+              key={product.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.03 }}
+            >
+              <Card className="h-full hover:shadow-lg transition-shadow">
+                <CardContent className="p-0">
+                  {/* Image */}
+                  <div className="relative aspect-square bg-gray-100 rounded-t-lg overflow-hidden">
+                    {product.image_url ? (
+                      <img 
+                        src={product.image_url} 
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Package className="w-16 h-16 text-gray-300" />
+                      </div>
+                    )}
+                    {/* Status Badge */}
+                    <div className="absolute top-2 right-2">
+                      {product.is_active ? (
+                        <Badge className="bg-green-500 text-white">Actif</Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-white/90 text-gray-600">Inactif</Badge>
+                      )}
+                    </div>
+                    {!product.public_id && (
+                      <div className="absolute top-2 left-2">
+                        <Badge className="bg-red-500 text-white">❌ ID manquant</Badge>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-4 space-y-3">
+                    {/* Name */}
+                    <h3 className="font-bold text-gray-900 line-clamp-2 min-h-[2.5rem]">
+                      {product.name}
+                    </h3>
+
+                    {/* Shop */}
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <span className="truncate">{getSellerName(product.seller_id)}</span>
+                    </div>
+
+                    {/* Price */}
+                    <div className="text-xl font-bold text-[#2563eb]">
+                      {formatPrice(product.price)} FCFA
+                    </div>
+
+                    {/* Stats */}
+                    <div className="grid grid-cols-2 gap-2 py-2 border-t border-gray-100">
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-gray-900">{stats.scans}</div>
+                        <div className="text-xs text-gray-500">Scans</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-gray-900">{stats.clicks}</div>
+                        <div className="text-xs text-gray-500">Clics</div>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-1 pt-2 border-t border-gray-100">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => setSelectedProduct({ ...product, stats })}
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        Voir
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => window.open(`/ProductPage?id=${product.public_id}`, '_blank')}
+                        disabled={!product.public_id}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDelete(product)}
+                        className="text-red-500 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {filteredProducts.length === 0 && (
+        <Card>
+          <CardContent className="py-12">
+            <div className="text-center text-gray-500">
+              <Package className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <p className="font-medium">Aucun produit trouvé</p>
+              <p className="text-sm mt-1">Essayez de modifier vos filtres</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Product details dialog */}
       {selectedProduct && (
