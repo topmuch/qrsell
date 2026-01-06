@@ -21,7 +21,7 @@ import SubscriptionExpired from './pages/SubscriptionExpired';
 import SubscriptionRequest from './pages/SubscriptionRequest';
 import TikTokGuide from './pages/TikTokGuide';
 import TikTokGuidePublic from './pages/TikTokGuidePublic';
-import RecentActivity from './pages/RecentActivity';
+import ActivityDetail from './pages/ActivityDetail';
 import GrowthTips from './pages/GrowthTips';
 import __Layout from './Layout.jsx';
 
@@ -50,7 +50,7 @@ export const PAGES = {
     "SubscriptionRequest": SubscriptionRequest,
     "TikTokGuide": TikTokGuide,
     "TikTokGuidePublic": TikTokGuidePublic,
-    "RecentActivity": RecentActivity,
+    "ActivityDetail": ActivityDetail,
     "GrowthTips": GrowthTips,
 }
 

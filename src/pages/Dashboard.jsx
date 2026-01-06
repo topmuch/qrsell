@@ -344,10 +344,11 @@ export default function Dashboard() {
         </motion.div>
 
         <Tabs defaultValue="overview" className="space-y-8">
-          <TabsList className="bg-white border p-1 rounded-xl shadow-sm">
+          <TabsList className="bg-white border p-1 rounded-xl shadow-sm flex-wrap">
             <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
               <Sparkles className="w-4 h-4" />
-              Vue d'ensemble
+              <span className="hidden sm:inline">Vue d'ensemble</span>
+              <span className="sm:hidden">Accueil</span>
             </TabsTrigger>
             <TabsTrigger value="products" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
               <Package className="w-4 h-4" />
@@ -363,11 +364,12 @@ export default function Dashboard() {
             </TabsTrigger>
             <TabsTrigger value="guide" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
               <BookOpen className="w-4 h-4" />
-              Guide TikTok
+              <span className="hidden sm:inline">Guide TikTok</span>
+              <span className="sm:hidden">Guide</span>
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
               <Settings className="w-4 h-4" />
-              Paramètres
+              <span className="hidden sm:inline">Paramètres</span>
             </TabsTrigger>
           </TabsList>
 
@@ -432,6 +434,7 @@ export default function Dashboard() {
                 <PerformanceChart products={products} analytics={analytics} />
                 <ActionCards 
                   recentActivity={recentActivity}
+                  analytics={analytics}
                   onExport={handleExportAnalytics}
                 />
               </div>

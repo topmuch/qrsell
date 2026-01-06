@@ -21,9 +21,22 @@ export default function SellerStatus({ seller, productsCount, totalScans }) {
   const completedCriteria = Object.values(criteria).filter(Boolean).length;
   const progress = (completedCriteria / 4) * 100;
 
-  // Check if all criteria met and show message
-  const allCriteriaMet = completedCriteria === 4;
-  const scansReached = totalScans >= 20;
+  // Message personnalisé
+  const getProgressMessage = () => {
+    if (criteria.scans && !criteria.products) {
+      return `Vous avez atteint 20 scans — ajoutez ${8 - productsCount} produit${8 - productsCount > 1 ? 's' : ''} pour débloquer le badge !`;
+    }
+    if (criteria.products && !criteria.scans) {
+      return `Plus que ${20 - totalScans} scan${20 - totalScans > 1 ? 's' : ''} pour débloquer le badge !`;
+    }
+    if (!criteria.subscription) {
+      return "Passez à l'abonnement Pro pour débloquer le badge vérifié.";
+    }
+    if (!criteria.age) {
+      return "Votre compte sera éligible dans quelques heures.";
+    }
+    return "Continuez à vendre pour débloquer le badge !";
+  };
 
   return (
     <Card className="bg-gradient-to-br from-[#2563eb]/5 to-blue-50/30 border-[#2563eb]/20">
@@ -62,6 +75,12 @@ export default function SellerStatus({ seller, productsCount, totalScans }) {
               <Progress value={progress} className="h-2" />
             </div>
 
+            <div className="bg-blue-50 rounded-lg p-3 mb-4">
+              <p className="text-sm text-blue-800 font-medium">
+                {getProgressMessage()}
+              </p>
+            </div>
+
             <div className="space-y-2 mb-4">
               <CriteriaItem 
                 completed={criteria.age}
@@ -80,14 +99,6 @@ export default function SellerStatus({ seller, productsCount, totalScans }) {
                 text={`Abonnement Pro ${criteria.subscription ? '✓' : '(requis)'}`}
               />
             </div>
-
-            {scansReached && !allCriteriaMet && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-                <p className="text-sm text-blue-800 font-medium">
-                  🎉 Vous avez atteint 20 scans — continuez à vendre pour débloquer le badge !
-                </p>
-              </div>
-            )}
           </>
         )}
 

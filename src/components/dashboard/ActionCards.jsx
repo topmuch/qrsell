@@ -7,22 +7,51 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils/index';
 
-export default function ActionCards({ recentActivity, onExport }) {
+export default function ActionCards({ recentActivity, onExport, analytics = [] }) {
+  // Get last 5 activities
+  const recentActivities = [...analytics]
+    .sort((a, b) => new Date(b.created_date) - new Date(a.created_date))
+    .slice(0, 5);
+
+  const formatTimeAgo = (date) => {
+    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+    if (seconds < 60) return `${seconds}s`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}min`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h`;
+    return `${Math.floor(hours / 24)}j`;
+  };
+
+  const getEventLabel = (type) => {
+    switch(type) {
+      case 'scan': return 'Scan QR';
+      case 'view_product': return 'Vue produit';
+      case 'whatsapp_click': return 'Clic WhatsApp';
+      case 'view_shop': return 'Visite boutique';
+      default: return type;
+    }
+  };
+
+  const activitySummary = recentActivities.length > 0 
+    ? `${getEventLabel(recentActivities[0].event_type)} · Il y a ${formatTimeAgo(recentActivities[0].created_date)}`
+    : 'Aucune activité récente';
+
   const actions = [
     {
       icon: Bell,
       title: 'Activité récente',
-      description: recentActivity || 'Aucune activité récente',
+      description: activitySummary,
       cta: 'Voir le détail',
       color: 'bg-blue-50 text-blue-600',
-      badge: recentActivity ? 'Nouveau' : null,
+      badge: recentActivities.length > 0 ? 'Nouveau' : null,
       badgeColor: 'bg-blue-500',
-      link: createPageUrl('RecentActivity')
+      link: createPageUrl('ActivityDetail')
     },
     {
       icon: TrendingUp,
       title: 'Gagnez plus',
-      description: 'Optimisez vos produits pour augmenter vos ventes',
+      description: 'Conseils personnalisés pour booster vos ventes',
       cta: 'Voir les conseils',
       color: 'bg-green-50 text-green-600',
       link: createPageUrl('GrowthTips')
