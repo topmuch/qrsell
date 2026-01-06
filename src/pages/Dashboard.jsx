@@ -281,52 +281,99 @@ export default function Dashboard() {
 
         {/* Navigation */}
         <nav className="flex-1 py-4">
-          <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val)} className="w-full">
-            <ul className="space-y-1 px-3">
-              <li>
-                <TabsTrigger value="overview" className="w-full justify-start bg-transparent data-[state=active]:bg-white/20 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg">
-                  <Sparkles className="w-5 h-5 mr-3" />
-                  Tableau de bord
-                </TabsTrigger>
-              </li>
-              <li>
-                <TabsTrigger value="products" className="w-full justify-start bg-transparent data-[state=active]:bg-white/20 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg">
-                  <Package className="w-5 h-5 mr-3" />
-                  Produits
-                </TabsTrigger>
-              </li>
-              <li>
-                <TabsTrigger value="promotions" className="w-full justify-start bg-transparent data-[state=active]:bg-white/20 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg">
-                  <Zap className="w-5 h-5 mr-3" />
-                  Promotions
-                </TabsTrigger>
-              </li>
-              <li>
-                <TabsTrigger value="live" className="w-full justify-start bg-transparent data-[state=active]:bg-white/20 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg">
-                  <span className="mr-3">🔴</span>
-                  Mode Live
-                </TabsTrigger>
-              </li>
-              <li>
-                <TabsTrigger value="campaigns" className="w-full justify-start bg-transparent data-[state=active]:bg-white/20 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg">
-                  <Sparkles className="w-5 h-5 mr-3" />
-                  Campagnes
-                </TabsTrigger>
-              </li>
-              <li>
-                <TabsTrigger value="guide" className="w-full justify-start bg-transparent data-[state=active]:bg-white/20 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg">
-                  <BookOpen className="w-5 h-5 mr-3" />
-                  Guide TikTok
-                </TabsTrigger>
-              </li>
-              <li>
-                <TabsTrigger value="settings" className="w-full justify-start bg-transparent data-[state=active]:bg-white/20 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg">
-                  <Settings className="w-5 h-5 mr-3" />
-                  Paramètres
-                </TabsTrigger>
-              </li>
-            </ul>
-          </Tabs>
+          <ul className="space-y-1 px-3">
+            <li>
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
+                  activeTab === 'overview'
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <Sparkles className="w-5 h-5 mr-3" />
+                Tableau de bord
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => setActiveTab('products')}
+                className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
+                  activeTab === 'products'
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <Package className="w-5 h-5 mr-3" />
+                Produits
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => setActiveTab('promotions')}
+                className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
+                  activeTab === 'promotions'
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <Zap className="w-5 h-5 mr-3" />
+                Promotions
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => setActiveTab('live')}
+                className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
+                  activeTab === 'live'
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <span className="mr-3">🔴</span>
+                Mode Live
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => setActiveTab('campaigns')}
+                className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
+                  activeTab === 'campaigns'
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <Sparkles className="w-5 h-5 mr-3" />
+                Campagnes
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => setActiveTab('guide')}
+                className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
+                  activeTab === 'guide'
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <BookOpen className="w-5 h-5 mr-3" />
+                Guide TikTok
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => setActiveTab('settings')}
+                className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
+                  activeTab === 'settings'
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <Settings className="w-5 h-5 mr-3" />
+                Paramètres
+              </button>
+            </li>
+          </ul>
         </nav>
 
         {/* Logout */}
@@ -374,9 +421,10 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+        <div className="space-y-8">
 
-          <TabsContent value="overview" className="space-y-8">
+          {activeTab === 'overview' && (
+          <div className="space-y-8">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <motion.div
@@ -532,9 +580,11 @@ export default function Dashboard() {
                 <SubscriptionStatus user={user} />
               </div>
             </div>
-          </TabsContent>
+          </div>
+          )}
 
-          <TabsContent value="products" className="space-y-6">
+          {activeTab === 'products' && (
+          <div className="space-y-6">
 
             {/* Import/Export & Catalog */}
             <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -603,13 +653,17 @@ export default function Dashboard() {
                 </AnimatePresence>
               </div>
             )}
-          </TabsContent>
+          </div>
+          )}
 
-          <TabsContent value="live" className="space-y-6">
+          {activeTab === 'live' && (
+          <div className="space-y-6">
             <LiveControl seller={seller} products={products} />
-          </TabsContent>
+          </div>
+          )}
 
-          <TabsContent value="promotions" className="space-y-6">
+          {activeTab === 'promotions' && (
+          <div className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
               {/* Promotions Flash */}
               <div className="bg-white p-6 rounded-xl shadow">
@@ -711,9 +765,11 @@ export default function Dashboard() {
                 )}
               </div>
             </div>
-          </TabsContent>
+          </div>
+          )}
 
-          <TabsContent value="campaigns" className="space-y-6">
+          {activeTab === 'campaigns' && (
+          <div className="space-y-6">
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
               <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 dark:text-white">
                 <Sparkles className="w-6 h-6 text-green-500" />
@@ -784,13 +840,17 @@ export default function Dashboard() {
                 </div>
               )}
             </div>
-          </TabsContent>
+          </div>
+          )}
 
-          <TabsContent value="guide">
+          {activeTab === 'guide' && (
+          <div>
             <TikTokGuide shopUrl={shopUrl} />
-          </TabsContent>
+          </div>
+          )}
 
-          <TabsContent value="settings" className="space-y-6">
+          {activeTab === 'settings' && (
+          <div className="space-y-6">
             <div className="max-w-6xl mx-auto">
               <div className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Paramètres de la boutique</h2>
@@ -817,8 +877,9 @@ export default function Dashboard() {
 
               <SettingsTabs seller={seller} />
             </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+          )}
+        </div>
         </div>
       </main>
 
