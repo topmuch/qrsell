@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { 
@@ -59,24 +59,23 @@ export default function Home() {
 
   const { data: demoProducts = [] } = useQuery({
     queryKey: ['home-demo-products', demoPetShop?.id],
-    queryFn: () => base44.entities.Product.filter({ seller_id: demoPetShop?.id, is_active: true }),
-    enabled: !!demoPetShop?.id
+    queryFn: async () => {
+      const allProducts = await base44.entities.Product.filter({ seller_id: demoPetShop?.id, is_active: true });
+      // Mélanger les produits de manière aléatoire
+      const shuffled = [...allProducts];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled.slice(0, 3);
+    },
+    enabled: !!demoPetShop?.id,
+    staleTime: 0,
+    cacheTime: 0
   });
 
-  // Shuffle and select 3 random products
-  const shuffleArray = (array) => {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-  };
-
-  const randomProducts = demoProducts.length > 0 ? shuffleArray(demoProducts).slice(0, 3) : [];
-
   // Demo products with real data or fallback
-  const products = randomProducts.length > 0 ? randomProducts : [
+  const products = demoProducts.length > 0 ? demoProducts : [
     {
       id: '1',
       name: 'Robe Wax Élégante',
