@@ -26,7 +26,7 @@ export default function BannerSlider({ images }) {
   };
 
   return (
-    <div className="relative w-full h-48 sm:h-64 md:h-72 max-h-[300px] overflow-hidden bg-gray-100">
+    <div className="relative w-full overflow-hidden bg-gray-100" style={{ maxWidth: '1168px', height: '384px', margin: '0 auto' }}>
       {/* Images */}
       {images.map((img, index) => (
         <div
