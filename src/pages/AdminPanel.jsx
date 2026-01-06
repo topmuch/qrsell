@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
-import { Shield, Users, Package, Activity, LogOut, Loader2, Megaphone, CreditCard, FileText, BarChart3, Bug, ShoppingCart, TrendingUp, DollarSign, Eye } from 'lucide-react';
+import { Shield, Users, Package, Activity, LogOut, Loader2, Megaphone, CreditCard, FileText, BarChart3, Bug, ShoppingCart, TrendingUp, DollarSign, Eye, Settings } from 'lucide-react';
 import StatsOverview from '@/components/admin/StatsOverview';
 import SellerManagement from '@/components/admin/SellerManagement';
 import ProductManagement from '@/components/admin/ProductManagement';
