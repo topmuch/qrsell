@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MessageCircle, Store } from 'lucide-react';
 import { motion } from 'framer-motion';
+import QRCode from 'qrcode';
 
-export default function ProductGrid({ products, seller, onWhatsAppClick }) {
+export default function ProductGrid({ products, seller, onWhatsAppClick, showQR = false }) {
   const formatPrice = (price) => {
     return new Intl.NumberFormat('fr-FR').format(price);
   };
@@ -39,8 +40,35 @@ Si vous souhaitez procéder à l'achat, il vous suffit de répondre avec "Oui, j
     );
   }
 
+  const ProductQRCode = ({ product }) => {
+    const canvasRef = React.useRef(null);
+    
+    React.useEffect(() => {
+      if (canvasRef.current) {
+        const productUrl = `${window.location.origin}/ProductPage?id=${product.public_id}`;
+        QRCode.toCanvas(canvasRef.current, productUrl, {
+          width: 80,
+          margin: 1,
+          color: {
+            dark: '#FF6B9D',
+            light: '#FFFFFF'
+          }
+        });
+      }
+    }, [product]);
+
+    return (
+      <div className="flex flex-col items-center gap-1 mt-3 p-2 bg-pink-50 rounded-lg">
+        <canvas ref={canvasRef} className="rounded" />
+        <p className="text-[10px] text-center text-gray-500 leading-tight">
+          Scannez-moi pour voir comment vos clients vous contactent !
+        </p>
+      </div>
+    );
+  };
+
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
       {products.map((product, index) => (
         <motion.div
           key={product.id}
@@ -48,46 +76,48 @@ Si vous souhaitez procéder à l'achat, il vous suffit de répondre avec "Oui, j
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.05 }}
         >
-          <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group h-full flex flex-col">
+          <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 group h-full flex flex-col border-0 shadow-md bg-white">
             <div className="aspect-square bg-gray-100 relative overflow-hidden">
               {product.image_url ? (
                 <img 
                   src={product.image_url} 
                   alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-                  <Store className="w-12 h-12 text-gray-200" />
+                  <Store className="w-16 h-16 text-gray-200" />
                 </div>
               )}
               
               {/* Badges */}
-              <div className="absolute top-2 left-2 flex flex-col gap-1">
+              <div className="absolute top-3 left-3 flex flex-col gap-2">
                 {product.is_new && (
-                  <Badge className="bg-blue-500 text-white">Nouveauté</Badge>
+                  <Badge className="bg-blue-500 text-white shadow-lg font-semibold">✨ Nouveauté</Badge>
                 )}
                 {product.is_on_promo && (
-                  <Badge className="bg-red-500 text-white">Promo</Badge>
+                  <Badge className="bg-red-500 text-white shadow-lg font-semibold">🔥 Promo</Badge>
                 )}
                 {product.is_out_of_stock && (
-                  <Badge className="bg-gray-800 text-white">Rupture</Badge>
+                  <Badge className="bg-gray-800 text-white shadow-lg font-semibold">Rupture</Badge>
                 )}
               </div>
             </div>
 
-            <div className="p-4 flex flex-col flex-1">
-              <h3 className="font-bold text-gray-900 mb-1 line-clamp-2">
+            <div className="p-6 flex flex-col flex-1">
+              <h3 className="font-bold text-xl text-gray-900 mb-2 line-clamp-2 leading-tight">
                 {product.name}
               </h3>
-              <p className="text-2xl font-bold text-[#10b981] mb-2">
-                {formatPrice(product.price)} FCFA
-              </p>
+              
               {product.description && (
-                <p className="text-sm text-gray-500 mb-4 line-clamp-2 flex-1">
+                <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
                   {product.description}
                 </p>
               )}
+              
+              <p className="text-3xl font-black text-[#10B981] mb-4">
+                {formatPrice(product.price)} <span className="text-lg">FCFA</span>
+              </p>
               
               <a 
                 href={getWhatsAppLink(product)}
@@ -97,16 +127,18 @@ Si vous souhaitez procéder à l'achat, il vous suffit de répondre avec "Oui, j
                 onClick={() => onWhatsAppClick(product)}
               >
                 <Button 
-                  className="w-full text-white"
+                  className="w-full text-white font-bold text-base py-6 shadow-lg hover:shadow-xl transition-all"
                   style={{
-                    background: `linear-gradient(135deg, ${seller.primary_color || '#2563eb'} 0%, ${seller.secondary_color || '#3b82f6'} 100%)`
+                    background: '#FF6B9D'
                   }}
                   disabled={product.is_out_of_stock}
                 >
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  {product.is_out_of_stock ? 'Indisponible' : 'Commander sur WhatsApp'}
+                  <MessageCircle className="w-5 h-5 mr-2" />
+                  {product.is_out_of_stock ? 'Indisponible' : '💬 Commander sur WhatsApp'}
                 </Button>
               </a>
+              
+              {showQR && !product.is_out_of_stock && <ProductQRCode product={product} />}
             </div>
           </Card>
         </motion.div>

@@ -123,29 +123,40 @@ export default function Shop() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header - Logo et réseaux sociaux uniquement */}
-      <header className="bg-white border-b sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4 py-4">
+    <div className="min-h-screen bg-white">
+      {/* Header - Logo du vendeur à gauche, nom à côté, réseaux sociaux à droite */}
+      <header className="bg-white sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            {/* Logo vendeur */}
-            <div className="flex items-center">
+            {/* Logo vendeur + nom */}
+            <div className="flex items-center gap-4">
               {seller?.logo_url ? (
                 <img 
                   src={seller.logo_url} 
                   alt={seller.shop_name}
-                  className="h-16 w-auto max-w-[250px] object-contain"
+                  className="h-20 w-auto object-contain"
                 />
               ) : (
                 <div 
-                  className="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-2xl shadow-lg"
+                  className="w-20 h-20 rounded-2xl flex items-center justify-center text-white font-bold text-3xl shadow-lg"
                   style={{
-                    background: `linear-gradient(135deg, ${seller.primary_color || '#2563eb'} 0%, ${seller.secondary_color || '#3b82f6'} 100%)`
+                    background: `linear-gradient(135deg, ${seller.primary_color || '#6C4AB6'} 0%, ${seller.secondary_color || '#FF6B9D'} 100%)`
                   }}
                 >
                   {seller.shop_name?.[0]?.toUpperCase() || 'B'}
                 </div>
               )}
+              <div>
+                <h1 className="text-2xl md:text-3xl font-black text-gray-900">{seller.shop_name}</h1>
+                {seller.is_verified && (
+                  <span className="text-sm text-green-600 flex items-center gap-1 mt-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    Boutique vérifiée
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Réseaux sociaux */}
@@ -155,7 +166,7 @@ export default function Shop() {
                   href={`https://wa.me/${seller.whatsapp_number.replace(/[^0-9]/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-11 h-11 bg-[#25D366] rounded-full flex items-center justify-center hover:opacity-90 transition-opacity shadow-md"
+                  className="w-11 h-11 bg-[#10B981] rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
                 >
                   <MessageCircle className="w-5 h-5 text-white" />
                 </a>
@@ -165,7 +176,7 @@ export default function Shop() {
                   href={`https://instagram.com/${seller.instagram.replace('@', '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-11 h-11 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity shadow-md"
+                  className="w-11 h-11 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
                 >
                   <Instagram className="w-5 h-5 text-white" />
                 </a>
@@ -175,7 +186,7 @@ export default function Shop() {
                   href={`https://tiktok.com/@${seller.tiktok.replace('@', '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-11 h-11 bg-gray-900 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity shadow-md"
+                  className="w-11 h-11 bg-gray-900 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
                 >
                   <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
@@ -187,7 +198,7 @@ export default function Shop() {
                   href={seller.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-11 h-11 bg-blue-600 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity shadow-md"
+                  className="w-11 h-11 bg-blue-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
                 >
                   <Facebook className="w-5 h-5 text-white" />
                 </a>
@@ -199,87 +210,61 @@ export default function Shop() {
 
       {/* Banner Slider */}
       {seller.banner_images && seller.banner_images.length > 0 && (
-        <BannerSlider images={seller.banner_images} />
+        <div className="w-full" style={{ maxHeight: '300px', overflow: 'hidden' }}>
+          <BannerSlider images={seller.banner_images} />
+        </div>
       )}
 
-      {/* Search Bar - Sous le header */}
-      <div className="bg-white border-b py-4">
-        <div className="container mx-auto px-4">
-          <div className="relative max-w-2xl mx-auto">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <Input
-              placeholder="Rechercher un produit..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Categories */}
-      <CategoryBar 
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
-        availableCategories={availableCategories}
-      />
-
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-12">
         {/* Featured Products */}
-        {featuredProducts.length > 0 && selectedCategory === 'all' && !searchQuery && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <span>🔥</span>
+        {featuredProducts.length > 0 && (
+          <div className="mb-16">
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-8 flex items-center gap-3">
+              <span className="text-4xl">🔥</span>
               <span>Produits populaires</span>
             </h2>
             <ProductGrid 
               products={featuredProducts}
               seller={seller}
               onWhatsAppClick={handleWhatsAppClick}
+              showQR={true}
             />
           </div>
         )}
 
         {/* All Products */}
         <div>
-          {selectedCategory !== 'all' || searchQuery ? (
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              {searchQuery ? `Résultats pour "${searchQuery}"` : `Catégorie: ${selectedCategory}`}
-            </h2>
-          ) : featuredProducts.length > 0 ? (
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Tous nos produits</h2>
-          ) : (
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Nos produits</h2>
-          )}
+          <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-8">Tous nos produits</h2>
 
           {loadingProducts ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 animate-spin text-[#2563eb]" />
+              <Loader2 className="w-8 h-8 animate-spin text-[#FF6B9D]" />
             </div>
           ) : (
             <ProductGrid 
-              products={filteredProducts}
+              products={products.filter(p => p.is_active)}
               seller={seller}
               onWhatsAppClick={handleWhatsAppClick}
+              showQR={true}
             />
           )}
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t mt-16 py-10">
+      <footer className="bg-gray-50 border-t mt-20 py-12">
         <div className="container mx-auto px-4">
           {/* Payment Methods */}
           {seller.payment_methods && seller.payment_methods.length > 0 && (
-            <div className="mb-10">
-              <h3 className="text-center font-semibold text-gray-700 mb-6 text-lg">Méthodes de paiement</h3>
-              <div className="flex flex-wrap items-center justify-center gap-8">
+            <div className="mb-12">
+              <h3 className="text-center font-bold text-gray-900 mb-8 text-xl">Méthodes de paiement acceptées</h3>
+              <div className="flex flex-wrap items-center justify-center gap-12">
                 {seller.payment_methods.map((logo, index) => (
                   <img 
                     key={index}
                     src={logo} 
                     alt={`Paiement ${index + 1}`}
-                    className="h-10 object-contain hover:scale-110 transition-transform"
+                    className="h-12 object-contain hover:scale-110 transition-transform filter grayscale hover:grayscale-0"
                   />
                 ))}
               </div>
@@ -288,15 +273,15 @@ export default function Shop() {
 
           {/* Partners */}
           {seller.partner_logos && seller.partner_logos.length > 0 && (
-            <div className="mb-10">
-              <h3 className="text-center font-semibold text-gray-700 mb-6 text-lg">Nos partenaires</h3>
-              <div className="flex flex-wrap items-center justify-center gap-10">
+            <div className="mb-12 pb-12 border-b">
+              <h3 className="text-center font-bold text-gray-900 mb-8 text-xl">Nos partenaires</h3>
+              <div className="flex flex-wrap items-center justify-center gap-14">
                 {seller.partner_logos.map((logo, index) => (
                   <img 
                     key={index}
                     src={logo} 
                     alt={`Partenaire ${index + 1}`}
-                    className="h-14 object-contain hover:scale-110 transition-transform"
+                    className="h-16 object-contain hover:scale-110 transition-transform filter grayscale hover:grayscale-0"
                   />
                 ))}
               </div>
@@ -304,47 +289,28 @@ export default function Shop() {
           )}
 
           {/* Footer Info */}
-          <div className="border-t pt-8">
-            <div className="grid md:grid-cols-2 gap-8 mb-6">
-              <div>
-                <h3 className="font-bold text-gray-900 mb-4 text-lg">{seller.shop_name}</h3>
-                <div className="space-y-3 text-sm text-gray-600">
-                  {seller.address && (
-                    <p className="flex items-start gap-2">
-                      <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" /> 
-                      {seller.address}
-                    </p>
-                  )}
-                  {seller.whatsapp_number && (
-                    <p className="flex items-center gap-2">
-                      <Phone className="w-4 h-4" /> 
-                      {seller.whatsapp_number}
-                    </p>
-                  )}
-                  {seller.email && (
-                    <p className="flex items-center gap-2">
-                      <Mail className="w-4 h-4" /> 
-                      {seller.email}
-                    </p>
-                  )}
-                </div>
-              </div>
-              
-              <div className="flex flex-col items-end justify-end">
-                <p className="text-[10px] text-gray-300 mb-0.5">Powered by</p>
-                <a 
-                  href="https://qrsell.app" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-[10px] text-gray-300 hover:text-gray-400 transition-colors font-medium"
-                >
-                  QRSell
-                </a>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-center md:text-left">
+              <h3 className="font-bold text-gray-900 mb-2 text-lg">{seller.shop_name}</h3>
+              <div className="space-y-1 text-sm text-gray-600">
+                {seller.address && <p>{seller.address}</p>}
+                {seller.whatsapp_number && <p>{seller.whatsapp_number}</p>}
+                {seller.email && <p>{seller.email}</p>}
               </div>
             </div>
             
-            <div className="border-t pt-4 text-center text-xs text-gray-400">
-              © {new Date().getFullYear()} {seller.shop_name}. Tous droits réservés.
+            <div className="text-center md:text-right">
+              <p className="text-xs text-gray-400 mb-1">Boutique propulsée par</p>
+              <a 
+                href="https://qrsell.app" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-block opacity-30 hover:opacity-50 transition-opacity"
+              >
+                <span className="text-xs font-semibold bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] bg-clip-text text-transparent">
+                  QRSell
+                </span>
+              </a>
             </div>
           </div>
         </div>
