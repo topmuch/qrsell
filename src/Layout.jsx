@@ -47,7 +47,7 @@ export default function Layout({ children, currentPageName }) {
               <Link 
                 to={createPageUrl('Home')} 
                 className={`font-medium transition-colors ${
-                  isActive('Home') ? 'text-[#2563eb]' : 'text-gray-700 hover:text-[#2563eb]'
+                  isActive('Home') ? 'text-[#6C4AB6]' : 'text-gray-700 hover:text-[#6C4AB6]'
                 }`}
               >
                 Accueil
@@ -55,7 +55,7 @@ export default function Layout({ children, currentPageName }) {
               <Link 
                 to={createPageUrl('AllShops')} 
                 className={`font-medium transition-colors ${
-                  isActive('AllShops') ? 'text-[#2563eb]' : 'text-gray-700 hover:text-[#2563eb]'
+                  isActive('AllShops') ? 'text-[#6C4AB6]' : 'text-gray-700 hover:text-[#6C4AB6]'
                 }`}
               >
                 Boutiques
@@ -63,7 +63,7 @@ export default function Layout({ children, currentPageName }) {
               <Link 
                 to={createPageUrl('Demo')} 
                 className={`font-medium transition-colors ${
-                  isActive('Demo') ? 'text-[#2563eb]' : 'text-gray-700 hover:text-[#2563eb]'
+                  isActive('Demo') ? 'text-[#6C4AB6]' : 'text-gray-700 hover:text-[#6C4AB6]'
                 }`}
               >
                 Démo
@@ -71,7 +71,7 @@ export default function Layout({ children, currentPageName }) {
               <Link 
                 to={createPageUrl('Campagnes')} 
                 className={`font-medium transition-colors ${
-                  isActive('Campagnes') ? 'text-[#2563eb]' : 'text-gray-700 hover:text-[#2563eb]'
+                  isActive('Campagnes') ? 'text-[#6C4AB6]' : 'text-gray-700 hover:text-[#6C4AB6]'
                 }`}
               >
                 Campagnes
@@ -83,7 +83,7 @@ export default function Layout({ children, currentPageName }) {
               {user ? (
                 <>
                   <Link to={createPageUrl('Dashboard')}>
-                    <Button className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-6">
+                    <Button className="bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] hover:opacity-90 text-white rounded-full px-6">
                       Mon Dashboard
                     </Button>
                   </Link>
@@ -132,7 +132,7 @@ export default function Layout({ children, currentPageName }) {
               <Link 
                 to={createPageUrl('Home')} 
                 className={`block py-2 font-medium ${
-                  isActive('Home') ? 'text-[#2563eb]' : 'text-gray-700'
+                isActive('Home') ? 'text-[#6C4AB6]' : 'text-gray-700'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -141,7 +141,7 @@ export default function Layout({ children, currentPageName }) {
               <Link 
                 to={createPageUrl('AllShops')} 
                 className={`block py-2 font-medium ${
-                  isActive('AllShops') ? 'text-[#2563eb]' : 'text-gray-700'
+                isActive('AllShops') ? 'text-[#6C4AB6]' : 'text-gray-700'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -150,7 +150,7 @@ export default function Layout({ children, currentPageName }) {
               <Link 
                 to={createPageUrl('Demo')} 
                 className={`block py-2 font-medium ${
-                  isActive('Demo') ? 'text-[#2563eb]' : 'text-gray-700'
+                isActive('Demo') ? 'text-[#6C4AB6]' : 'text-gray-700'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -159,7 +159,7 @@ export default function Layout({ children, currentPageName }) {
               <Link 
                 to={createPageUrl('Campagnes')} 
                 className={`block py-2 font-medium ${
-                  isActive('Campagnes') ? 'text-[#2563eb]' : 'text-gray-700'
+                isActive('Campagnes') ? 'text-[#6C4AB6]' : 'text-gray-700'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -170,8 +170,8 @@ export default function Layout({ children, currentPageName }) {
                   to={createPageUrl('Dashboard')}
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <Button className="w-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full mt-3">
-                    Mon Dashboard
+                  <Button className="w-full bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] hover:opacity-90 text-white rounded-full mt-3">
+                  Mon Dashboard
                   </Button>
                 </Link>
               ) : (

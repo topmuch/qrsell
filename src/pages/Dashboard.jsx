@@ -609,7 +609,7 @@ export default function Dashboard() {
                   setEditProduct(null);
                   setShowProductForm(true);
                 }}
-                className="bg-gradient-to-r from-[#2563eb] to-[#3b82f6] hover:opacity-90 text-white shadow-lg"
+                className="bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] hover:opacity-90 text-white shadow-lg"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Ajouter un produit
@@ -631,7 +631,7 @@ export default function Dashboard() {
                 <p className="text-gray-500 mb-6">Commencez par ajouter votre premier produit</p>
                 <Button 
                   onClick={() => setShowProductForm(true)}
-                  className="bg-gradient-to-r from-[#2563eb] to-[#3b82f6] hover:opacity-90 text-white"
+                  className="bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] hover:opacity-90 text-white"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Ajouter un produit
