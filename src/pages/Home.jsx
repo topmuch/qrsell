@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import NewHeroSection from '@/components/landing/NewHeroSection';
-import HowItWorksNew from '@/components/landing/HowItWorksNew';
-import ShopShowcase from '@/components/landing/ShopShowcase';
-import WhyChooseUs from '@/components/landing/WhyChooseUs';
+import InteractiveHero from '@/components/landing/InteractiveHero';
+import InteractiveDemo from '@/components/landing/InteractiveDemo';
+import OnlineShopSection from '@/components/landing/OnlineShopSection';
+import PromotionsSection from '@/components/landing/PromotionsSection';
+import DashboardSection from '@/components/landing/DashboardSection';
+import ReinforcedCTA from '@/components/landing/ReinforcedCTA';
 import TestimonialSection from '@/components/landing/TestimonialSection';
-import PlansSection from '@/components/landing/PlansSection';
-import PricingPreview from '@/components/landing/PricingPreview';
-import FinalCTA from '@/components/landing/FinalCTA';
 import Footer from '@/components/landing/Footer';
-import TikTokGuideSection from '@/components/landing/TikTokGuideSection';
 import { CheckCircle2, X } from 'lucide-react';
 
 export default function Home() {
@@ -46,14 +44,13 @@ export default function Home() {
 
       {/* Main content */}
       <main>
-        <NewHeroSection />
-        <HowItWorksNew />
-        <ShopShowcase />
-        <TikTokGuideSection />
-        <WhyChooseUs />
-        <PricingPreview />
+        <InteractiveHero />
+        <InteractiveDemo />
+        <OnlineShopSection />
+        <PromotionsSection />
+        <DashboardSection />
         <TestimonialSection />
-        <FinalCTA />
+        <ReinforcedCTA />
       </main>
 
       <Footer />
