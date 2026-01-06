@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Zap } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function PromotionForm({ open, onClose, seller, products }) {
   const [productId, setProductId] = useState('');
@@ -28,16 +29,24 @@ export default function PromotionForm({ open, onClose, seller, products }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['promotions']);
+      toast.success('Promotion créée avec succès !');
       onClose();
       setProductId('');
       setDiscount('10');
       setDuration('30');
+    },
+    onError: () => {
+      toast.error('Erreur lors de la création');
     }
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!productId || !discount) return;
+    
+    if (!productId || !discount) {
+      toast.error('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
 
     createMutation.mutate({
       seller_id: seller.id,
@@ -121,8 +130,14 @@ export default function PromotionForm({ open, onClose, seller, products }) {
               disabled={createMutation.isPending || !productId}
               className="bg-orange-500 hover:bg-orange-600"
             >
-              {createMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Créer la promotion
+              {createMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  En cours...
+                </>
+              ) : (
+                'Créer la promotion'
+              )}
             </Button>
           </div>
         </form>

@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { base44 } from '@/api/base44Client';
 import { Loader2, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function ProductForm({ open, onClose, seller, onSuccess, editProduct }) {
   const [formData, setFormData] = useState({
@@ -41,30 +42,43 @@ export default function ProductForm({ open, onClose, seller, onSuccess, editProd
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    const productData = {
-      ...formData,
-      price: parseFloat(formData.price),
-      seller_id: seller.id,
-      shop_slug: seller.shop_slug,
-      is_active: true
-    };
-
-    if (editProduct) {
-      // Générer un public_id si manquant
-      if (!editProduct.public_id) {
-        productData.public_id = generatePublicId();
-      }
-      await base44.entities.Product.update(editProduct.id, productData);
-    } else {
-      productData.public_id = generatePublicId();
-      await base44.entities.Product.create(productData);
+    
+    if (!formData.name || !formData.price) {
+      toast.error('Veuillez remplir tous les champs obligatoires');
+      return;
     }
 
-    setLoading(false);
-    onSuccess();
-    onClose();
+    setLoading(true);
+
+    try {
+      const productData = {
+        ...formData,
+        price: parseFloat(formData.price),
+        seller_id: seller.id,
+        shop_slug: seller.shop_slug,
+        is_active: true
+      };
+
+      if (editProduct) {
+        // Générer un public_id si manquant
+        if (!editProduct.public_id) {
+          productData.public_id = generatePublicId();
+        }
+        await base44.entities.Product.update(editProduct.id, productData);
+        toast.success('Produit modifié avec succès !');
+      } else {
+        productData.public_id = generatePublicId();
+        await base44.entities.Product.create(productData);
+        toast.success('Produit ajouté avec succès !');
+      }
+
+      onSuccess();
+      onClose();
+    } catch (error) {
+      toast.error('Erreur lors de l\'enregistrement');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -224,7 +238,10 @@ export default function ProductForm({ open, onClose, seller, onSuccess, editProd
               disabled={loading || uploading}
             >
               {loading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  En cours...
+                </>
               ) : editProduct ? (
                 'Sauvegarder les modifications'
               ) : (

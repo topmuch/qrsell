@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Loader2, Ticket } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function CouponForm({ open, onClose, seller }) {
   const [amount, setAmount] = useState('');
@@ -29,15 +30,23 @@ export default function CouponForm({ open, onClose, seller }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['coupons']);
+      toast.success('Coupon créé avec succès !');
       onClose();
       setAmount('');
       setDescription('');
+    },
+    onError: () => {
+      toast.error('Erreur lors de la création');
     }
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!amount) return;
+    
+    if (!amount) {
+      toast.error('Veuillez remplir tous les champs obligatoires');
+      return;
+    }
 
     createMutation.mutate({
       seller_id: seller.id,
@@ -93,8 +102,14 @@ export default function CouponForm({ open, onClose, seller }) {
               disabled={createMutation.isPending || !amount}
               className="bg-purple-500 hover:bg-purple-600"
             >
-              {createMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Créer le coupon
+              {createMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  En cours...
+                </>
+              ) : (
+                'Créer le coupon'
+              )}
             </Button>
           </div>
         </form>

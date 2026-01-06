@@ -67,12 +67,16 @@ export default function SubscriptionManagement() {
   };
 
   const sendByEmail = async () => {
-    await base44.integrations.Core.SendEmail({
-      to: resetPasswordUser.user_email,
-      subject: 'Réinitialisation de votre mot de passe QRSell',
-      body: `Bonjour,\n\nVotre mot de passe a été réinitialisé.\n\nEmail: ${resetPasswordUser.user_email}\nNouveau mot de passe: ${generatedPassword}\n\nVous pouvez vous connecter sur https://qrsell.app\n\nCordialement,\nL'équipe QRSell`
-    });
-    alert('Email envoyé avec succès !');
+    try {
+      await base44.integrations.Core.SendEmail({
+        to: resetPasswordUser.user_email,
+        subject: 'Réinitialisation de votre mot de passe QRSell',
+        body: `Bonjour,\n\nVotre mot de passe a été réinitialisé.\n\nEmail: ${resetPasswordUser.user_email}\nNouveau mot de passe: ${generatedPassword}\n\nVous pouvez vous connecter sur https://qrsell.app\n\nCordialement,\nL'équipe QRSell`
+      });
+      toast.success('Email envoyé avec succès !');
+    } catch (error) {
+      toast.error('Erreur lors de l\'envoi de l\'email');
+    }
   };
 
   const { data: subscriptions = [] } = useQuery({
