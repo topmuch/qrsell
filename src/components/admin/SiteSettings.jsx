@@ -109,12 +109,12 @@ export default function SiteSettings() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6 max-w-4xl px-4 md:px-0">
       <div className="flex items-center gap-3">
-        <SettingsIcon className="w-8 h-8 text-[#2563eb]" />
+        <SettingsIcon className="w-6 h-6 md:w-8 md:h-8 text-[#2563eb]" />
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Paramètres du site</h2>
-          <p className="text-gray-500 dark:text-gray-400">Configuration globale de la plateforme</p>
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Paramètres du site</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Configuration globale de la plateforme</p>
         </div>
       </div>
 
@@ -181,7 +181,7 @@ export default function SiteSettings() {
               <Palette className="w-4 h-4" />
               Couleurs du site
             </Label>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="primary_color" className="text-xs text-gray-500">Couleur principale</Label>
                 <div className="flex gap-2 mt-1">
@@ -223,7 +223,7 @@ export default function SiteSettings() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="currency">Devise par défaut</Label>
               <Select
@@ -290,7 +290,7 @@ export default function SiteSettings() {
           <CardTitle className="dark:text-white">Configuration SMTP</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="smtp_host">Hôte SMTP</Label>
               <Input
@@ -336,11 +336,11 @@ export default function SiteSettings() {
         </CardContent>
       </Card>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end pb-6">
         <Button
           onClick={handleSave}
           disabled={saveMutation.isPending}
-          className="bg-[#10B770] hover:bg-[#0e9d5f] text-white shadow-lg"
+          className="bg-[#10B770] hover:bg-[#0e9d5f] text-white shadow-lg w-full md:w-auto"
         >
           {saveMutation.isPending ? (
             <>
