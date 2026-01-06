@@ -39,6 +39,7 @@ import PromotionCard from '@/components/dashboard/PromotionCard';
 import CouponForm from '@/components/dashboard/CouponForm';
 import CouponCard from '@/components/dashboard/CouponCard';
 import EnhancedQRCode from '@/components/ui/EnhancedQRCode';
+import LiveControl from '@/components/dashboard/LiveControl';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Dashboard() {
@@ -358,6 +359,10 @@ export default function Dashboard() {
               <Zap className="w-4 h-4" />
               Promotions
             </TabsTrigger>
+            <TabsTrigger value="live" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
+              <span className="text-red-500">🔴</span>
+              Mode Live
+            </TabsTrigger>
             <TabsTrigger value="campaigns" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
               <Sparkles className="w-4 h-4" />
               Campagnes
@@ -514,6 +519,10 @@ export default function Dashboard() {
                 </AnimatePresence>
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="live" className="space-y-6">
+            <LiveControl seller={seller} products={products} />
           </TabsContent>
 
           <TabsContent value="promotions" className="space-y-6">

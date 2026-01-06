@@ -24,6 +24,7 @@ import TikTokGuidePublic from './pages/TikTokGuidePublic';
 import RecentActivity from './pages/RecentActivity';
 import GrowthTips from './pages/GrowthTips';
 import ActivityDetail from './pages/ActivityDetail';
+import Live from './pages/Live';
 import __Layout from './Layout.jsx';
 
 
@@ -54,6 +55,7 @@ export const PAGES = {
     "RecentActivity": RecentActivity,
     "GrowthTips": GrowthTips,
     "ActivityDetail": ActivityDetail,
+    "Live": Live,
 }
 
 export const pagesConfig = {
