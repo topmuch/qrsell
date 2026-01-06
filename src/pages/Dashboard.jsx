@@ -14,10 +14,12 @@ import {
   ExternalLink,
   Loader2,
   Sparkles,
-  Sun,
-  Moon,
   Zap,
-  Ticket
+  Ticket,
+  LogOut,
+  TrendingUp,
+  Eye,
+  MessageCircle
 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import SellerProfileForm from '@/components/dashboard/SellerProfileForm';
@@ -48,9 +50,9 @@ export default function Dashboard() {
   const [showProductForm, setShowProductForm] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
   const [copied, setCopied] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const [showPromotionForm, setShowPromotionForm] = useState(false);
   const [showCouponForm, setShowCouponForm] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -59,25 +61,7 @@ export default function Dashboard() {
       setUser(currentUser);
     };
     loadUser();
-
-    // Load theme preference
-    const savedTheme = localStorage.getItem('dashboard-theme');
-    if (savedTheme === 'dark') {
-      setDarkMode(true);
-      document.documentElement.classList.add('dark');
-    }
   }, []);
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    if (!darkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('dashboard-theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('dashboard-theme', 'light');
-    }
-  };
 
   // Check subscription
   const { data: subscriptions = [], isLoading: loadingSubscription } = useQuery({
@@ -266,139 +250,233 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Logo size="md" />
-            
-            <div className="flex items-center gap-4">
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={toggleDarkMode}
-                className="dark:text-gray-300"
-              >
-                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </Button>
-              {seller && (
-                <div className="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-lg px-3 py-2">
-                  <Store className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                  <span className="text-sm text-gray-600 dark:text-gray-300 truncate max-w-[150px]">
-                    {seller.shop_name}
-                  </span>
-                  <Button 
-                    size="icon" 
-                    variant="ghost" 
-                    className="h-6 w-6"
-                    onClick={copyShopLink}
-                  >
-                    {copied ? (
-                      <Check className="w-3 h-3 text-green-500" />
-                    ) : (
-                      <Copy className="w-3 h-3" />
-                    )}
-                  </Button>
-                  <a href={shopUrl} target="_blank" rel="noopener noreferrer">
-                    <Button size="icon" variant="ghost" className="h-6 w-6">
-                      <ExternalLink className="w-3 h-3" />
-                    </Button>
-                  </a>
-                </div>
-              )}
-              <Button variant="outline" size="sm" onClick={handleLogout}>
-                Déconnexion
-              </Button>
+    <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar */}
+      <aside className="w-64 flex flex-col" style={{ backgroundColor: '#4CAF50' }}>
+        {/* Logo & Profile */}
+        <div className="p-6 border-b border-white/20">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-white rounded flex items-center justify-center">
+              <Store className="w-6 h-6" style={{ color: '#4CAF50' }} />
+            </div>
+            <span className="text-white font-bold text-xl">QRSell</span>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-white/20 border-2 border-white flex items-center justify-center">
+              <span className="text-white font-bold text-lg">
+                {seller?.shop_name?.charAt(0) || user?.full_name?.charAt(0) || 'V'}
+              </span>
+            </div>
+            <div>
+              <div className="text-white font-semibold text-sm">
+                {seller?.shop_name || user?.full_name || 'Vendeur'}
+              </div>
+              <div className="text-white/70 text-xs truncate max-w-[120px]">
+                {user?.email}
+              </div>
             </div>
           </div>
         </div>
-      </header>
+
+        {/* Navigation */}
+        <nav className="flex-1 py-4">
+          <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val)} className="w-full">
+            <ul className="space-y-1 px-3">
+              <li>
+                <TabsTrigger value="overview" className="w-full justify-start bg-transparent data-[state=active]:bg-white/20 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg">
+                  <Sparkles className="w-5 h-5 mr-3" />
+                  Tableau de bord
+                </TabsTrigger>
+              </li>
+              <li>
+                <TabsTrigger value="products" className="w-full justify-start bg-transparent data-[state=active]:bg-white/20 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg">
+                  <Package className="w-5 h-5 mr-3" />
+                  Produits
+                </TabsTrigger>
+              </li>
+              <li>
+                <TabsTrigger value="promotions" className="w-full justify-start bg-transparent data-[state=active]:bg-white/20 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg">
+                  <Zap className="w-5 h-5 mr-3" />
+                  Promotions
+                </TabsTrigger>
+              </li>
+              <li>
+                <TabsTrigger value="live" className="w-full justify-start bg-transparent data-[state=active]:bg-white/20 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg">
+                  <span className="mr-3">🔴</span>
+                  Mode Live
+                </TabsTrigger>
+              </li>
+              <li>
+                <TabsTrigger value="campaigns" className="w-full justify-start bg-transparent data-[state=active]:bg-white/20 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg">
+                  <Sparkles className="w-5 h-5 mr-3" />
+                  Campagnes
+                </TabsTrigger>
+              </li>
+              <li>
+                <TabsTrigger value="guide" className="w-full justify-start bg-transparent data-[state=active]:bg-white/20 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg">
+                  <BookOpen className="w-5 h-5 mr-3" />
+                  Guide TikTok
+                </TabsTrigger>
+              </li>
+              <li>
+                <TabsTrigger value="settings" className="w-full justify-start bg-transparent data-[state=active]:bg-white/20 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg">
+                  <Settings className="w-5 h-5 mr-3" />
+                  Paramètres
+                </TabsTrigger>
+              </li>
+            </ul>
+          </Tabs>
+        </nav>
+
+        {/* Logout */}
+        <div className="p-4 border-t border-white/20">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-colors text-white/80 hover:text-white"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="text-sm font-medium">Déconnexion</span>
+          </button>
+        </div>
+      </aside>
 
       {/* Main content */}
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Banner publicitaire */}
-        <Banner position="dashboard" />
-
-        {/* Welcome banner */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-[#2563eb] to-[#3b82f6] rounded-2xl p-6 mb-8 text-white"
-        >
-          <div className="flex items-center justify-between">
+      <main className="flex-1 overflow-y-auto">
+        <div className="p-8 max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-2">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold mb-2 flex items-center gap-2">
-                <Sparkles className="w-6 h-6" />
-                Bonjour, {seller?.full_name || 'Vendeur'} !
+              <h1 className="text-3xl font-bold text-gray-900">
+                Bonjour, {seller?.shop_name || 'Vendeur'} !
               </h1>
-              <p className="text-white/90">
-                Voici un aperçu de vos performances cette semaine
-              </p>
+              <p className="text-gray-500">Analyses des ventes et mises à jour récentes</p>
             </div>
-            {seller?.is_verified && (
-              <div className="hidden md:flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                <Check className="w-5 h-5" />
-                <span className="font-semibold">Vérifié</span>
+            <div className="flex items-center gap-6">
+              {seller?.is_verified && (
+                <div className="text-right">
+                  <div className="flex items-center gap-1 text-sm text-green-600">
+                    <Check className="w-4 h-4" />
+                    <span className="font-semibold">Vérifié</span>
+                  </div>
+                </div>
+              )}
+              <div className="text-right">
+                <div className="text-2xl font-bold text-gray-900">{totalScans}</div>
+                <div className="text-sm text-gray-500">Total Scans</div>
               </div>
-            )}
+              <div className="text-right">
+                <div className="text-2xl font-bold text-gray-900">{products.length}</div>
+                <div className="text-sm text-gray-500">Produits</div>
+              </div>
+            </div>
           </div>
-        </motion.div>
+        </div>
 
-        <Tabs defaultValue="overview" className="space-y-8">
-          <TabsList className="bg-white border p-1 rounded-xl shadow-sm flex-wrap">
-            <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
-              <Sparkles className="w-4 h-4" />
-              <span className="hidden sm:inline">Vue d'ensemble</span>
-              <span className="sm:hidden">Accueil</span>
-            </TabsTrigger>
-            <TabsTrigger value="products" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
-              <Package className="w-4 h-4" />
-              Produits
-            </TabsTrigger>
-            <TabsTrigger value="promotions" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
-              <Zap className="w-4 h-4" />
-              Promotions
-            </TabsTrigger>
-            <TabsTrigger value="live" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
-              <span className="text-red-500">🔴</span>
-              Mode Live
-            </TabsTrigger>
-            <TabsTrigger value="campaigns" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
-              <Sparkles className="w-4 h-4" />
-              Campagnes
-            </TabsTrigger>
-            <TabsTrigger value="guide" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
-              <BookOpen className="w-4 h-4" />
-              <span className="hidden sm:inline">Guide TikTok</span>
-              <span className="sm:hidden">Guide</span>
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#2563eb] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white rounded-lg">
-              <Settings className="w-4 h-4" />
-              <span className="hidden sm:inline">Paramètres</span>
-            </TabsTrigger>
-          </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
 
           <TabsContent value="overview" className="space-y-8">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-gradient-to-br from-cyan-400 to-cyan-500 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden"
+              >
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="text-xs font-semibold uppercase tracking-wider opacity-90">
+                      SCANS TOTAUX
+                    </div>
+                    <Eye className="w-6 h-6 opacity-80" />
+                  </div>
+                  <div className="text-3xl font-black mb-2">
+                    {analytics.filter(a => a.event_type === 'scan').length}
+                  </div>
+                  <div className="text-xs opacity-80 mb-1">Cette semaine</div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="bg-gradient-to-br from-orange-400 to-orange-500 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden"
+              >
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="text-xs font-semibold uppercase tracking-wider opacity-90">
+                      VUES PRODUITS
+                    </div>
+                    <Package className="w-6 h-6 opacity-80" />
+                  </div>
+                  <div className="text-3xl font-black mb-2">
+                    {analytics.filter(a => a.event_type === 'view_product').length}
+                  </div>
+                  <div className="text-xs opacity-80 mb-1">Cette semaine</div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden"
+              >
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="text-xs font-semibold uppercase tracking-wider opacity-90">
+                      CLICS WHATSAPP
+                    </div>
+                    <MessageCircle className="w-6 h-6 opacity-80" />
+                  </div>
+                  <div className="text-3xl font-black mb-2">
+                    {analytics.filter(a => a.event_type === 'whatsapp_click').length}
+                  </div>
+                  <div className="text-xs opacity-80 mb-1">Cette semaine</div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden"
+              >
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="text-xs font-semibold uppercase tracking-wider opacity-90">
+                      TAUX CONVERSION
+                    </div>
+                    <TrendingUp className="w-6 h-6 opacity-80" />
+                  </div>
+                  <div className="text-3xl font-black mb-2">
+                    {analytics.filter(a => a.event_type === 'scan').length > 0 
+                      ? ((analytics.filter(a => a.event_type === 'whatsapp_click').length / analytics.filter(a => a.event_type === 'scan').length) * 100).toFixed(1)
+                      : 0}%
+                  </div>
+                  <div className="text-xs opacity-80 mb-1">Cette semaine</div>
+                </div>
+              </motion.div>
+            </div>
+
             {/* Hot Demand Alert */}
             <HotDemandAlert sellerId={seller?.id} products={products} />
-
-            {/* KPIs */}
-            <KPICards analytics={analytics} />
 
             {/* Shop QR Code Card */}
             {seller && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border dark:border-gray-700"
+                className="bg-white rounded-2xl p-8 shadow-lg border"
               >
                 <div className="flex flex-col md:flex-row items-center gap-8">
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">
                       QR Code de votre boutique
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    <p className="text-gray-600 mb-4">
                       Scannez ce code pour accéder directement à votre vitrine en ligne. Partagez-le sur vos réseaux sociaux, flyers ou vidéos TikTok.
                     </p>
                     <div className="flex items-center gap-2">
@@ -406,13 +484,12 @@ export default function Dashboard() {
                         variant="outline" 
                         size="sm"
                         onClick={copyShopLink}
-                        className="dark:border-gray-600 dark:text-gray-300"
                       >
                         {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
                         Copier le lien
                       </Button>
                       <a href={shopUrl} target="_blank" rel="noopener noreferrer">
-                        <Button variant="outline" size="sm" className="dark:border-gray-600 dark:text-gray-300">
+                        <Button variant="outline" size="sm">
                           <ExternalLink className="w-4 h-4 mr-2" />
                           Voir la boutique
                         </Button>
@@ -423,7 +500,7 @@ export default function Dashboard() {
                     <EnhancedQRCode
                       url={shopUrl}
                       size={300}
-                      color={seller.primary_color || '#2563eb'}
+                      color={seller.primary_color || '#4CAF50'}
                       logo={seller.logo_url}
                       showText={true}
                       text="Scanner pour voir la boutique"
@@ -742,6 +819,7 @@ export default function Dashboard() {
             </div>
           </TabsContent>
         </Tabs>
+        </div>
       </main>
 
       {/* Product form modal */}

@@ -4,6 +4,7 @@ import AdminBanners from './pages/AdminBanners';
 import AdminCampaigns from './pages/AdminCampaigns';
 import AdminPanel from './pages/AdminPanel';
 import AllShops from './pages/AllShops';
+import BioLink from './pages/BioLink';
 import Campagnes from './pages/Campagnes';
 import Campaigns from './pages/Campaigns';
 import CouponRedeem from './pages/CouponRedeem';
@@ -25,7 +26,6 @@ import SubscriptionExpired from './pages/SubscriptionExpired';
 import SubscriptionRequest from './pages/SubscriptionRequest';
 import TikTokGuide from './pages/TikTokGuide';
 import TikTokGuidePublic from './pages/TikTokGuidePublic';
-import BioLink from './pages/BioLink';
 import __Layout from './Layout.jsx';
 
 
@@ -36,6 +36,7 @@ export const PAGES = {
     "AdminCampaigns": AdminCampaigns,
     "AdminPanel": AdminPanel,
     "AllShops": AllShops,
+    "BioLink": BioLink,
     "Campagnes": Campagnes,
     "Campaigns": Campaigns,
     "CouponRedeem": CouponRedeem,
@@ -57,7 +58,6 @@ export const PAGES = {
     "SubscriptionRequest": SubscriptionRequest,
     "TikTokGuide": TikTokGuide,
     "TikTokGuidePublic": TikTokGuidePublic,
-    "BioLink": BioLink,
 }
 
 export const pagesConfig = {
