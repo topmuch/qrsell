@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import FeaturedProductSelector from './FeaturedProductSelector';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -143,11 +144,18 @@ export default function SettingsTabs({ seller }) {
     await updateMutation.mutateAsync({ [field]: value });
   };
 
+  const { data: products = [] } = useQuery({
+    queryKey: ['settings-products', seller?.id],
+    queryFn: () => base44.entities.Product.filter({ seller_id: seller?.id, is_active: true }),
+    enabled: !!seller?.id
+  });
+
   const tabs = [
     { id: 'basic', label: 'Informations', icon: Store },
     { id: 'appearance', label: 'Apparence', icon: Palette },
     { id: 'social', label: 'Réseaux sociaux', icon: Globe },
-    { id: 'payment', label: 'Paiement & Partenaires', icon: CreditCard }
+    { id: 'payment', label: 'Paiement & Partenaires', icon: CreditCard },
+    { id: 'biolink', label: 'Lien Bio', icon: Globe }
   ];
 
   return (
@@ -554,6 +562,10 @@ export default function SettingsTabs({ seller }) {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {activeTab === 'biolink' && (
+        <FeaturedProductSelector seller={seller} products={products} />
       )}
     </div>
   );
