@@ -80,15 +80,15 @@ export default function AdminPanel() {
   }
 
   const menuItems = [
-    { id: 'overview', label: 'Dashboard', icon: BarChart3 },
-    { id: 'sellers', label: 'Sellers', icon: Users },
-    { id: 'products', label: 'Products', icon: Package },
-    { id: 'logs', label: 'Logs', icon: Activity },
-    { id: 'banners', label: 'Banners', icon: Megaphone },
-    { id: 'campaigns', label: 'Campaigns', icon: Package },
-    { id: 'plans', label: 'Plans', icon: FileText },
-    { id: 'requests', label: 'Requests', icon: CreditCard },
-    { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard },
+    { id: 'overview', label: 'Tableau de bord', icon: BarChart3 },
+    { id: 'sellers', label: 'Vendeurs', icon: Users },
+    { id: 'products', label: 'Produits', icon: Package },
+    { id: 'logs', label: 'Journaux', icon: Activity },
+    { id: 'banners', label: 'Bannières', icon: Megaphone },
+    { id: 'campaigns', label: 'Campagnes', icon: Package },
+    { id: 'plans', label: 'Forfaits', icon: FileText },
+    { id: 'requests', label: 'Demandes', icon: CreditCard },
+    { id: 'subscriptions', label: 'Abonnements', icon: CreditCard },
   ];
 
   // Calculate stats
@@ -104,33 +104,33 @@ export default function AdminPanel() {
 
   const stats = [
     {
-      title: 'TODAY ORDERS',
+      title: 'COMMANDES DU JOUR',
       value: todayOrders,
-      subtitle: 'Compared To Last Week',
+      subtitle: 'Par rapport à la semaine dernière',
       change: '+51,483',
       color: 'from-cyan-400 to-cyan-500',
       icon: ShoppingCart
     },
     {
-      title: 'TODAY EARNINGS',
+      title: 'REVENUS DU JOUR',
       value: `${(todayEarnings / 1000).toFixed(1)}K`,
-      subtitle: 'Compared To Last Week',
+      subtitle: 'Par rapport à la semaine dernière',
       change: '-35.36%',
       color: 'from-orange-400 to-orange-500',
       icon: DollarSign
     },
     {
-      title: 'TOTAL EARNINGS',
+      title: 'REVENUS TOTAUX',
       value: `${(totalEarnings / 1000).toFixed(1)}K`,
-      subtitle: 'Compared To Last Week',
+      subtitle: 'Par rapport à la semaine dernière',
       change: '+54.98%',
       color: 'from-purple-500 to-purple-600',
       icon: TrendingUp
     },
     {
-      title: 'PRODUCT SOLD',
+      title: 'PRODUITS VENDUS',
       value: productsSold,
-      subtitle: 'Compared To Last Week',
+      subtitle: 'Par rapport à la semaine dernière',
       change: '-75.93%',
       color: 'from-pink-500 to-pink-600',
       icon: Package
@@ -197,7 +197,7 @@ export default function AdminPanel() {
             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 transition-colors text-white/80 hover:text-white"
           >
             <LogOut className="w-5 h-5" />
-            <span className="text-sm font-medium">Logout</span>
+            <span className="text-sm font-medium">Déconnexion</span>
           </button>
         </div>
       </aside>
@@ -210,8 +210,8 @@ export default function AdminPanel() {
             <div className="mb-8">
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900">Hi, Welcome Back!</h1>
-                  <p className="text-gray-500">Sales analytics and recent updates</p>
+                  <h1 className="text-3xl font-bold text-gray-900">Bonjour, Bienvenue !</h1>
+                  <p className="text-gray-500">Analyses des ventes et mises à jour récentes</p>
                 </div>
                 <div className="flex items-center gap-6">
                   <div className="text-right">
@@ -224,13 +224,13 @@ export default function AdminPanel() {
                     <div className="text-2xl font-bold text-gray-900">
                       {new Intl.NumberFormat('fr-FR').format(totalRevenue / 1000)}K
                     </div>
-                    <div className="text-sm text-gray-500">Total Revenue</div>
+                    <div className="text-sm text-gray-500">Revenus totaux</div>
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-bold text-gray-900">
                       {new Intl.NumberFormat('fr-FR').format(totalUsers * 354)}
                     </div>
-                    <div className="text-sm text-gray-500">Total Users</div>
+                    <div className="text-sm text-gray-500">Utilisateurs totaux</div>
                   </div>
                 </div>
               </div>
@@ -275,29 +275,29 @@ export default function AdminPanel() {
               <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900">ORDER STATUS</h3>
-                    <p className="text-sm text-gray-500">Order revenue and tracking blank your order form shop dash to arrivals</p>
+                    <h3 className="text-lg font-bold text-gray-900">STATUT DES COMMANDES</h3>
+                    <p className="text-sm text-gray-500">Revenus des commandes et suivi de votre boutique jusqu'à la livraison</p>
                   </div>
                   <div className="flex items-center gap-6">
                     <div>
                       <div className="text-xl font-bold text-gray-900">30,900.00</div>
                       <div className="text-xs text-green-600 flex items-center gap-1">
                         <TrendingUp className="w-3 h-3" />
-                        <span>Success</span>
+                        <span>Réussi</span>
                       </div>
                     </div>
                     <div>
                       <div className="text-xl font-bold text-gray-900">18,300.00</div>
                       <div className="text-xs text-blue-600 flex items-center gap-1">
                         <Activity className="w-3 h-3" />
-                        <span>Pending</span>
+                        <span>En attente</span>
                       </div>
                     </div>
                     <div>
                       <div className="text-xl font-bold text-gray-900">10,240.00</div>
                       <div className="text-xs text-red-600 flex items-center gap-1">
                         <Activity className="w-3 h-3" />
-                        <span>Failed</span>
+                        <span>Échoué</span>
                       </div>
                     </div>
                   </div>
@@ -321,12 +321,12 @@ export default function AdminPanel() {
 
               {/* Sales Map */}
               <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <h3 className="text-lg font-bold text-gray-900 mb-2">SALES REVENUE</h3>
-                <p className="text-sm text-gray-500 mb-4">Sales performance in all states in the united States</p>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">REVENUS DES VENTES</h3>
+                <p className="text-sm text-gray-500 mb-4">Performance des ventes dans toutes les régions</p>
                 <div className="bg-gray-100 rounded-xl h-48 flex items-center justify-center">
                   <div className="text-center">
                     <Eye className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-500">World Map Visualization</p>
+                    <p className="text-sm text-gray-500">Visualisation carte mondiale</p>
                   </div>
                 </div>
               </div>
@@ -336,7 +336,7 @@ export default function AdminPanel() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Recent Activity */}
               <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">RECENT CUSTOMERS</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">CLIENTS RÉCENTS</h3>
                 <div className="space-y-4">
                   {sellers.slice(0, 5).map((seller, idx) => (
                     <div key={seller.id} className="flex items-center gap-3">
@@ -345,9 +345,9 @@ export default function AdminPanel() {
                       </div>
                       <div className="flex-1">
                         <div className="font-semibold text-sm text-gray-900">{seller.shop_name}</div>
-                        <div className="text-xs text-gray-500">{seller.email || 'No email'}</div>
+                        <div className="text-xs text-gray-500">{seller.email || 'Pas d\'email'}</div>
                       </div>
-                      <div className="text-xs text-gray-400">Active</div>
+                      <div className="text-xs text-gray-400">Actif</div>
                     </div>
                   ))}
                 </div>
@@ -355,13 +355,13 @@ export default function AdminPanel() {
 
               {/* Sales Activity */}
               <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">SALES ACTIVITY</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">ACTIVITÉ DES VENTES</h3>
                 <div className="space-y-4">
                   {[
-                    { label: 'Total Products', count: products.length, color: 'bg-green-500' },
-                    { label: 'Total Sales', count: analytics.filter(a => a.event_type === 'whatsapp_click').length, color: 'bg-blue-500' },
-                    { label: 'Total Revenue', count: `${(totalRevenue / 1000).toFixed(0)}K`, color: 'bg-purple-500' },
-                    { label: 'Customer Visits', count: analytics.filter(a => a.event_type === 'view_shop').length, color: 'bg-pink-500' }
+                    { label: 'Total Produits', count: products.length, color: 'bg-green-500' },
+                    { label: 'Total Ventes', count: analytics.filter(a => a.event_type === 'whatsapp_click').length, color: 'bg-blue-500' },
+                    { label: 'Revenus Totaux', count: `${(totalRevenue / 1000).toFixed(0)}K`, color: 'bg-purple-500' },
+                    { label: 'Visites Clients', count: analytics.filter(a => a.event_type === 'view_shop').length, color: 'bg-pink-500' }
                   ].map((item, idx) => (
                     <div key={idx} className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-full ${item.color} flex items-center justify-center`}>
@@ -369,7 +369,7 @@ export default function AdminPanel() {
                       </div>
                       <div className="flex-1">
                         <div className="font-semibold text-sm text-gray-900">{item.label}</div>
-                        <div className="text-xs text-gray-500">{idx + 3} days ago</div>
+                        <div className="text-xs text-gray-500">Il y a {idx + 3} jours</div>
                       </div>
                     </div>
                   ))}
@@ -378,7 +378,7 @@ export default function AdminPanel() {
 
               {/* Recent Orders */}
               <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">RECENT ORDERS</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">COMMANDES RÉCENTES</h3>
                 <div className="flex items-center justify-center h-32">
                   <div className="relative w-32 h-32">
                     <svg viewBox="0 0 100 100" className="transform -rotate-90">
@@ -394,11 +394,11 @@ export default function AdminPanel() {
                 <div className="grid grid-cols-2 gap-4 mt-4">
                   <div>
                     <div className="text-lg font-bold text-gray-900">4,982.00</div>
-                    <div className="text-xs text-gray-500">● Cancelled Last 6 months</div>
+                    <div className="text-xs text-gray-500">● Annulées 6 derniers mois</div>
                   </div>
                   <div>
                     <div className="text-lg font-bold text-gray-900">$188.02</div>
-                    <div className="text-xs text-gray-500">● Delivered Last 6 months</div>
+                    <div className="text-xs text-gray-500">● Livrées 6 derniers mois</div>
                   </div>
                 </div>
               </div>
