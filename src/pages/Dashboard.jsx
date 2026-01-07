@@ -393,7 +393,8 @@ export default function Dashboard() {
   }
 
   // Show profile form if seller profile not completed
-  if (!loadingSeller && !seller) {
+  if (!loadingSeller && !seller && user?.role !== 'admin') {
+    console.log('📝 Profil vendeur manquant - affichage du formulaire de création');
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50/50 to-white py-12 px-4">
         <div className="max-w-lg mx-auto">
