@@ -43,25 +43,28 @@ export default function LiveControl({ seller, currentShop, products }) {
         throw new Error('Sélectionnez au moins 1 produit');
       }
 
+      // Vérifier s'il y a une session active pour cette boutique
+      const activeLiveSessions = await base44.entities.LiveSession.filter({
+        shop_slug: currentShop.shop_slug,
+        is_live: true
+      });
+
+      if (activeLiveSessions.length > 0) {
+        throw new Error('Une session live est déjà active pour cette boutique. Arrêtez-la avant d\'en démarrer une nouvelle.');
+      }
+
       const firstProduct = selectedProducts[0];
       
-      if (liveSession) {
-        return await base44.entities.LiveSession.update(liveSession.id, {
-          active_product_id: firstProduct,
-          preloaded_products: selectedProducts,
-          is_live: true,
-          live_started_at: new Date().toISOString()
-        });
-      } else {
-        return await base44.entities.LiveSession.create({
-          seller_id: seller.id,
-          shop_slug: seller.shop_slug,
-          active_product_id: firstProduct,
-          preloaded_products: selectedProducts,
-          is_live: true,
-          live_started_at: new Date().toISOString()
-        });
-      }
+      // Créer une NOUVELLE session à chaque fois (historisation)
+      return await base44.entities.LiveSession.create({
+        seller_id: seller.id,
+        shop_slug: currentShop.shop_slug,
+        active_product_id: firstProduct,
+        preloaded_products: selectedProducts,
+        is_live: true,
+        live_started_at: new Date().toISOString(),
+        total_scans: 0
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['live-session']);
@@ -85,10 +88,21 @@ export default function LiveControl({ seller, currentShop, products }) {
   });
 
   const stopLiveMutation = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
+      // Calculer les stats finales avant d'arrêter
+      const liveAnalytics = analytics.filter(a => {
+        const eventTime = new Date(a.created_date);
+        const liveStart = new Date(liveSession.live_started_at);
+        return eventTime >= liveStart && 
+               liveSession.preloaded_products?.includes(a.product_id);
+      });
+
+      const totalScans = liveAnalytics.filter(a => a.event_type === 'scan').length;
+
       return base44.entities.LiveSession.update(liveSession.id, {
         is_live: false,
         live_ended_at: new Date().toISOString(),
+        total_scans: totalScans,
         flash_offer_active: false
       });
     },
@@ -415,12 +429,12 @@ export default function LiveControl({ seller, currentShop, products }) {
                     </div>
                     <Switch
                       id="public-counter"
-                      checked={seller.show_live_public_counter || false}
+                      checked={currentShop?.show_live_public_counter || false}
                       onCheckedChange={(checked) => {
-                        base44.entities.Seller.update(seller.id, {
+                        base44.entities.Shop.update(currentShop.id, {
                           show_live_public_counter: checked
                         }).then(() => {
-                          queryClient.invalidateQueries(['seller']);
+                          queryClient.invalidateQueries(['shops']);
                           toast.success(checked ? 'Compteur public activé' : 'Compteur public désactivé');
                         });
                       }}

@@ -10,7 +10,7 @@ import { base44 } from '@/api/base44Client';
 import { Loader2, Upload, X, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function ProductForm({ open, onClose, seller, onSuccess, editProduct }) {
+export default function ProductForm({ open, onClose, seller, currentShop, editProduct, onSuccess }) {
   const [formData, setFormData] = useState({
     name: editProduct?.name || '',
     price: editProduct?.price || '',
@@ -55,7 +55,7 @@ export default function ProductForm({ open, onClose, seller, onSuccess, editProd
         ...formData,
         price: parseFloat(formData.price),
         seller_id: seller.id,
-        shop_slug: seller.shop_slug,
+        shop_slug: currentShop?.shop_slug || seller.shop_slug,
         is_active: true
       };
 
