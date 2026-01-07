@@ -66,15 +66,22 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const loadUser = async () => {
+    const loadUser = async (retryCount = 0) => {
       try {
+        await new Promise(resolve => setTimeout(resolve, 500)); // Attendre 500ms
         const currentUser = await base44.auth.me();
         console.log('👤 Utilisateur chargé:', currentUser);
         setUser(currentUser);
       } catch (error) {
-        console.error('❌ Erreur authentification:', error);
-        // Si pas authentifié, rediriger vers login
-        base44.auth.redirectToLogin('/Dashboard');
+        console.error('❌ Erreur authentification (tentative ' + (retryCount + 1) + '):', error);
+        // Retry jusqu'à 3 fois
+        if (retryCount < 3) {
+          console.log('🔄 Nouvelle tentative dans 1 seconde...');
+          setTimeout(() => loadUser(retryCount + 1), 1000);
+        } else {
+          console.error('❌ Échec après 3 tentatives, redirection vers login');
+          base44.auth.redirectToLogin('/Dashboard');
+        }
       }
     };
     loadUser();
