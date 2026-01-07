@@ -68,13 +68,22 @@ export default function Dashboard() {
   useEffect(() => {
     const loadUser = async (retryCount = 0) => {
       try {
-        await new Promise(resolve => setTimeout(resolve, 500)); // Attendre 500ms
+        console.log('🚀 Tentative de chargement utilisateur (tentative ' + (retryCount + 1) + ')');
+        await new Promise(resolve => setTimeout(resolve, 500));
         const currentUser = await base44.auth.me();
-        console.log('👤 Utilisateur chargé:', currentUser);
+        console.log('👤 ✅ Utilisateur chargé avec succès:', {
+          email: currentUser?.email,
+          full_name: currentUser?.full_name,
+          role: currentUser?.role,
+          id: currentUser?.id
+        });
         setUser(currentUser);
       } catch (error) {
-        console.error('❌ Erreur authentification (tentative ' + (retryCount + 1) + '):', error);
-        // Retry jusqu'à 3 fois
+        console.error('❌ Erreur authentification (tentative ' + (retryCount + 1) + '):', {
+          message: error.message,
+          status: error.response?.status,
+          error: error
+        });
         if (retryCount < 3) {
           console.log('🔄 Nouvelle tentative dans 1 seconde...');
           setTimeout(() => loadUser(retryCount + 1), 1000);
@@ -326,6 +335,7 @@ export default function Dashboard() {
 
   // Wait for subscription data to load before checking
   if (loadingSubscription) {
+    console.log('⏳ Chargement de l\'abonnement en cours...');
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <Loader2 className="w-8 h-8 animate-spin text-[#ed477c]" />
@@ -333,10 +343,26 @@ export default function Dashboard() {
     );
   }
 
-  // Check if user has active subscription
-  if (!activeSubscription) {
+  console.log('🔍 Vérification abonnement - activeSubscription:', activeSubscription);
+  console.log('🔍 Vérification abonnement - user.role:', user?.role);
+  console.log('🔍 Vérification abonnement - subscriptionError:', subscriptionError);
+
+  // Admin bypass - les admins n'ont pas besoin d'abonnement
+  if (user?.role === 'admin') {
+    console.log('👑 Utilisateur admin détecté - bypass de la vérification d\'abonnement');
+  } else if (!activeSubscription) {
+    console.log('❌ Pas d\'abonnement actif trouvé - redirection vers SubscriptionExpired');
+    console.log('📊 Total subscriptions:', subscriptions?.length);
+    console.log('📊 Subscriptions data:', subscriptions);
     window.location.href = '/SubscriptionExpired';
     return null;
+  } else {
+    console.log('✅ Abonnement actif trouvé:', {
+      plan_code: activeSubscription.plan_code,
+      start_date: activeSubscription.start_date,
+      end_date: activeSubscription.end_date,
+      is_active: activeSubscription.is_active
+    });
   }
 
   // Show profile form if seller profile not completed
