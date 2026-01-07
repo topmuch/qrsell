@@ -3,13 +3,13 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Store, Plus } from 'lucide-react';
+import { Store, Plus, Sparkles } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from 'sonner';
 
-export default function ShopSelector({ seller, currentShop, onShopChange }) {
+export default function ShopSelector({ seller, currentShop, onShopChange, currentPlan, onUpgradeClick }) {
   const [showCreateDialog, setShowCreateDialog] = React.useState(false);
   const [newShopData, setNewShopData] = React.useState({
     shop_name: '',
@@ -42,12 +42,19 @@ export default function ShopSelector({ seller, currentShop, onShopChange }) {
   });
 
   const currentPlan = plans.find(p => p.code === subscription?.plan_code);
-  const maxShops = currentPlan?.code === 'pro' ? 3 : 1;
+  const maxShops = currentPlan?.max_shops || 1;
   const canCreateMore = shops.length < maxShops;
+  const isPro = currentPlan?.code === 'pro';
 
   const handleCreateShop = async () => {
     if (!newShopData.shop_name || !newShopData.shop_slug) {
       toast.error('Veuillez remplir tous les champs');
+      return;
+    }
+
+    // Vérifier si l'utilisateur a atteint la limite
+    if (!canCreateMore) {
+      if (onUpgradeClick) onUpgradeClick();
       return;
     }
 
@@ -74,6 +81,9 @@ export default function ShopSelector({ seller, currentShop, onShopChange }) {
   };
 
   if (shops.length === 0) return null;
+
+  // Si le vendeur n'est pas Pro et a déjà 1 boutique, ne pas afficher le sélecteur
+  if (!isPro && shops.length === 1) return null;
 
   return (
     <div className="mb-6 bg-white rounded-xl shadow-md p-4 border-2 border-purple-100">
@@ -103,22 +113,34 @@ export default function ShopSelector({ seller, currentShop, onShopChange }) {
           </div>
         </div>
 
-        {canCreateMore && (
-          <Button
-            onClick={() => setShowCreateDialog(true)}
-            variant="outline"
-            className="border-purple-300 text-purple-600 hover:bg-purple-50"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Nouvelle boutique
-          </Button>
-        )}
-
-        {!canCreateMore && (
-          <div className="text-xs text-gray-500">
-            {shops.length}/{maxShops} boutiques
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {canCreateMore ? (
+            <Button
+              onClick={() => setShowCreateDialog(true)}
+              variant="outline"
+              className="border-purple-300 text-purple-600 hover:bg-purple-50"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nouvelle boutique
+            </Button>
+          ) : (
+            <>
+              <div className="text-xs text-gray-500 mr-2">
+                {shops.length}/{maxShops} boutiques
+              </div>
+              {!isPro && (
+                <Button
+                  onClick={onUpgradeClick}
+                  size="sm"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-xs"
+                >
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Débloquer +2
+                </Button>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       {/* Create Shop Dialog */}

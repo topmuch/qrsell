@@ -47,6 +47,7 @@ import LiveControl from '@/components/dashboard/LiveControl';
 import CatalogGenerator from '@/components/dashboard/CatalogGenerator';
 import ShopSelector from '@/components/dashboard/ShopSelector';
 import TrendAlerts from '@/components/dashboard/TrendAlerts';
+import UpgradeModal from '@/components/dashboard/UpgradeModal';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Dashboard() {
@@ -59,6 +60,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentShop, setCurrentShop] = useState(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -84,6 +86,16 @@ export default function Dashboard() {
   });
 
   const activeSubscription = subscriptions[0];
+
+  // Get plan details
+  const { data: plans = [] } = useQuery({
+    queryKey: ['plans'],
+    queryFn: () => base44.entities.Plan.list()
+  });
+
+  const currentPlan = plans.find(p => p.code === activeSubscription?.plan_code);
+  const isPro = currentPlan?.code === 'pro';
+  const hasTrendAlerts = currentPlan?.has_trend_alerts || false;
 
   // Get seller profile
   const { data: sellers = [], isLoading: loadingSeller, refetch: refetchSeller } = useQuery({
@@ -503,12 +515,14 @@ export default function Dashboard() {
       {/* Main content */}
       <main className="flex-1 overflow-y-auto md:ml-0">
         <div className="p-4 md:p-8 max-w-7xl mx-auto pt-20 md:pt-8">
-        {/* Shop Selector */}
-        {seller && shops.length > 0 && (
+        {/* Shop Selector - Only for Pro users OR if they have multiple shops */}
+        {seller && shops.length > 0 && (isPro || shops.length > 1) && (
           <ShopSelector 
             seller={seller}
             currentShop={currentShop}
             onShopChange={setCurrentShop}
+            currentPlan={currentPlan}
+            onUpgradeClick={() => setShowUpgradeModal(true)}
           />
         )}
 
@@ -549,8 +563,8 @@ export default function Dashboard() {
 
           {activeTab === 'overview' && (
           <div className="space-y-8">
-            {/* Trend Alerts */}
-            <TrendAlerts seller={seller} currentShop={currentShop} />
+            {/* Trend Alerts - Only for Pro */}
+            {hasTrendAlerts && <TrendAlerts seller={seller} currentShop={currentShop} />}
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -1043,6 +1057,12 @@ export default function Dashboard() {
           seller={seller}
         />
       )}
-    </div>
-  );
-}
+
+      {/* Upgrade Modal */}
+      <UpgradeModal 
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+      />
+      </div>
+      );
+      }
