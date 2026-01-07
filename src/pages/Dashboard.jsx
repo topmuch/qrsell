@@ -79,15 +79,15 @@ export default function Dashboard() {
     queryFn: async () => {
       const subs = await base44.entities.Subscription.filter({ user_email: user?.email });
       console.log('🔍 Subscriptions trouvés:', subs);
-      console.log('📧 Email utilisateur:', user?.email);
-      const now = moment.utc().startOf('day');
-      console.log('📅 Date actuelle (UTC):', now.format());
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      console.log('📅 Date actuelle:', now);
       const filtered = subs.filter(sub => {
-        const endDate = moment.utc(sub.end_date);
-        console.log(`✅ Sub: active=${sub.is_active}, end_date=${sub.end_date}, isAfter=${endDate.isAfter(now)}`);
-        return sub.is_active && endDate.isAfter(now);
+        const endDate = new Date(sub.end_date);
+        console.log(`✅ Sub: active=${sub.is_active}, end_date=${sub.end_date}, endDate>${now}=${endDate > now}`);
+        return sub.is_active && endDate > now;
       });
-      console.log('✨ Abonnements filtrés:', filtered);
+      console.log('✨ Abonnements valides:', filtered);
       return filtered;
     },
     enabled: !!user?.email
