@@ -160,7 +160,7 @@ export default function Live() {
     );
   }
 
-  const qrUrl = `${window.location.origin}/ProductPage?id=${product.public_id}`;
+  const qrUrl = `${window.location.origin}/ProductPage?id=${product.public_id}&live=true`;
   const discountedPrice = calculateDiscountedPrice();
   const isFlashActive = liveSession?.flash_offer_active && timeRemaining;
 
