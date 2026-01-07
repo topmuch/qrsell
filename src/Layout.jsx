@@ -100,7 +100,7 @@ export default function Layout({ children, currentPageName }) {
                   <Button 
                     variant="ghost" 
                     className="text-gray-600 hover:text-[#2563eb]"
-                    onClick={() => base44.auth.redirectToLogin()}
+                    onClick={() => base44.auth.redirectToLogin(createPageUrl('Dashboard'))}
                   >
                     Connexion
                   </Button>
@@ -180,7 +180,7 @@ export default function Layout({ children, currentPageName }) {
                     variant="outline" 
                     className="w-full"
                     onClick={() => {
-                      base44.auth.redirectToLogin();
+                      base44.auth.redirectToLogin(createPageUrl('Dashboard'));
                       setMobileMenuOpen(false);
                     }}
                   >

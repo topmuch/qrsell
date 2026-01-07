@@ -144,6 +144,27 @@ export default function LiveControl({ seller, products }) {
 
   return (
     <div className="space-y-6">
+      {/* Live Reports Button */}
+      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+        <CardContent className="py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-bold text-gray-900 mb-1">Rapports de Live</h3>
+              <p className="text-sm text-gray-600">
+                Consultez l'historique complet de vos sessions live
+              </p>
+            </div>
+            <Button
+              onClick={() => window.location.href = '/LiveReports'}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:opacity-90"
+            >
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Voir les rapports
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Live Report */}
       <LiveReport 
         liveSession={liveSession}
