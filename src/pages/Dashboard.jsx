@@ -45,6 +45,8 @@ import CouponCard from '@/components/dashboard/CouponCard';
 import EnhancedQRCode from '@/components/ui/EnhancedQRCode';
 import LiveControl from '@/components/dashboard/LiveControl';
 import CatalogGenerator from '@/components/dashboard/CatalogGenerator';
+import ShopSelector from '@/components/dashboard/ShopSelector';
+import TrendAlerts from '@/components/dashboard/TrendAlerts';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Dashboard() {
@@ -56,6 +58,7 @@ export default function Dashboard() {
   const [showCouponForm, setShowCouponForm] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentShop, setCurrentShop] = useState(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -91,11 +94,56 @@ export default function Dashboard() {
 
   const seller = sellers[0];
 
-  // Get products
-  const { data: products = [], isLoading: loadingProducts, refetch: refetchProducts } = useQuery({
-    queryKey: ['products', seller?.id],
-    queryFn: () => base44.entities.Product.filter({ seller_id: seller?.id }),
+  // Get shops for this seller
+  const { data: shops = [] } = useQuery({
+    queryKey: ['shops', seller?.id],
+    queryFn: async () => {
+      const allShops = await base44.entities.Shop.filter({ seller_id: seller?.id });
+      // If no shops exist, create one from seller data
+      if (allShops.length === 0 && seller) {
+        const newShop = await base44.entities.Shop.create({
+          seller_id: seller.id,
+          shop_name: seller.shop_name,
+          shop_slug: seller.shop_slug,
+          logo_url: seller.logo_url,
+          banner_url: seller.banner_url,
+          banner_images: seller.banner_images,
+          primary_color: seller.primary_color,
+          secondary_color: seller.secondary_color,
+          category: 'Autre',
+          address: seller.address,
+          whatsapp_number: seller.whatsapp_number,
+          email: seller.email,
+          tiktok: seller.tiktok,
+          instagram: seller.instagram,
+          facebook: seller.facebook,
+          whatsapp_business: seller.whatsapp_business,
+          payment_methods: seller.payment_methods,
+          partner_logos: seller.partner_logos,
+          featured_product_id: seller.featured_product_id,
+          use_manual_featured: seller.use_manual_featured,
+          show_live_public_counter: seller.show_live_public_counter,
+          is_active: true
+        });
+        return [newShop];
+      }
+      return allShops;
+    },
     enabled: !!seller?.id
+  });
+
+  // Set current shop
+  React.useEffect(() => {
+    if (shops.length > 0 && !currentShop) {
+      setCurrentShop(shops[0]);
+    }
+  }, [shops, currentShop]);
+
+  // Get products for current shop
+  const { data: products = [], isLoading: loadingProducts, refetch: refetchProducts } = useQuery({
+    queryKey: ['products', currentShop?.id],
+    queryFn: () => base44.entities.Product.filter({ shop_slug: currentShop?.shop_slug }),
+    enabled: !!currentShop?.shop_slug
   });
 
   // Get analytics
@@ -114,18 +162,25 @@ export default function Dashboard() {
     }
   });
 
-  // Fetch promotions
+  // Fetch promotions for current shop
   const { data: promotions = [] } = useQuery({
-    queryKey: ['promotions', seller?.id],
-    queryFn: () => base44.entities.Promotion.filter({ seller_id: seller?.id }),
-    enabled: !!seller?.id
+    queryKey: ['promotions', currentShop?.id],
+    queryFn: async () => {
+      const allPromotions = await base44.entities.Promotion.filter({ seller_id: seller?.id });
+      // Filter by shop_slug if available in promotion data
+      return allPromotions;
+    },
+    enabled: !!seller?.id && !!currentShop
   });
 
-  // Fetch coupons
+  // Fetch coupons for current shop
   const { data: coupons = [] } = useQuery({
-    queryKey: ['coupons', seller?.id],
-    queryFn: () => base44.entities.Coupon.filter({ seller_id: seller?.id }),
-    enabled: !!seller?.id
+    queryKey: ['coupons', currentShop?.id],
+    queryFn: async () => {
+      const allCoupons = await base44.entities.Coupon.filter({ seller_id: seller?.id });
+      return allCoupons;
+    },
+    enabled: !!seller?.id && !!currentShop
   });
 
   const deletePromotionMutation = useMutation({
@@ -212,7 +267,7 @@ export default function Dashboard() {
     }
   };
 
-  const shopUrl = seller ? `${window.location.origin}/Shop?slug=${seller.shop_slug}` : '';
+  const shopUrl = currentShop ? `${window.location.origin}/Shop?slug=${currentShop.shop_slug}` : '';
 
   const copyShopLink = () => {
     navigator.clipboard.writeText(shopUrl);
@@ -448,6 +503,15 @@ export default function Dashboard() {
       {/* Main content */}
       <main className="flex-1 overflow-y-auto md:ml-0">
         <div className="p-4 md:p-8 max-w-7xl mx-auto pt-20 md:pt-8">
+        {/* Shop Selector */}
+        {seller && shops.length > 0 && (
+          <ShopSelector 
+            seller={seller}
+            currentShop={currentShop}
+            onShopChange={setCurrentShop}
+          />
+        )}
+
         {/* Banners */}
         <BannerDisplay position="dashboard" />
 
@@ -485,6 +549,9 @@ export default function Dashboard() {
 
           {activeTab === 'overview' && (
           <div className="space-y-8">
+            {/* Trend Alerts */}
+            <TrendAlerts seller={seller} currentShop={currentShop} />
+
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <motion.div
@@ -573,7 +640,7 @@ export default function Dashboard() {
             <HotDemandAlert sellerId={seller?.id} products={products} />
 
             {/* Shop QR Code Card */}
-            {seller && (
+            {currentShop && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -582,7 +649,7 @@ export default function Dashboard() {
                 <div className="flex flex-col md:flex-row items-center gap-8">
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                      QR Code de votre boutique
+                      QR Code de {currentShop.shop_name}
                     </h3>
                     <p className="text-gray-600 mb-4">
                       Scannez ce code pour accéder directement à votre vitrine en ligne. Partagez-le sur vos réseaux sociaux, flyers ou vidéos TikTok.
@@ -608,8 +675,8 @@ export default function Dashboard() {
                     <EnhancedQRCode
                       url={shopUrl}
                       size={300}
-                      color={seller.primary_color || '#4CAF50'}
-                      logo={seller.logo_url}
+                      color={currentShop.primary_color || '#4CAF50'}
+                      logo={currentShop.logo_url}
                       showText={true}
                       text="Scanner pour voir la boutique"
                     />
@@ -718,7 +785,7 @@ export default function Dashboard() {
 
           {activeTab === 'live' && (
           <div className="space-y-6">
-            <LiveControl seller={seller} products={products} />
+            <LiveControl seller={seller} currentShop={currentShop} products={products} />
           </div>
           )}
 
@@ -944,7 +1011,7 @@ export default function Dashboard() {
       </main>
 
       {/* Product form modal */}
-      {showProductForm && seller && (
+      {showProductForm && seller && currentShop && (
         <ProductForm 
           open={showProductForm}
           onClose={() => {
@@ -952,6 +1019,7 @@ export default function Dashboard() {
             setEditProduct(null);
           }}
           seller={seller}
+          currentShop={currentShop}
           editProduct={editProduct}
           onSuccess={handleProductSuccess}
         />

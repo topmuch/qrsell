@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
-export default function LiveControl({ seller, products }) {
+export default function LiveControl({ seller, currentShop, products }) {
   const [copied, setCopied] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [showFlashOffer, setShowFlashOffer] = useState(false);
@@ -22,9 +22,9 @@ export default function LiveControl({ seller, products }) {
   const queryClient = useQueryClient();
 
   const { data: liveSessions = [] } = useQuery({
-    queryKey: ['live-session', seller?.id],
-    queryFn: () => base44.entities.LiveSession.filter({ seller_id: seller?.id }),
-    enabled: !!seller?.id,
+    queryKey: ['live-session', currentShop?.shop_slug],
+    queryFn: () => base44.entities.LiveSession.filter({ shop_slug: currentShop?.shop_slug }),
+    enabled: !!currentShop?.shop_slug,
     refetchInterval: 3000
   });
 
@@ -118,7 +118,7 @@ export default function LiveControl({ seller, products }) {
     }
   });
 
-  const liveUrl = `${window.location.origin}/Live?slug=${seller?.shop_slug}`;
+  const liveUrl = `${window.location.origin}/Live?slug=${currentShop?.shop_slug}`;
 
   const copyLiveLink = () => {
     navigator.clipboard.writeText(liveUrl);
