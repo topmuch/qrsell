@@ -84,9 +84,6 @@ export default function ShopSelector({ seller, currentShop, onShopChange, curren
 
   if (shops.length === 0) return null;
 
-  // Si le vendeur n'est pas Pro et a déjà 1 boutique, ne pas afficher le sélecteur
-  if (!isPro && shops.length === 1) return null;
-
   return (
     <div className="mb-6 bg-white rounded-xl shadow-md p-4 border-2 border-purple-100">
       <div className="flex items-center justify-between gap-4">

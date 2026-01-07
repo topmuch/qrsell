@@ -21,7 +21,8 @@ import {
   Eye,
   MessageCircle,
   Menu,
-  X
+  X,
+  ArrowRight
 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import SellerProfileForm from '@/components/dashboard/SellerProfileForm';
@@ -515,8 +516,8 @@ export default function Dashboard() {
       {/* Main content */}
       <main className="flex-1 overflow-y-auto md:ml-0">
         <div className="p-4 md:p-8 max-w-7xl mx-auto pt-20 md:pt-8">
-        {/* Shop Selector - Only for Pro users OR if they have multiple shops */}
-        {seller && shops.length > 0 && (isPro || shops.length > 1) && (
+        {/* Shop Selector - Always show to demonstrate multi-shop feature */}
+        {seller && shops.length > 0 && currentShop && (
           <ShopSelector 
             seller={seller}
             currentShop={currentShop}
@@ -563,8 +564,45 @@ export default function Dashboard() {
 
           {activeTab === 'overview' && (
           <div className="space-y-8">
-            {/* Trend Alerts - Only for Pro */}
-            {hasTrendAlerts && <TrendAlerts seller={seller} currentShop={currentShop} />}
+            {/* Trend Alerts - Always show with upgrade prompt for non-Pro */}
+            {currentShop && (
+              hasTrendAlerts ? (
+                <TrendAlerts seller={seller} currentShop={currentShop} />
+              ) : (
+                <div 
+                  onClick={() => setShowUpgradeModal(true)}
+                  className="mb-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-6 text-white shadow-2xl cursor-pointer hover:shadow-3xl transition-shadow"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
+                        <TrendingUp className="w-6 h-6" />
+                        🔥 Alertes de tendances (Pro)
+                      </h2>
+                      <p className="text-white/90 mb-3">
+                        Découvrez les produits en forte demande dans votre ville et optimisez votre catalogue pour doubler vos ventes.
+                      </p>
+                      <div className="flex items-center gap-2 text-sm text-white/80">
+                        <Check className="w-4 h-4" />
+                        <span>Tendances localisées par ville et catégorie</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-white/80">
+                        <Check className="w-4 h-4" />
+                        <span>Suggestions de produits basées sur 68% des vendeurs</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-white/80">
+                        <Check className="w-4 h-4" />
+                        <span>Comparaisons de performance avec la moyenne</span>
+                      </div>
+                    </div>
+                    <Button className="bg-white text-purple-600 hover:bg-gray-100 font-bold">
+                      Débloquer maintenant
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </div>
+                </div>
+              )
+            )}
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
