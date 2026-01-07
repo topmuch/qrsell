@@ -19,7 +19,9 @@ import {
   LogOut,
   TrendingUp,
   Eye,
-  MessageCircle
+  MessageCircle,
+  Menu,
+  X
 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 import SellerProfileForm from '@/components/dashboard/SellerProfileForm';
@@ -53,6 +55,7 @@ export default function Dashboard() {
   const [showPromotionForm, setShowPromotionForm] = useState(false);
   const [showCouponForm, setShowCouponForm] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -251,8 +254,34 @@ export default function Dashboard() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        className="fixed top-4 left-4 z-50 md:hidden bg-[#4CAF50] text-white p-3 rounded-lg shadow-lg"
+      >
+        {mobileMenuOpen ? (
+          <X className="w-6 h-6" />
+        ) : (
+          <Menu className="w-6 h-6" />
+        )}
+      </button>
+
+      {/* Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 flex flex-col" style={{ backgroundColor: '#4CAF50' }}>
+      <aside 
+        className={`
+          fixed md:static inset-y-0 left-0 z-50 w-64 flex flex-col transform transition-transform duration-300 md:transform-none overflow-y-auto
+          ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+        `}
+        style={{ backgroundColor: '#4CAF50' }}
+      >
         {/* Logo & Profile */}
         <div className="p-6 border-b border-white/20">
           <div className="flex items-center gap-3 mb-6">
@@ -284,7 +313,10 @@ export default function Dashboard() {
           <ul className="space-y-1 px-3">
             <li>
               <button
-                onClick={() => setActiveTab('overview')}
+                onClick={() => {
+                  setActiveTab('overview');
+                  setMobileMenuOpen(false);
+                }}
                 className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
                   activeTab === 'overview'
                     ? 'bg-white/20 text-white'
@@ -297,7 +329,10 @@ export default function Dashboard() {
             </li>
             <li>
               <button
-                onClick={() => setActiveTab('products')}
+                onClick={() => {
+                  setActiveTab('products');
+                  setMobileMenuOpen(false);
+                }}
                 className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
                   activeTab === 'products'
                     ? 'bg-white/20 text-white'
@@ -310,7 +345,10 @@ export default function Dashboard() {
             </li>
             <li>
               <button
-                onClick={() => setActiveTab('promotions')}
+                onClick={() => {
+                  setActiveTab('promotions');
+                  setMobileMenuOpen(false);
+                }}
                 className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
                   activeTab === 'promotions'
                     ? 'bg-white/20 text-white'
@@ -323,7 +361,10 @@ export default function Dashboard() {
             </li>
             <li>
               <button
-                onClick={() => setActiveTab('live')}
+                onClick={() => {
+                  setActiveTab('live');
+                  setMobileMenuOpen(false);
+                }}
                 className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
                   activeTab === 'live'
                     ? 'bg-white/20 text-white'
@@ -336,7 +377,10 @@ export default function Dashboard() {
             </li>
             <li>
               <button
-                onClick={() => setActiveTab('campaigns')}
+                onClick={() => {
+                  setActiveTab('campaigns');
+                  setMobileMenuOpen(false);
+                }}
                 className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
                   activeTab === 'campaigns'
                     ? 'bg-white/20 text-white'
@@ -349,7 +393,10 @@ export default function Dashboard() {
             </li>
             <li>
               <button
-                onClick={() => setActiveTab('guide')}
+                onClick={() => {
+                  setActiveTab('guide');
+                  setMobileMenuOpen(false);
+                }}
                 className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
                   activeTab === 'guide'
                     ? 'bg-white/20 text-white'
@@ -362,7 +409,10 @@ export default function Dashboard() {
             </li>
             <li>
               <button
-                onClick={() => setActiveTab('settings')}
+                onClick={() => {
+                  setActiveTab('settings');
+                  setMobileMenuOpen(false);
+                }}
                 className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
                   activeTab === 'settings'
                     ? 'bg-white/20 text-white'
@@ -389,8 +439,8 @@ export default function Dashboard() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="p-8 max-w-7xl mx-auto">
+      <main className="flex-1 overflow-y-auto md:ml-0">
+        <div className="p-4 md:p-8 max-w-7xl mx-auto pt-20 md:pt-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">

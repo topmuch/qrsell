@@ -124,21 +124,21 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header - Logo du vendeur à gauche, nom à côté, réseaux sociaux à droite */}
+      {/* Header - Logo uniquement à gauche, réseaux sociaux à droite */}
       <header className="bg-white sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo vendeur + nom */}
-            <div className="flex items-center gap-4">
+            {/* Logo vendeur uniquement */}
+            <div className="flex items-center">
               {seller?.logo_url ? (
                 <img 
                   src={seller.logo_url} 
                   alt={seller.shop_name}
-                  className="h-20 w-auto object-contain"
+                  className="h-12 md:h-16 w-auto object-contain"
                 />
               ) : (
                 <div 
-                  className="w-20 h-20 rounded-2xl flex items-center justify-center text-white font-bold text-3xl shadow-lg"
+                  className="w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-white font-bold text-xl md:text-2xl shadow-lg"
                   style={{
                     background: `linear-gradient(135deg, ${seller.primary_color || '#6C4AB6'} 0%, ${seller.secondary_color || '#FF6B9D'} 100%)`
                   }}
@@ -146,29 +146,18 @@ export default function Shop() {
                   {seller.shop_name?.[0]?.toUpperCase() || 'B'}
                 </div>
               )}
-              <div>
-                <h1 className="text-2xl md:text-3xl font-black text-gray-900">{seller.shop_name}</h1>
-                {seller.is_verified && (
-                  <span className="text-sm text-green-600 flex items-center gap-1 mt-1">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    Boutique vérifiée
-                  </span>
-                )}
-              </div>
             </div>
 
             {/* Réseaux sociaux */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-3">
               {seller.whatsapp_number && (
                 <a 
                   href={`https://wa.me/${seller.whatsapp_number.replace(/[^0-9]/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-11 h-11 bg-[#10B981] rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
+                  className="w-8 h-8 md:w-11 md:h-11 bg-[#10B981] rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
                 >
-                  <MessageCircle className="w-5 h-5 text-white" />
+                  <MessageCircle className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </a>
               )}
               {seller.instagram && (
@@ -176,9 +165,9 @@ export default function Shop() {
                   href={`https://instagram.com/${seller.instagram.replace('@', '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-11 h-11 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
+                  className="w-8 h-8 md:w-11 md:h-11 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
                 >
-                  <Instagram className="w-5 h-5 text-white" />
+                  <Instagram className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </a>
               )}
               {seller.tiktok && (
@@ -186,9 +175,9 @@ export default function Shop() {
                   href={`https://tiktok.com/@${seller.tiktok.replace('@', '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-11 h-11 bg-gray-900 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
+                  className="w-8 h-8 md:w-11 md:h-11 bg-gray-900 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
                 >
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
                   </svg>
                 </a>
@@ -198,9 +187,9 @@ export default function Shop() {
                   href={seller.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-11 h-11 bg-blue-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
+                  className="w-8 h-8 md:w-11 md:h-11 bg-blue-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
                 >
-                  <Facebook className="w-5 h-5 text-white" />
+                  <Facebook className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </a>
               )}
             </div>
@@ -210,12 +199,12 @@ export default function Shop() {
 
       {/* Banner Slider */}
       {seller.banner_images && seller.banner_images.length > 0 && (
-        <div className="w-full" style={{ maxHeight: '300px', overflow: 'hidden' }}>
+        <div className="w-full">
           <BannerSlider images={seller.banner_images} />
         </div>
       )}
 
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-6 md:py-12">
         {/* Featured Products */}
         {featuredProducts.length > 0 && (
           <div className="mb-16">
