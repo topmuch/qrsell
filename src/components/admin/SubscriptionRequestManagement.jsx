@@ -14,6 +14,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
 import { createPageUrl } from '@/utils/index';
+import moment from 'moment';
 
 export default function SubscriptionRequestManagement() {
   const [filter, setFilter] = useState("pending");
@@ -74,9 +75,8 @@ export default function SubscriptionRequestManagement() {
     const user = await base44.auth.me();
     const password = generatePassword();
     
-    const startDate = new Date();
-    const endDate = new Date();
-    endDate.setMonth(endDate.getMonth() + parseInt(actionData.duration_months || request.duration_months));
+    const startDate = moment.utc();
+    const endDate = moment.utc().add(parseInt(actionData.duration_months || request.duration_months), 'months');
 
     const plan = plans.find(p => p.code === (actionData.plan_code || request.plan_code));
 
