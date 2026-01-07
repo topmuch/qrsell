@@ -78,16 +78,23 @@ export default function Dashboard() {
     queryKey: ['subscription', user?.email],
     queryFn: async () => {
       const subs = await base44.entities.Subscription.filter({ user_email: user?.email });
+      console.log('🔍 Subscriptions trouvés:', subs);
+      console.log('📧 Email utilisateur:', user?.email);
       const now = moment.utc().startOf('day');
-      return subs.filter(sub => 
-        sub.is_active && 
-        moment.utc(sub.end_date).isAfter(now)
-      );
+      console.log('📅 Date actuelle (UTC):', now.format());
+      const filtered = subs.filter(sub => {
+        const endDate = moment.utc(sub.end_date);
+        console.log(`✅ Sub: active=${sub.is_active}, end_date=${sub.end_date}, isAfter=${endDate.isAfter(now)}`);
+        return sub.is_active && endDate.isAfter(now);
+      });
+      console.log('✨ Abonnements filtrés:', filtered);
+      return filtered;
     },
     enabled: !!user?.email
   });
 
   const activeSubscription = subscriptions[0];
+  console.log('🎯 Active subscription:', activeSubscription);
 
   // Get plan details
   const { data: plans = [] } = useQuery({
