@@ -369,8 +369,8 @@ export default function Dashboard() {
     console.error('📊 DEBUG INFO:', {
       user_email: user?.email,
       user_id: user?.id,
-      total_subscriptions: subscriptions?.length,
-      subscriptions_details: subscriptions?.map(s => ({
+      total_subscriptions: subscriptions?.length || 0,
+      subscriptions_details: (subscriptions || []).map(s => ({
         plan: s.plan_code,
         is_active: s.is_active,
         start: s.start_date,
