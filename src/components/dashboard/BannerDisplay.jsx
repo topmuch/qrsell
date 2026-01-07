@@ -38,24 +38,24 @@ export default function BannerDisplay({ position = 'dashboard' }) {
         className="relative mb-6"
       >
         <div className="bg-gradient-to-r from-[#2563eb] to-[#3b82f6] rounded-xl overflow-hidden shadow-lg">
-          <div className="flex items-center justify-between p-4">
+          <div className="flex items-center justify-between p-6 md:p-8">
             <div className="flex-1">
               {activeBanner.image_url && (
-                <div className="mb-3">
+                <div className="mb-4">
                   <img 
                     src={activeBanner.image_url} 
                     alt={activeBanner.text}
-                    className="max-h-24 rounded-lg object-contain"
+                    className="max-h-40 md:max-h-48 w-auto rounded-lg object-contain"
                   />
                 </div>
               )}
-              <p className="text-white font-medium mb-2">{activeBanner.text}</p>
+              <p className="text-white font-semibold text-lg md:text-xl mb-4">{activeBanner.text}</p>
               {activeBanner.link && (
                 <a
                   href={activeBanner.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-white text-[#2563eb] px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                  className="inline-flex items-center gap-2 bg-white text-[#2563eb] px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors text-base"
                 >
                   En savoir plus
                   <span>→</span>
@@ -64,9 +64,9 @@ export default function BannerDisplay({ position = 'dashboard' }) {
             </div>
             <button
               onClick={() => setDismissed(true)}
-              className="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors"
+              className="text-white/80 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors ml-4"
             >
-              <X className="w-5 h-5" />
+              <X className="w-6 h-6" />
             </button>
           </div>
         </div>
