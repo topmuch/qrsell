@@ -36,15 +36,17 @@ export default function ShopSelector({ seller, currentShop, onShopChange, curren
     enabled: !!seller?.created_by
   });
 
+  // Use currentPlan from props, or fetch if not provided
   const { data: plans = [] } = useQuery({
     queryKey: ['plans'],
-    queryFn: () => base44.entities.Plan.list()
+    queryFn: () => base44.entities.Plan.list(),
+    enabled: !currentPlan
   });
 
-  const currentPlan = plans.find(p => p.code === subscription?.plan_code);
-  const maxShops = currentPlan?.max_shops || 1;
+  const plan = currentPlan || plans.find(p => p.code === subscription?.plan_code);
+  const maxShops = plan?.max_shops || 1;
   const canCreateMore = shops.length < maxShops;
-  const isPro = currentPlan?.code === 'pro';
+  const isPro = plan?.code === 'pro';
 
   const handleCreateShop = async () => {
     if (!newShopData.shop_name || !newShopData.shop_slug) {
