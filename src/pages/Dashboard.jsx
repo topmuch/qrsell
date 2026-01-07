@@ -300,7 +300,16 @@ export default function Dashboard() {
     base44.auth.logout('/');
   };
 
-  if (!user || loadingSubscription) {
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Loader2 className="w-8 h-8 animate-spin text-[#ed477c]" />
+      </div>
+    );
+  }
+
+  // Wait for subscription data to load before checking
+  if (loadingSubscription) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <Loader2 className="w-8 h-8 animate-spin text-[#ed477c]" />
