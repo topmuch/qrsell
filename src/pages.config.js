@@ -27,6 +27,8 @@ import SubscriptionRequest from './pages/SubscriptionRequest';
 import TikTokGuide from './pages/TikTokGuide';
 import TikTokGuidePublic from './pages/TikTokGuidePublic';
 import LiveReports from './pages/LiveReports';
+import Onboarding from './pages/Onboarding';
+import OnboardingSuccess from './pages/OnboardingSuccess';
 import __Layout from './Layout.jsx';
 
 
@@ -60,6 +62,8 @@ export const PAGES = {
     "TikTokGuide": TikTokGuide,
     "TikTokGuidePublic": TikTokGuidePublic,
     "LiveReports": LiveReports,
+    "Onboarding": Onboarding,
+    "OnboardingSuccess": OnboardingSuccess,
 }
 
 export const pagesConfig = {

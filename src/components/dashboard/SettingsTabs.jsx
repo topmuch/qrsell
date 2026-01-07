@@ -16,7 +16,8 @@ import {
   Palette,
   Globe,
   CreditCard,
-  Users
+  Users,
+  Check
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -72,6 +73,8 @@ export default function SettingsTabs({ seller }) {
       await updateMutation.mutateAsync({ 
         banner_images: [...currentBanners, file_url] 
       });
+      queryClient.invalidateQueries(['seller']);
+      toast.success('Bannière ajoutée !');
     } catch (error) {
       toast.error('Erreur lors de l\'upload');
     } finally {
@@ -135,8 +138,29 @@ export default function SettingsTabs({ seller }) {
     await updateMutation.mutateAsync({ partner_logos: newPartners });
   };
 
+  const [localSettings, setLocalSettings] = useState({
+    primary_color: seller.primary_color || '#2563eb',
+    secondary_color: seller.secondary_color || '#3b82f6'
+  });
+
+  React.useEffect(() => {
+    setLocalSettings({
+      primary_color: seller.primary_color || '#2563eb',
+      secondary_color: seller.secondary_color || '#3b82f6'
+    });
+  }, [seller]);
+
+  const handleColorChange = (field, value) => {
+    setLocalSettings(prev => ({ ...prev, [field]: value }));
+  };
+
   const handleFieldUpdate = async (field, value) => {
     await updateMutation.mutateAsync({ [field]: value });
+  };
+
+  const handleSaveSettings = async () => {
+    await updateMutation.mutateAsync(localSettings);
+    toast.success('✅ Paramètres sauvegardés !');
   };
 
   const { data: products = [] } = useQuery({
@@ -342,14 +366,14 @@ export default function SettingsTabs({ seller }) {
                 <div className="flex items-center gap-3 mt-2">
                   <Input
                     type="color"
-                    value={seller.primary_color || '#2563eb'}
-                    onChange={(e) => handleFieldUpdate('primary_color', e.target.value)}
+                    value={localSettings.primary_color}
+                    onChange={(e) => handleColorChange('primary_color', e.target.value)}
                     className="w-20 h-12 cursor-pointer"
                   />
                   <Input
                     type="text"
-                    value={seller.primary_color || '#2563eb'}
-                    onChange={(e) => handleFieldUpdate('primary_color', e.target.value)}
+                    value={localSettings.primary_color}
+                    onChange={(e) => handleColorChange('primary_color', e.target.value)}
                     className="flex-1"
                   />
                 </div>
@@ -360,33 +384,52 @@ export default function SettingsTabs({ seller }) {
                 <div className="flex items-center gap-3 mt-2">
                   <Input
                     type="color"
-                    value={seller.secondary_color || '#3b82f6'}
-                    onChange={(e) => handleFieldUpdate('secondary_color', e.target.value)}
+                    value={localSettings.secondary_color}
+                    onChange={(e) => handleColorChange('secondary_color', e.target.value)}
                     className="w-20 h-12 cursor-pointer"
                   />
                   <Input
                     type="text"
-                    value={seller.secondary_color || '#3b82f6'}
-                    onChange={(e) => handleFieldUpdate('secondary_color', e.target.value)}
+                    value={localSettings.secondary_color}
+                    onChange={(e) => handleColorChange('secondary_color', e.target.value)}
                     className="flex-1"
                   />
                 </div>
               </div>
 
-              {/* Aperçu */}
+              {/* Aperçu en temps réel */}
               <div className="mt-6 p-4 border rounded-lg">
-                <p className="text-sm text-gray-600 mb-3">Aperçu des couleurs :</p>
+                <p className="text-sm text-gray-600 mb-3">Aperçu en temps réel :</p>
                 <div className="flex gap-3">
                   <div 
-                    className="flex-1 h-16 rounded-lg shadow-md flex items-center justify-center text-white font-semibold"
+                    className="flex-1 h-16 rounded-lg shadow-md flex items-center justify-center text-white font-semibold transition-all duration-300"
                     style={{
-                      background: `linear-gradient(135deg, ${seller.primary_color || '#2563eb'} 0%, ${seller.secondary_color || '#3b82f6'} 100%)`
+                      background: `linear-gradient(135deg, ${localSettings.primary_color} 0%, ${localSettings.secondary_color} 100%)`
                     }}
                   >
-                    Bouton Commander
+                    Commander sur WhatsApp
                   </div>
                 </div>
               </div>
+
+              {/* Bouton Sauvegarder */}
+              <Button
+                onClick={handleSaveSettings}
+                disabled={updateMutation.isPending}
+                className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:opacity-90 text-white shadow-lg transform hover:scale-105 transition-all"
+              >
+                {updateMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Sauvegarde...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4 mr-2" />
+                    Sauvegarder
+                  </>
+                )}
+              </Button>
             </CardContent>
           </Card>
         </div>
