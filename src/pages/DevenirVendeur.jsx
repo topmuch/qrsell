@@ -99,7 +99,7 @@ export default function DevenirVendeur() {
                 ))}
               </ul>
 
-              <Link to={createPageUrl('SubscriptionRequest') + '?plan=starter'}>
+              <Link to={createPageUrl('Onboarding') + '?plan=starter'}>
                 <Button className="w-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-lg py-6">
                   Choisir ce forfait
                 </Button>
@@ -138,7 +138,7 @@ export default function DevenirVendeur() {
                 ))}
               </ul>
 
-              <Link to={createPageUrl('SubscriptionRequest') + '?plan=pro'}>
+              <Link to={createPageUrl('Onboarding') + '?plan=pro'}>
                 <Button className="w-full bg-gradient-to-r from-[#2563eb] to-[#3b82f6] hover:opacity-90 text-white text-lg py-6">
                   <TrendingUp className="w-5 h-5 mr-2" />
                   Choisir ce forfait
