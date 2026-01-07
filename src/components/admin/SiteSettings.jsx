@@ -22,7 +22,8 @@ export default function SiteSettings() {
     smtp_port: '587',
     smtp_email: '',
     smtp_api_key: '',
-    whatsapp_support: ''
+    whatsapp_support: '',
+    subscription_reminder_days: 5
   });
   const [uploading, setUploading] = useState(false);
 
@@ -54,7 +55,8 @@ export default function SiteSettings() {
         smtp_port: siteSettings.smtp_port || '587',
         smtp_email: siteSettings.smtp_email || '',
         smtp_api_key: siteSettings.smtp_api_key || '',
-        whatsapp_support: siteSettings.whatsapp_support || ''
+        whatsapp_support: siteSettings.whatsapp_support || '',
+        subscription_reminder_days: siteSettings.subscription_reminder_days || 5
       });
     }
   }, [siteSettings]);
@@ -263,10 +265,10 @@ export default function SiteSettings() {
         </CardContent>
       </Card>
 
-      {/* WhatsApp Support */}
+      {/* WhatsApp Support & Abonnements */}
       <Card className="dark:bg-gray-800 dark:border-gray-700">
         <CardHeader>
-          <CardTitle className="dark:text-white">Support WhatsApp</CardTitle>
+          <CardTitle className="dark:text-white">Support & Abonnements</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -279,6 +281,22 @@ export default function SiteSettings() {
             />
             <p className="text-xs text-gray-500">
               Ce numéro sera utilisé pour le bouton WhatsApp flottant sur la page d'accueil. Format international requis (ex: +221771234567)
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="subscription_reminder_days">Jours avant rappel d'expiration</Label>
+            <Input
+              id="subscription_reminder_days"
+              type="number"
+              min="1"
+              max="30"
+              value={settings.subscription_reminder_days}
+              onChange={(e) => setSettings({ ...settings, subscription_reminder_days: parseInt(e.target.value) || 5 })}
+              placeholder="5"
+            />
+            <p className="text-xs text-gray-500">
+              Nombre de jours avant expiration pour envoyer un email de rappel aux clients
             </p>
           </div>
         </CardContent>
