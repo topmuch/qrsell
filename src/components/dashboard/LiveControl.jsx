@@ -165,14 +165,6 @@ export default function LiveControl({ seller, products }) {
         </CardContent>
       </Card>
 
-      {/* Live Report */}
-      <LiveReport 
-        liveSession={liveSession}
-        analytics={analytics}
-        products={products}
-        productStats={productStats}
-      />
-
       {/* Live Status & URL */}
       <Card className={liveSession?.is_live ? 'border-2 border-red-500' : ''}>
         <CardHeader>
