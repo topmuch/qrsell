@@ -14,10 +14,41 @@ export default function SellerProfileForm({ user, onProfileComplete }) {
     shop_slug: '',
     shop_name: ''
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [checkingSlug, setCheckingSlug] = useState(false);
   const [slugAvailable, setSlugAvailable] = useState(null);
   const [error, setError] = useState('');
+  const [prefilledData, setPrefilledData] = useState(false);
+
+  // Load subscription request data on mount
+  useEffect(() => {
+    const loadRequestData = async () => {
+      try {
+        const requests = await base44.entities.SubscriptionRequest.filter({ 
+          user_email: user.email,
+          status: 'approved'
+        });
+        
+        if (requests.length > 0) {
+          const request = requests[0];
+          setFormData({
+            full_name: request.full_name || '',
+            whatsapp_number: request.phone || '',
+            shop_slug: request.business_name.toLowerCase().replace(/[^a-z0-9]+/g, '_').substring(0, 30) || '',
+            shop_name: request.business_name || ''
+          });
+          setPrefilledData(true);
+          setSlugAvailable(true);
+        }
+      } catch (error) {
+        console.error('Error loading request data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadRequestData();
+  }, [user.email]);
 
   // Generate slug from shop name
   const generateSlug = (name) => {
@@ -80,15 +111,19 @@ export default function SellerProfileForm({ user, onProfileComplete }) {
 
     setLoading(true);
     
-    const sellerData = {
-      ...formData,
-      is_subscribed: true, // For MVP, auto-subscribe
-      profile_completed: true
-    };
+    try {
+      const sellerData = {
+        ...formData,
+        is_subscribed: true,
+        profile_completed: true
+      };
 
-    await base44.entities.Seller.create(sellerData);
-    setLoading(false);
-    onProfileComplete();
+      await base44.entities.Seller.create(sellerData);
+      onProfileComplete();
+    } catch (error) {
+      setError('Erreur lors de la création du profil');
+      setLoading(false);
+    }
   };
 
   return (
@@ -104,7 +139,10 @@ export default function SellerProfileForm({ user, onProfileComplete }) {
           </div>
           <CardTitle className="text-2xl">Créez votre profil vendeur</CardTitle>
           <CardDescription>
-            Ces informations seront utilisées pour votre boutique
+            {prefilledData 
+              ? "Ces informations ont été récupérées depuis votre inscription. Vous pouvez les modifier si nécessaire."
+              : "Ces informations seront utilisées pour votre boutique"
+            }
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">

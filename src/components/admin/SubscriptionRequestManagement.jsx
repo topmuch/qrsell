@@ -100,7 +100,24 @@ export default function SubscriptionRequestManagement() {
         payment_recorded: false
       });
 
-      // 3. Mettre à jour la demande
+      // 3. Créer le profil Seller automatiquement
+      try {
+        await base44.asServiceRole.entities.Seller.create({
+          full_name: request.full_name,
+          whatsapp_number: request.phone,
+          shop_slug: request.business_name.toLowerCase().replace(/[^a-z0-9]+/g, '_').substring(0, 30),
+          shop_name: request.business_name,
+          address: request.city,
+          is_subscribed: true,
+          profile_completed: true,
+          created_by: request.user_email
+        });
+      } catch (sellerError) {
+        console.error('Error creating seller profile:', sellerError);
+        // Continue even if seller creation fails - user can create it later
+      }
+
+      // 4. Mettre à jour la demande
       await updateRequestMutation.mutateAsync({
         id: request.id,
         data: {
@@ -110,7 +127,7 @@ export default function SubscriptionRequestManagement() {
         }
       });
 
-      // 4. Stocker les identifiants pour affichage
+      // 5. Stocker les identifiants pour affichage
       setGeneratedCredentials({
         email: request.user_email,
         password: password,
@@ -119,7 +136,7 @@ export default function SubscriptionRequestManagement() {
         endDate: format(endDate, 'dd/MM/yyyy', { locale: fr })
       });
 
-      // 5. Envoyer email avec identifiants
+      // 6. Envoyer email avec identifiants
       await base44.integrations.Core.SendEmail({
         to: request.user_email,
         subject: '🎉 Votre compte QRSell est activé !',
