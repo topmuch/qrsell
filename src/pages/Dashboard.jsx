@@ -67,8 +67,15 @@ export default function Dashboard() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
+      try {
+        const currentUser = await base44.auth.me();
+        console.log('👤 Utilisateur chargé:', currentUser);
+        setUser(currentUser);
+      } catch (error) {
+        console.error('❌ Erreur authentification:', error);
+        // Si pas authentifié, rediriger vers login
+        base44.auth.redirectToLogin('/Dashboard');
+      }
     };
     loadUser();
   }, []);
