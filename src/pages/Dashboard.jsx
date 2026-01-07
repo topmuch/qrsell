@@ -288,7 +288,7 @@ export default function Dashboard() {
             <div className="w-10 h-10 bg-white rounded flex items-center justify-center">
               <Store className="w-6 h-6" style={{ color: '#4CAF50' }} />
             </div>
-            <span className="text-white font-bold text-xl">QRSell</span>
+            <span className="text-white font-bold text-xl">ShopQR</span>
           </div>
           
           <div className="flex items-center gap-3">

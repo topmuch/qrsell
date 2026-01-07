@@ -139,15 +139,15 @@ export default function SubscriptionRequestManagement() {
       // 6. Envoyer email avec identifiants
       await base44.integrations.Core.SendEmail({
         to: request.user_email,
-        subject: '🎉 Votre compte QRSell est activé !',
+        subject: '🎉 Votre compte ShopQR est activé !',
         body: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-              <h1 style="color: white; margin: 0; font-size: 28px;">🎉 Bienvenue sur QRSell !</h1>
+              <h1 style="color: white; margin: 0; font-size: 28px;">🎉 Bienvenue sur ShopQR !</h1>
             </div>
             <div style="padding: 30px; background-color: #ffffff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
               <p style="font-size: 16px; color: #374151;">Bonjour ${request.full_name},</p>
-              <p style="font-size: 16px; color: #374151;">Votre compte QRSell est maintenant <strong style="color: #059669;">activé</strong> ! 🚀</p>
+              <p style="font-size: 16px; color: #374151;">Votre compte ShopQR est maintenant <strong style="color: #059669;">activé</strong> ! 🚀</p>
               
               <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #f59e0b;">
                 <p style="margin: 0 0 10px 0; font-weight: bold; color: #92400e;">🔐 Vos identifiants de connexion :</p>
@@ -204,13 +204,13 @@ export default function SubscriptionRequestManagement() {
     try {
       await base44.integrations.Core.SendEmail({
         to: request.user_email,
-        subject: 'Mise à jour de votre demande QRSell',
+        subject: 'Mise à jour de votre demande ShopQR',
         body: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="padding: 30px; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px;">
               <p style="font-size: 16px; color: #374151;">Bonjour ${request.full_name},</p>
               <p style="font-size: 16px; color: #374151;">
-                Nous avons examiné votre demande d'abonnement QRSell et malheureusement nous ne pouvons pas l'accepter pour le moment.
+                Nous avons examiné votre demande d'abonnement ShopQR et malheureusement nous ne pouvons pas l'accepter pour le moment.
               </p>
               ${actionData.rejection_reason ? `
                 <div style="background-color: #fef2f2; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ef4444;">
@@ -222,7 +222,7 @@ export default function SubscriptionRequestManagement() {
               </p>
               <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
                 Cordialement,<br/>
-                L'équipe QRSell
+                L'équipe ShopQR
               </p>
             </div>
           </div>
@@ -294,7 +294,7 @@ export default function SubscriptionRequestManagement() {
         body: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="padding: 30px; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px;">
-              <h2 style="color: #111827;">Rappel de vos identifiants QRSell</h2>
+              <h2 style="color: #111827;">Rappel de vos identifiants ShopQR</h2>
               <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 25px 0;">
                 <p style="margin: 5px 0;"><strong>Email :</strong> ${generatedCredentials.email}</p>
                 <p style="margin: 5px 0;"><strong>Mot de passe :</strong> ${generatedCredentials.password}</p>
