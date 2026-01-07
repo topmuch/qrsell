@@ -81,23 +81,25 @@ export default function Dashboard() {
   }, []);
 
   // Check subscription
-  const { data: subscriptions = [], isLoading: loadingSubscription } = useQuery({
+  const { data: subscriptions = [], isLoading: loadingSubscription, error: subscriptionError } = useQuery({
     queryKey: ['subscription', user?.email],
     queryFn: async () => {
+      console.log('🔄 Début de la requête subscriptions pour:', user?.email);
       const subs = await base44.entities.Subscription.filter({ user_email: user?.email });
-      console.log('🔍 Subscriptions trouvés:', subs);
+      console.log('🔍 Subscriptions trouvés:', subs.length, 'abonnements', subs);
       const now = new Date();
       now.setHours(0, 0, 0, 0);
       console.log('📅 Date actuelle:', now);
       const filtered = subs.filter(sub => {
         const endDate = new Date(sub.end_date);
-        console.log(`✅ Sub: active=${sub.is_active}, end_date=${sub.end_date}, endDate>${now}=${endDate > now}`);
+        console.log(`✅ Checking sub: active=${sub.is_active}, plan=${sub.plan_code}, end_date=${sub.end_date}, endDate>${now}=${endDate > now}`);
         return sub.is_active && endDate > now;
       });
-      console.log('✨ Abonnements valides:', filtered);
+      console.log('✨ Abonnements valides après filtrage:', filtered.length, filtered);
       return filtered;
     },
-    enabled: !!user?.email
+    enabled: !!user?.email,
+    retry: false
   });
 
   const activeSubscription = subscriptions[0];
