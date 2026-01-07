@@ -17,6 +17,7 @@ import QRCode from 'qrcode';
 export default function ProductPage() {
   const params = new URLSearchParams(window.location.search);
   const publicId = params.get('id');
+  const isLiveScan = params.get('live') === 'true';
   const [showShareModal, setShowShareModal] = useState(false);
 
   console.log('🔍 ProductPage - Public ID from URL:', publicId);
@@ -51,6 +52,19 @@ export default function ProductPage() {
   });
 
   console.log('🔍 ProductPage - Seller found:', seller);
+
+  // Fetch active live session if this is a live scan
+  const { data: liveSessions = [] } = useQuery({
+    queryKey: ['live-session-product-page', seller?.id],
+    queryFn: () => base44.entities.LiveSession.filter({ seller_id: seller?.id, is_live: true }),
+    enabled: !!seller?.id && isLiveScan,
+    refetchInterval: 5000
+  });
+
+  const liveSession = liveSessions[0];
+  const isFlashOfferActive = liveSession?.flash_offer_active && 
+    liveSession?.flash_offer_ends_at && 
+    new Date(liveSession.flash_offer_ends_at) > new Date();
 
   // Track scan and product view
   useEffect(() => {
@@ -92,13 +106,28 @@ export default function ProductPage() {
     return new Intl.NumberFormat('fr-FR').format(price);
   };
 
+  const calculateDiscountedPrice = () => {
+    if (!isFlashOfferActive || !product) return product?.price;
+    
+    if (liveSession.flash_offer_type === 'percentage') {
+      return product.price - (product.price * liveSession.flash_offer_value / 100);
+    } else {
+      return product.price - liveSession.flash_offer_value;
+    }
+  };
+
   const generateProfessionalWhatsAppMessage = () => {
+    const finalPrice = calculateDiscountedPrice();
+    const priceText = isFlashOfferActive 
+      ? `Prix : ${formatPrice(finalPrice)} FCFA 🔥 (Offre flash active !)` 
+      : `Prix : ${formatPrice(product.price)} FCFA`;
+    
     return `Merci d'avoir scanné le QR Code pour le produit ${product.name} ! 😊
 
 Voici un petit résumé du produit :
 
 Nom du produit : ${product.name}
-Prix : ${formatPrice(product.price)} FCFA
+${priceText}
 ${product.description ? `Description rapide : ${product.description}` : ''}
 ${product.image_url ? `\nPhoto : ${product.image_url}` : ''}
 
@@ -254,12 +283,34 @@ Si vous souhaitez procéder à l'achat, il vous suffit de répondre avec "Oui, j
           <CardContent className="p-6 space-y-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">{product.name}</h1>
-              <p 
-                className="text-3xl font-bold mb-4"
-                style={{ color: seller.primary_color || '#ed477c' }}
-              >
-                {formatPrice(product.price)} FCFA
-              </p>
+              {isFlashOfferActive ? (
+                <div className="space-y-1 mb-4">
+                  <p className="text-lg text-gray-400 line-through">{formatPrice(product.price)} FCFA</p>
+                  <div className="flex items-center gap-3">
+                    <p 
+                      className="text-3xl font-bold"
+                      style={{ color: seller.primary_color || '#ed477c' }}
+                    >
+                      {formatPrice(calculateDiscountedPrice())} FCFA
+                    </p>
+                    <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full animate-pulse">
+                      🔥 OFFRE FLASH
+                    </span>
+                  </div>
+                  {liveSession?.flash_offer_type === 'percentage' && (
+                    <p className="text-green-600 font-semibold text-sm">
+                      -{liveSession.flash_offer_value}% de réduction !
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p 
+                  className="text-3xl font-bold mb-4"
+                  style={{ color: seller.primary_color || '#ed477c' }}
+                >
+                  {formatPrice(product.price)} FCFA
+                </p>
+              )}
               {product.description && (
                 <p className="text-gray-600 leading-relaxed">{product.description}</p>
               )}
