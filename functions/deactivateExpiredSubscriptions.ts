@@ -40,16 +40,16 @@ Deno.serve(async (req) => {
         // Send expiration email
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: subscription.user_email,
-          subject: '🔴 Votre abonnement QRSell a expiré',
+          subject: '🔴 Votre abonnement ShopQR a expiré',
           body: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <div style="background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+              <div style="background: linear-gradient(135deg, #6C4AB6 0%, #FF6B9D 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
                 <h1 style="color: white; margin: 0; font-size: 28px;">🔴 Abonnement expiré</h1>
               </div>
               <div style="padding: 30px; background-color: #ffffff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
                 <p style="font-size: 16px; color: #374151;">Bonjour ${seller?.shop_name || subscription.user_email},</p>
                 <p style="font-size: 16px; color: #374151;">
-                  Votre abonnement QRSell a <strong style="color: #ef4444;">expiré</strong> le ${new Date(subscription.end_date).toLocaleDateString('fr-FR')}.
+                  Votre abonnement ShopQR a <strong style="color: #ef4444;">expiré</strong> le ${new Date(subscription.end_date).toLocaleDateString('fr-FR')}.
                 </p>
                 
                 <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #ef4444;">
@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
                 </p>
 
                 <div style="text-align: center; margin: 30px 0;">
-                  <a href="${Deno.env.get('BASE44_APP_URL') || 'https://qrsell.com'}/Dashboard" 
+                  <a href="${Deno.env.get('BASE44_APP_URL') || window.location.origin}/Dashboard" 
                      style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 16px;">
                     💳 Renouveler maintenant
                   </a>

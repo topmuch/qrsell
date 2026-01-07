@@ -12,8 +12,8 @@ import { toast } from "sonner";
 
 export default function SiteSettings() {
   const [settings, setSettings] = useState({
-    site_name: 'QRSell',
-    logo_url: 'https://drive.google.com/uc?export=view&id=1eveFkGHiW-tM5vck1UDR00SaO42huoKU',
+    site_name: 'ShopQR',
+    logo_url: '',
     primary_color: '#2563eb',
     secondary_color: '#3b82f6',
     default_currency: 'FCFA',
@@ -45,8 +45,8 @@ export default function SiteSettings() {
   React.useEffect(() => {
     if (siteSettings) {
       setSettings({
-        site_name: siteSettings.site_name || 'QRSell',
-        logo_url: siteSettings.logo_url || 'https://drive.google.com/uc?export=view&id=1eveFkGHiW-tM5vck1UDR00SaO42huoKU',
+        site_name: siteSettings.site_name || 'ShopQR',
+        logo_url: siteSettings.logo_url || '',
         primary_color: siteSettings.primary_color || '#2563eb',
         secondary_color: siteSettings.secondary_color || '#3b82f6',
         default_currency: siteSettings.default_currency || 'FCFA',
@@ -127,17 +127,20 @@ export default function SiteSettings() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="site_name">Nom du site</Label>
+            <Label htmlFor="site_name">Nom de la plateforme</Label>
             <Input
               id="site_name"
               value={settings.site_name}
               onChange={(e) => setSettings({ ...settings, site_name: e.target.value })}
-              placeholder="QRSell"
+              placeholder="ShopQR"
             />
+            <p className="text-xs text-gray-500">
+              Ce nom s'affichera partout sur la plateforme
+            </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="logo_url">Logo du site</Label>
+            <Label htmlFor="logo_url">Logo de la plateforme</Label>
             <div className="flex gap-3">
               <Input
                 id="logo_url"

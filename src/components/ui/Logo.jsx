@@ -23,35 +23,37 @@ export default function Logo({ size = 'md', showText = true, variant = 'light' }
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <linearGradient id="qrsell-logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id="shopqr-logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#6C4AB6" />
-            <stop offset="50%" stopColor="#FF6B9D" />
-            <stop offset="100%" stopColor="#10B981" />
+            <stop offset="100%" stopColor="#FF6B9D" />
           </linearGradient>
         </defs>
-        <rect width="100" height="100" rx="20" fill="url(#qrsell-logo-gradient)"/>
-        <g opacity="0.95">
-          <rect x="20" y="20" width="15" height="15" rx="2" fill="white"/>
-          <rect x="65" y="20" width="15" height="15" rx="2" fill="white"/>
-          <rect x="20" y="65" width="15" height="15" rx="2" fill="white"/>
-          <circle cx="50" cy="50" r="12" fill="white"/>
-          <rect x="42" y="20" width="8" height="8" rx="1" fill="white"/>
-          <rect x="56" y="20" width="8" height="8" rx="1" fill="white"/>
-          <rect x="42" y="72" width="8" height="8" rx="1" fill="white"/>
-          <rect x="72" y="42" width="8" height="8" rx="1" fill="white"/>
-          <rect x="72" y="56" width="8" height="8" rx="1" fill="white"/>
-        </g>
+        {/* Q letter stylized with QR code pattern */}
+        <circle cx="50" cy="50" r="42" fill="url(#shopqr-logo-gradient)"/>
+        <circle cx="50" cy="50" r="28" fill="white"/>
+        <circle cx="50" cy="50" r="20" fill="url(#shopqr-logo-gradient)"/>
+        
+        {/* QR code dots inside Q */}
+        <rect x="44" y="44" width="4" height="4" fill="white" rx="1"/>
+        <rect x="52" y="44" width="4" height="4" fill="white" rx="1"/>
+        <rect x="44" y="52" width="4" height="4" fill="white" rx="1"/>
+        <rect x="52" y="52" width="4" height="4" fill="white" rx="1"/>
+        
+        {/* Q tail */}
+        <path d="M 65 65 L 75 75" stroke="url(#shopqr-logo-gradient)" strokeWidth="8" strokeLinecap="round"/>
       </svg>
       {showText && (
         <span style={{ 
           fontSize: fontSize[size], 
-          fontWeight: 'bold',
-          background: 'linear-gradient(135deg, #6C4AB6 0%, #FF6B9D 50%, #10B981 100%)',
+          fontWeight: '700',
+          fontFamily: 'Inter, -apple-system, sans-serif',
+          letterSpacing: '-0.02em',
+          background: 'linear-gradient(135deg, #6C4AB6 0%, #FF6B9D 100%)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text'
         }}>
-          QRSell
+          ShopQR
         </span>
       )}
     </div>

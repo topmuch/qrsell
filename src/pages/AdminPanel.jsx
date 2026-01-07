@@ -149,7 +149,7 @@ export default function AdminPanel() {
             <div className="w-10 h-10 bg-white rounded flex items-center justify-center">
               <Shield className="w-6 h-6" style={{ color: '#4CAF50' }} />
             </div>
-            <span className="text-white font-bold text-xl">QRSell Admin</span>
+            <span className="text-white font-bold text-xl">ShopQR Admin</span>
           </div>
           
           <div className="flex items-center gap-3">
