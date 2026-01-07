@@ -16,6 +16,7 @@ import Logo from '@/components/ui/Logo';
 export default function Onboarding() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [completedSteps, setCompletedSteps] = useState([]);
   
   const [formData, setFormData] = useState({
     full_name: '',
@@ -39,6 +40,7 @@ export default function Onboarding() {
   });
 
   const selectedPlan = plans.find(p => p.code === formData.plan_code);
+  const totalPrice = selectedPlan ? (selectedPlan.price || 0) * formData.duration_months : 0;
 
   const handleSlugChange = (value) => {
     const cleaned = value.toLowerCase().replace(/[^a-z0-9_-]/g, '');
@@ -59,6 +61,7 @@ export default function Onboarding() {
         return;
       }
     }
+    setCompletedSteps(prev => [...prev, currentStep]);
     setCurrentStep(prev => prev + 1);
   };
 
@@ -94,7 +97,7 @@ export default function Onboarding() {
   const progress = (currentStep / 3) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-8 px-4">
+    <div className="min-h-screen py-8 px-4" style={{ backgroundColor: '#FAF9FC' }}>
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -107,11 +110,30 @@ export default function Onboarding() {
 
         {/* Progress */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">Étape {currentStep} sur 3</span>
-            <span className="text-sm font-medium text-gray-700">{Math.round(progress)}%</span>
+          <div className="flex items-center justify-between mb-4">
+            {[1, 2, 3].map(step => (
+              <div key={step} className="flex items-center">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
+                  completedSteps.includes(step) 
+                    ? 'bg-green-500 text-white' 
+                    : currentStep === step 
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' 
+                    : 'bg-gray-200 text-gray-400'
+                }`}>
+                  {completedSteps.includes(step) ? (
+                    <CheckCircle className="w-6 h-6" />
+                  ) : (
+                    step
+                  )}
+                </div>
+                {step < 3 && (
+                  <div className={`w-16 md:w-32 h-1 mx-2 ${
+                    completedSteps.includes(step) ? 'bg-green-500' : 'bg-gray-200'
+                  }`} />
+                )}
+              </div>
+            ))}
           </div>
-          <Progress value={progress} className="h-2" />
         </div>
 
         <AnimatePresence mode="wait">
@@ -318,6 +340,26 @@ export default function Onboarding() {
                       </SelectContent>
                     </Select>
                   </div>
+
+                  {/* Prix Total */}
+                  {selectedPlan && (
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">Prix mensuel</p>
+                          <p className="text-lg font-semibold text-gray-900">
+                            {(selectedPlan.price || 0).toLocaleString('fr-FR')} FCFA/mois
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-gray-600 mb-1">Total à payer</p>
+                          <p className="text-3xl font-black text-green-600">
+                            {totalPrice.toLocaleString('fr-FR')} FCFA
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="flex gap-3">
                     <Button onClick={handleBack} variant="outline" className="flex-1">

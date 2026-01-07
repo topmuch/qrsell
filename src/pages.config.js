@@ -15,6 +15,9 @@ import DevenirVendeur from './pages/DevenirVendeur';
 import GrowthTips from './pages/GrowthTips';
 import Home from './pages/Home';
 import Live from './pages/Live';
+import LiveReports from './pages/LiveReports';
+import Onboarding from './pages/Onboarding';
+import OnboardingSuccess from './pages/OnboardingSuccess';
 import ProductPage from './pages/ProductPage';
 import ProfileSetup from './pages/ProfileSetup';
 import PromotionProduct from './pages/PromotionProduct';
@@ -26,9 +29,6 @@ import SubscriptionExpired from './pages/SubscriptionExpired';
 import SubscriptionRequest from './pages/SubscriptionRequest';
 import TikTokGuide from './pages/TikTokGuide';
 import TikTokGuidePublic from './pages/TikTokGuidePublic';
-import LiveReports from './pages/LiveReports';
-import Onboarding from './pages/Onboarding';
-import OnboardingSuccess from './pages/OnboardingSuccess';
 import __Layout from './Layout.jsx';
 
 
@@ -50,6 +50,9 @@ export const PAGES = {
     "GrowthTips": GrowthTips,
     "Home": Home,
     "Live": Live,
+    "LiveReports": LiveReports,
+    "Onboarding": Onboarding,
+    "OnboardingSuccess": OnboardingSuccess,
     "ProductPage": ProductPage,
     "ProfileSetup": ProfileSetup,
     "PromotionProduct": PromotionProduct,
@@ -61,9 +64,6 @@ export const PAGES = {
     "SubscriptionRequest": SubscriptionRequest,
     "TikTokGuide": TikTokGuide,
     "TikTokGuidePublic": TikTokGuidePublic,
-    "LiveReports": LiveReports,
-    "Onboarding": Onboarding,
-    "OnboardingSuccess": OnboardingSuccess,
 }
 
 export const pagesConfig = {

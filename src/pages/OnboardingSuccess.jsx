@@ -27,27 +27,24 @@ export default function OnboardingSuccess() {
       icon: Package,
       title: 'Ajoutez votre premier produit',
       description: 'Créez votre catalogue et commencez à vendre',
-      action: () => window.location.href = createPageUrl('Dashboard'),
       color: 'from-blue-500 to-cyan-500'
     },
     {
       icon: QrCode,
       title: 'Téléchargez votre QR code TikTok',
       description: 'Partagez-le dans vos vidéos pour générer des ventes',
-      action: () => window.location.href = createPageUrl('Dashboard'),
       color: 'from-purple-500 to-pink-500'
     },
     {
       icon: Radio,
       title: 'Lancez votre premier live',
       description: 'Montrez vos produits en direct et boostez vos ventes',
-      action: () => window.location.href = createPageUrl('Dashboard'),
       color: 'from-orange-500 to-red-500'
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12 px-4">
+    <div className="min-h-screen py-12 px-4" style={{ backgroundColor: '#FAF9FC' }}>
       <div className="max-w-4xl mx-auto">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -96,13 +93,10 @@ export default function OnboardingSuccess() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.2 }}
               >
-                <Card 
-                  className="hover:shadow-xl transition-all duration-300 cursor-pointer group"
-                  onClick={action.action}
-                >
+                <Card className="hover:shadow-xl transition-all duration-300">
                   <CardContent className="p-6">
                     <div className="flex items-center gap-4">
-                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${action.color} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${action.color} flex items-center justify-center flex-shrink-0`}>
                         <Icon className="w-8 h-8 text-white" />
                       </div>
                       <div className="flex-1">
@@ -113,7 +107,7 @@ export default function OnboardingSuccess() {
                           {action.description}
                         </p>
                       </div>
-                      <CheckCircle className="w-6 h-6 text-green-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <CheckCircle className="w-6 h-6 text-green-500" />
                     </div>
                   </CardContent>
                 </Card>
@@ -125,12 +119,14 @@ export default function OnboardingSuccess() {
         {/* CTA Button */}
         <div className="text-center">
           <Button
-            onClick={() => window.location.href = createPageUrl('Dashboard')}
+            onClick={() => window.location.href = '/'}
             className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white px-12 py-6 text-lg shadow-2xl transform hover:scale-105 transition-all"
           >
-            <Sparkles className="w-5 h-5 mr-2" />
-            Accéder à mon dashboard
+            Retour à la page d'accueil
           </Button>
+          <p className="text-sm text-gray-600 mt-4 max-w-md mx-auto">
+            Votre boutique sera activée dès que notre équipe aura validé votre demande. Vous recevrez un email de confirmation.
+          </p>
         </div>
       </div>
     </div>
