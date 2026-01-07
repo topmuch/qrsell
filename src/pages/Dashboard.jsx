@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import moment from 'moment';
 import { 
   Plus, 
   Package, 
@@ -77,10 +78,10 @@ export default function Dashboard() {
     queryKey: ['subscription', user?.email],
     queryFn: async () => {
       const subs = await base44.entities.Subscription.filter({ user_email: user?.email });
-      const now = new Date();
+      const now = moment().utc();
       return subs.filter(sub => 
         sub.is_active && 
-        new Date(sub.end_date) > now
+        moment.utc(sub.end_date).isAfter(now)
       );
     },
     enabled: !!user?.email
