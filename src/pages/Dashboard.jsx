@@ -68,27 +68,13 @@ export default function Dashboard() {
   useEffect(() => {
     const loadUser = async (retryCount = 0) => {
       try {
-        console.log('🚀 Tentative de chargement utilisateur (tentative ' + (retryCount + 1) + ')');
         await new Promise(resolve => setTimeout(resolve, 500));
         const currentUser = await base44.auth.me();
-        console.log('👤 ✅ Utilisateur chargé avec succès:', {
-          email: currentUser?.email,
-          full_name: currentUser?.full_name,
-          role: currentUser?.role,
-          id: currentUser?.id
-        });
         setUser(currentUser);
       } catch (error) {
-        console.error('❌ Erreur authentification (tentative ' + (retryCount + 1) + '):', {
-          message: error.message,
-          status: error.response?.status,
-          error: error
-        });
         if (retryCount < 3) {
-          console.log('🔄 Nouvelle tentative dans 1 seconde...');
           setTimeout(() => loadUser(retryCount + 1), 1000);
         } else {
-          console.error('❌ Échec après 3 tentatives, redirection vers login');
           base44.auth.redirectToLogin('/Dashboard');
         }
       }
@@ -114,7 +100,6 @@ export default function Dashboard() {
   });
 
   const activeSubscription = subscriptions[0];
-  console.log('🎯 Active subscription:', activeSubscription);
 
   // Get plan details
   const { data: plans = [] } = useQuery({
@@ -330,7 +315,6 @@ export default function Dashboard() {
 
   // Wait for subscription data to load before checking
   if (loadingSubscription) {
-    console.log('⏳ Chargement de l\'abonnement en cours...');
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <Loader2 className="w-8 h-8 animate-spin text-[#ed477c]" />
@@ -338,10 +322,8 @@ export default function Dashboard() {
     );
   }
 
-  // Admin bypass - les admins n'ont pas besoin d'abonnement
-  if (user?.role === 'admin') {
-    console.log('👑 Utilisateur admin détecté - bypass de la vérification d\'abonnement');
-  } else if (!activeSubscription) {
+  // Admin bypass OR valid subscription required
+  if (user?.role !== 'admin' && !activeSubscription) {
     window.location.href = '/SubscriptionExpired';
     return null;
   }
