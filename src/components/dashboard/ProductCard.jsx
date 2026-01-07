@@ -170,15 +170,44 @@ export default function ProductCard({ product, seller, onEdit, onDelete, analyti
               <h3 className="font-semibold text-gray-900 mb-1 truncate">
                 {product.name}
               </h3>
-              <p className="text-lg font-bold text-[#2563eb]">
+              <p className="text-xl font-bold text-[#6C4AB6] mb-3">
                 {formatPrice(product.price)} FCFA
               </p>
-              {product.description && (
-                <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                  {product.description}
-                </p>
-              )}
             </div>
+
+            {/* QR Code Section */}
+            <div className="bg-white p-3 rounded-xl border-2 border-dashed border-[#6C4AB6] relative mb-3">
+              <div 
+                className="cursor-pointer"
+                onClick={() => setShowQR(true)}
+              >
+                <div className="flex items-center justify-center mb-2">
+                  <QrCode className="w-20 h-20 text-[#6C4AB6]" />
+                </div>
+                <p className="text-center text-xs font-semibold text-[#6C4AB6]">
+                  Scannez-moi !
+                </p>
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  downloadQRCode();
+                }}
+                disabled={downloading}
+                className="absolute bottom-1 right-1 text-[#6C4AB6] hover:bg-purple-50 h-7 text-xs px-2"
+              >
+                <Download className="w-3 h-3 mr-1" />
+                {downloading ? '...' : 'Télécharger'}
+              </Button>
+            </div>
+
+            {product.description && (
+              <p className="text-sm text-gray-500 line-clamp-2">
+                {product.description}
+              </p>
+            )}
 
             {/* Stats */}
             <div className="flex items-center gap-3 text-xs text-gray-500 pt-2 border-t">
@@ -187,39 +216,27 @@ export default function ProductCard({ product, seller, onEdit, onDelete, analyti
               <span>👆 {clickCount} clics</span>
             </div>
 
-            {/* Action buttons */}
-            <div className="flex gap-2">
-              <Button 
-                size="sm" 
-                variant="outline" 
-                onClick={downloadQRCode}
-                disabled={downloading}
-                className="flex-1"
-              >
-                <Download className="w-3 h-3 mr-1" />
-                {downloading ? 'Téléchargement...' : 'QR TikTok'}
-              </Button>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                onClick={copyLink}
-                className="flex-1"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-3 h-3 mr-1 text-green-500" />
-                    Copié
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3 h-3 mr-1" />
-                    Lien
-                  </>
-                )}
-              </Button>
-            </div>
+            {/* Action button */}
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={copyLink}
+              className="w-full"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-3 h-3 mr-1 text-green-500" />
+                  Lien copié
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3 h-3 mr-1" />
+                  Copier le lien
+                </>
+              )}
+            </Button>
 
-            <p className="text-xs text-gray-400 font-mono">
+            <p className="text-xs text-gray-400 font-mono text-center">
               {product.public_id}
             </p>
           </CardContent>
