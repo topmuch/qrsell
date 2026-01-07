@@ -100,31 +100,13 @@ export default function Dashboard() {
   const { data: subscriptions = [], isLoading: loadingSubscription, error: subscriptionError } = useQuery({
     queryKey: ['subscription', user?.email],
     queryFn: async () => {
-      console.log('🔄 Début de la requête subscriptions pour:', user?.email);
       const subs = await base44.entities.Subscription.filter({ user_email: user?.email });
-      console.log('🔍 Subscriptions trouvés:', subs.length, 'abonnements', subs);
-      
       const now = new Date();
       now.setHours(0, 0, 0, 0);
-      console.log('📅 Date actuelle (00:00:00):', now.toISOString());
-      
       const filtered = subs.filter(sub => {
         const endDate = new Date(sub.end_date);
-        endDate.setHours(23, 59, 59, 999); // Fin de journée pour end_date
-        
-        console.log(`🔍 Vérification abonnement:`, {
-          plan_code: sub.plan_code,
-          is_active: sub.is_active,
-          end_date: sub.end_date,
-          end_date_parsed: endDate.toISOString(),
-          now: now.toISOString(),
-          is_valid: sub.is_active && endDate >= now
-        });
-        
-        return sub.is_active && endDate >= now; // >= au lieu de >
+        return sub.is_active && endDate > now;
       });
-      
-      console.log('✨ Abonnements valides après filtrage:', filtered.length, filtered);
       return filtered;
     },
     enabled: !!user?.email,
@@ -356,45 +338,16 @@ export default function Dashboard() {
     );
   }
 
-  console.log('🔍 Vérification finale - activeSubscription:', activeSubscription);
-  console.log('🔍 Vérification finale - user.role:', user?.role);
-  console.log('🔍 Vérification finale - subscriptionError:', subscriptionError);
-  console.log('🔍 Vérification finale - Total subscriptions:', subscriptions?.length);
-
   // Admin bypass - les admins n'ont pas besoin d'abonnement
   if (user?.role === 'admin') {
-    console.log('👑 ✅ Utilisateur admin détecté - accès autorisé sans vérification d\'abonnement');
+    console.log('👑 Utilisateur admin détecté - bypass de la vérification d\'abonnement');
   } else if (!activeSubscription) {
-    console.error('❌ BLOCAGE ACCÈS - Raison: Aucun abonnement actif trouvé');
-    console.error('📊 DEBUG INFO:', {
-      user_email: user?.email,
-      user_id: user?.id,
-      total_subscriptions: subscriptions?.length || 0,
-      subscriptions_details: (subscriptions || []).map(s => ({
-        plan: s.plan_code,
-        is_active: s.is_active,
-        start: s.start_date,
-        end: s.end_date,
-        now: new Date().toISOString()
-      })),
-      error: subscriptionError?.message
-    });
-    console.error('🔄 Redirection vers /SubscriptionExpired...');
     window.location.href = '/SubscriptionExpired';
     return null;
-  } else {
-    console.log('✅ ✅ ✅ Abonnement actif trouvé - ACCÈS AUTORISÉ:', {
-      plan_code: activeSubscription.plan_code,
-      start_date: activeSubscription.start_date,
-      end_date: activeSubscription.end_date,
-      is_active: activeSubscription.is_active,
-      user_email: user?.email
-    });
   }
 
   // Show profile form if seller profile not completed
-  if (!loadingSeller && !seller && user?.role !== 'admin') {
-    console.log('📝 Profil vendeur manquant - affichage du formulaire de création');
+  if (!loadingSeller && !seller) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50/50 to-white py-12 px-4">
         <div className="max-w-lg mx-auto">
