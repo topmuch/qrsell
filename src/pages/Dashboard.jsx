@@ -377,6 +377,15 @@ export default function Dashboard() {
             </li>
             <li>
               <button
+                onClick={() => window.location.href = '/PerformanceReports'}
+                className="w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors text-white/80 hover:text-white hover:bg-white/10"
+              >
+                <TrendingUp className="w-5 h-5 mr-3" />
+                Preuve de performance
+              </button>
+            </li>
+            <li>
+              <button
                 onClick={() => {
                   setActiveTab('campaigns');
                   setMobileMenuOpen(false);
