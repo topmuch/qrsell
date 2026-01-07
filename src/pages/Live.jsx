@@ -168,6 +168,7 @@ export default function Live() {
     <div className="min-h-screen bg-gradient-to-br from-[#6C4AB6] via-[#FF6B9D] to-red-500 p-4 flex items-center justify-center">
       {/* Top Banner - Public Counter */}
       <motion.div
+        key={`banner-${liveStats.scans}`}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         className="fixed top-0 left-0 right-0 bg-gradient-to-r from-orange-500 to-red-500 text-white py-4 px-4 shadow-2xl z-50"
@@ -180,6 +181,9 @@ export default function Live() {
           >
             🔥 {liveStats.scans} personnes ont scanné ce produit — vous aussi ?
           </motion.p>
+          <p className="text-xs mt-1 opacity-80">
+            Mise à jour automatique • Produit actuel : {product.name}
+          </p>
         </div>
       </motion.div>
 
@@ -187,6 +191,7 @@ export default function Live() {
         key={product.id}
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
         className="w-full max-w-2xl mt-16"
       >
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">

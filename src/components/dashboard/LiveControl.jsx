@@ -204,29 +204,51 @@ export default function LiveControl({ seller, products }) {
                 <AlertDescription>
                   <div className="space-y-3">
                     <p className="font-medium text-gray-900">
-                      🔴 Votre live est actif ! Partagez ce lien sur votre écran :
+                      🔴 Votre live est actif ! Ce QR code unique fonctionne pour tous vos produits :
                     </p>
-                    <div className="flex items-center gap-2">
-                      <code className="flex-1 bg-white p-3 rounded-lg text-sm font-mono border-2 border-red-300 text-red-700">
-                        {liveUrl}
-                      </code>
-                      <Button 
-                        variant="outline"
-                        size="sm"
-                        onClick={copyLiveLink}
-                        className="border-red-300"
-                      >
-                        {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                      </Button>
-                      <a href={liveUrl} target="_blank" rel="noopener noreferrer">
-                        <Button 
-                          variant="outline"
-                          size="sm"
-                          className="border-red-300"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </Button>
-                      </a>
+                    <div className="flex flex-col md:flex-row items-center gap-4">
+                      <div className="flex-1 space-y-2 w-full">
+                        <code className="block bg-white p-3 rounded-lg text-sm font-mono border-2 border-red-300 text-red-700 break-all">
+                          {liveUrl}
+                        </code>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline"
+                            size="sm"
+                            onClick={copyLiveLink}
+                            className="border-red-300 flex-1"
+                          >
+                            {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+                            Copier
+                          </Button>
+                          <a href={liveUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
+                            <Button 
+                              variant="outline"
+                              size="sm"
+                              className="border-red-300 w-full bg-blue-50 hover:bg-blue-100"
+                            >
+                              <Eye className="w-4 h-4 mr-2" />
+                              Voir ce que voit le client
+                            </Button>
+                          </a>
+                        </div>
+                      </div>
+                      <div className="bg-white p-4 rounded-xl border-2 border-red-300 shadow-lg">
+                        <div className="text-xs text-center mb-2 font-bold text-red-600">QR CODE UNIQUE</div>
+                        <div className="w-32 h-32 bg-gray-100 rounded flex items-center justify-center">
+                          <img 
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(liveUrl)}`}
+                            alt="QR Code Live"
+                            className="w-full h-full"
+                          />
+                        </div>
+                        <div className="text-xs text-center mt-2 text-gray-600">Affiche-le une fois</div>
+                      </div>
+                    </div>
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                      <p className="text-sm text-green-900">
+                        ✅ <strong>Changez de produit ci-dessous</strong> → vos clients verront le nouveau produit automatiquement (mise à jour toutes les 3 secondes)
+                      </p>
                     </div>
                   </div>
                 </AlertDescription>
@@ -418,24 +440,34 @@ export default function LiveControl({ seller, products }) {
               </Button>
             </>
           ) : (
-            <Alert>
-              <AlertDescription>
-                <p className="text-gray-600 mb-4">
-                  🚀 <strong>Mode Live avancé</strong> : Préparez jusqu'à 5 produits et changez-les en direct sans recharger !
-                </p>
-                <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                  <p className="text-sm text-purple-900 font-medium mb-2">
-                    💡 Comment ça marche :
+            <div className="space-y-4">
+              <Alert>
+                <AlertDescription>
+                  <p className="text-gray-600 mb-4">
+                    🚀 <strong>Mode Live avancé</strong> : Préparez jusqu'à 5 produits et changez-les en direct sans recharger !
                   </p>
-                  <ul className="text-sm text-gray-700 space-y-1 list-disc list-inside">
-                    <li>Sélectionnez 1 à 5 produits ci-dessous</li>
-                    <li>Démarrez le live avec le premier produit</li>
-                    <li>Changez de produit en 1 clic pendant le live</li>
-                    <li>Le QR code reste identique, seul le contenu change !</li>
-                  </ul>
-                </div>
-              </AlertDescription>
-            </Alert>
+                  <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                    <p className="text-sm text-purple-900 font-medium mb-2">
+                      💡 Comment ça marche :
+                    </p>
+                    <ul className="text-sm text-gray-700 space-y-1 list-disc list-inside">
+                      <li>Sélectionnez 1 à 5 produits ci-dessous</li>
+                      <li>Démarrez le live avec le premier produit</li>
+                      <li>Changez de produit en 1 clic pendant le live</li>
+                      <li><strong>Le QR code reste identique</strong>, seul le contenu change automatiquement !</li>
+                    </ul>
+                  </div>
+                </AlertDescription>
+              </Alert>
+              {selectedProducts.length === 0 && (
+                <Alert variant="destructive">
+                  <AlertDescription className="flex items-center gap-2">
+                    <span className="text-2xl">⚠️</span>
+                    <span className="font-medium">Aucun produit sélectionné. Sélectionnez au moins 1 produit pour commencer.</span>
+                  </AlertDescription>
+                </Alert>
+              )}
+            </div>
           )}
         </CardContent>
       </Card>
@@ -443,13 +475,27 @@ export default function LiveControl({ seller, products }) {
       {/* Products Selection/Management */}
       <Card>
         <CardHeader>
-          <CardTitle>
-            {liveSession?.is_live ? 'Vos produits en live' : 'Préparez votre live'}
+          <CardTitle className="flex items-center justify-between">
+            <span>
+              {liveSession?.is_live ? 'Changez de produit en direct' : 'Préparez votre live'}
+            </span>
+            {liveSession?.is_live && liveSession.active_product_id && (
+              <Badge className="bg-green-500 text-white">
+                <Eye className="w-3 h-3 mr-1" />
+                Produit actif visible par les clients
+              </Badge>
+            )}
           </CardTitle>
-          {!liveSession?.is_live && (
+          {!liveSession?.is_live ? (
             <p className="text-sm text-gray-600 mt-1">
               Sélectionnez entre 1 et 5 produits ({selectedProducts.length}/5)
             </p>
+          ) : (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
+              <p className="text-sm text-blue-900">
+                💡 <strong>Cliquez sur un produit</strong> pour le montrer instantanément à vos clients. Le QR code reste le même !
+              </p>
+            </div>
           )}
         </CardHeader>
         <CardContent>
@@ -502,23 +548,30 @@ export default function LiveControl({ seller, products }) {
                         </p>
 
                         {liveSession?.is_live ? (
-                          <Button
-                            onClick={() => changeProductMutation.mutate(product.id)}
-                            className={`w-full ${isActive ? 'bg-red-500 hover:bg-red-600' : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90'}`}
-                            disabled={isActive || changeProductMutation.isPending}
-                          >
-                            {isActive ? (
-                              <>
-                                <Radio className="w-4 h-4 mr-2 animate-pulse" />
-                                Actif
-                              </>
-                            ) : (
-                              <>
-                                <Zap className="w-4 h-4 mr-2" />
-                                Afficher
-                              </>
+                          <div className="space-y-2">
+                            <Button
+                              onClick={() => changeProductMutation.mutate(product.id)}
+                              className={`w-full ${isActive ? 'bg-green-500 hover:bg-green-600' : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90'}`}
+                              disabled={isActive || changeProductMutation.isPending}
+                            >
+                              {isActive ? (
+                                <>
+                                  <Radio className="w-4 h-4 mr-2 animate-pulse" />
+                                  🔴 EN DIRECT
+                                </>
+                              ) : (
+                                <>
+                                  <Zap className="w-4 h-4 mr-2" />
+                                  Afficher ce produit
+                                </>
+                              )}
+                            </Button>
+                            {isActive && (
+                              <p className="text-xs text-center text-green-600 font-medium">
+                                👁️ Visible par les clients maintenant
+                              </p>
                             )}
-                          </Button>
+                          </div>
                         ) : (
                           <Button
                             onClick={() => toggleProductSelection(product.id)}
