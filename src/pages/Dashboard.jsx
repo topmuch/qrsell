@@ -78,7 +78,7 @@ export default function Dashboard() {
     queryKey: ['subscription', user?.email],
     queryFn: async () => {
       const subs = await base44.entities.Subscription.filter({ user_email: user?.email });
-      const now = moment().utc();
+      const now = moment.utc().startOf('day');
       return subs.filter(sub => 
         sub.is_active && 
         moment.utc(sub.end_date).isAfter(now)

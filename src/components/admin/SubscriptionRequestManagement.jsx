@@ -75,8 +75,8 @@ export default function SubscriptionRequestManagement() {
     const user = await base44.auth.me();
     const password = generatePassword();
     
-    const startDate = moment.utc();
-    const endDate = moment.utc().add(parseInt(actionData.duration_months || request.duration_months), 'months');
+    const startDate = moment.utc().startOf('day');
+    const endDate = moment.utc().add(parseInt(actionData.duration_months || request.duration_months), 'months').endOf('day');
 
     const plan = plans.find(p => p.code === (actionData.plan_code || request.plan_code));
 
