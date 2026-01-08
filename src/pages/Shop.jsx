@@ -21,18 +21,33 @@ export default function Shop() {
     queryKey: ['shop', slug],
     queryFn: () => base44.entities.Shop.filter({ shop_slug: slug }),
     enabled: !!slug,
-    staleTime: 0, // Always fetch fresh data
-    gcTime: 1000 * 60 // Cache for 1 minute
+    staleTime: 0, // Always fetch fresh data immediately
+    gcTime: 0 // No caching - always refetch
   });
 
   // Refetch shop data when page comes into focus
   React.useEffect(() => {
+    // Refetch immediately on mount
+    refetchShop();
+
     const handleFocus = () => {
       refetchShop();
     };
+    
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refetchShop();
+      }
+    };
+
     window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
-  }, [refetchShop]);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [slug, refetchShop]);
 
   const shop = shops[0];
 
