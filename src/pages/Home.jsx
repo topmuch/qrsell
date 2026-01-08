@@ -195,46 +195,91 @@ export default function Home() {
         </div>
       )}
 
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 sm:px-6 py-12 sm:py-20">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12 sm:mb-16"
-          >
-            <div className="inline-block bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] text-white px-4 sm:px-6 py-2 rounded-full mb-4 sm:mb-6 text-xs sm:text-sm font-semibold">
-              🚀 La révolution e-commerce pour l'Afrique
-            </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 sm:mb-6 leading-tight px-2">
-                                Créez votre <span className="bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] bg-clip-text text-transparent">boutique QR</span> et vendez sur TikTok
-                              </h1>
-                              <h2 className="text-xl sm:text-2xl font-semibold text-gray-700 mb-4">
-                                QR code commerce + WhatsApp commerce Afrique
-                              </h2>
-            <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-10 max-w-3xl mx-auto px-4">
-              Pour vendeurs TikTok ou artisans : créez votre vitrine en ligne. Vos clients scannent et commandent sur WhatsApp.
-            </p>
-            <div className="flex flex-col gap-3 sm:gap-4 px-4">
-              <Button 
-                onClick={() => window.location.href = createPageUrl('DevenirVendeur')}
-                className="w-full bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] hover:opacity-90 text-white text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 rounded-full shadow-2xl transform hover:scale-105 transition-all"
+      {/* Hero Section - Redesigned */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#6C4AB6] via-[#8B5CF6] to-[#FF6B9D] py-16 sm:py-24">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-10 left-10 w-64 h-64 bg-white rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        </div>
+
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="max-w-5xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center"
+            >
+              {/* Top badge */}
+              <motion.div
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md rounded-full px-4 sm:px-6 py-2 sm:py-3 mb-6 sm:mb-8 border border-white/30"
               >
-                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                Créer ma boutique — 5 000 FCFA/mois
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={() => window.location.href = createPageUrl('Demo')}
-                className="w-full border-2 border-[#6C4AB6] text-[#6C4AB6] hover:bg-[#6C4AB6] hover:text-white text-base sm:text-lg px-6 sm:px-8 py-6 sm:py-7 rounded-full"
-              >
-                Voir la démo
-              </Button>
-            </div>
-            <p className="text-xs sm:text-sm text-gray-500 mt-4 sm:mt-6 px-4">
-              ✓ Configuration en 2 min • ✓ Annulation libre • ✓ Support inclus
-            </p>
-          </motion.div>
+                <span className="text-2xl sm:text-3xl">🚀</span>
+                <span className="text-white text-sm sm:text-base font-bold">
+                  La révolution e-commerce pour l'Afrique
+                </span>
+              </motion.div>
+
+              {/* Main title */}
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 sm:mb-6 leading-tight px-2">
+                Vendez sans site web.<br />
+                <span className="inline-flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
+                  Juste un QR Code
+                  <QrCode className="w-8 h-8 sm:w-10 sm:h-10 inline-block" />
+                  + WhatsApp
+                  <MessageCircle className="w-8 h-8 sm:w-10 sm:h-10 inline-block" />
+                </span>
+              </h1>
+
+              {/* Subtitle */}
+              <h2 className="text-lg sm:text-xl md:text-2xl text-white/95 mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed px-4 font-medium">
+                Pour vendeurs TikTok, artisans ou commerçants : vos clients <span className="font-bold">scannent → commandent → paient.</span> En 2 minutes.
+              </h2>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 px-4 mb-8 sm:mb-10 max-w-2xl mx-auto">
+                <Button 
+                  onClick={() => window.location.href = createPageUrl('DevenirVendeur')}
+                  className="w-full sm:flex-1 bg-white text-[#6C4AB6] hover:bg-gray-100 text-base sm:text-lg md:text-xl px-8 sm:px-10 py-6 sm:py-8 rounded-full shadow-2xl transform hover:scale-105 transition-all font-black"
+                >
+                  <span className="mr-2 text-xl sm:text-2xl">🚀</span>
+                  Créer ma boutique — 5 000 FCFA/mois
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => window.location.href = createPageUrl('Demo')}
+                  className="w-full sm:w-auto bg-transparent border-2 border-white text-white hover:bg-white hover:text-[#6C4AB6] text-base sm:text-lg px-6 sm:px-8 py-6 sm:py-8 rounded-full font-bold transition-all"
+                >
+                  <span className="mr-2">▶️</span>
+                  Voir la démo en 30 sec
+                </Button>
+              </div>
+
+              {/* Social proof badges */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-white/95 text-sm sm:text-base px-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-green-400 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                  </div>
+                  <span className="font-semibold">Configuration en 2 min</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-green-400 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                  </div>
+                  <span className="font-semibold">Annulation libre</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-green-400 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                  </div>
+                  <span className="font-semibold">Support inclus</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
