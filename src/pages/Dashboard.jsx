@@ -82,8 +82,15 @@ export default function Dashboard() {
     loadUser();
   }, []);
 
+  // Get seller profile FIRST
+  const { data: sellers = [], isLoading: loadingSeller, refetch: refetchSeller } = useQuery({
+    queryKey: ['seller', user?.email],
+    queryFn: () => base44.entities.Seller.filter({ created_by: user?.email }),
+    enabled: !!user?.email
+  });
+
   // Check subscription
-  const { data: subscriptions = [], isLoading: loadingSubscription, error: subscriptionError } = useQuery({
+  const { data: subscriptions = [], isLoading: loadingSubscription } = useQuery({
     queryKey: ['subscription', user?.email],
     queryFn: async () => {
       const subs = await base44.entities.Subscription.filter({ user_email: user?.email });
@@ -100,6 +107,7 @@ export default function Dashboard() {
   });
 
   const activeSubscription = subscriptions[0];
+  const seller = sellers[0];
 
   // Get plan details
   const { data: plans = [] } = useQuery({
@@ -110,15 +118,6 @@ export default function Dashboard() {
   const currentPlan = plans.find(p => p.code === activeSubscription?.plan_code);
   const isPro = currentPlan?.code === 'pro';
   const hasTrendAlerts = currentPlan?.has_trend_alerts || false;
-
-  // Get seller profile
-  const { data: sellers = [], isLoading: loadingSeller, refetch: refetchSeller } = useQuery({
-    queryKey: ['seller', user?.email],
-    queryFn: () => base44.entities.Seller.filter({ created_by: user?.email }),
-    enabled: !!user?.email && !!activeSubscription
-  });
-
-  const seller = sellers[0];
 
   // Get shops for this seller
   const { data: shops = [] } = useQuery({
@@ -313,8 +312,8 @@ export default function Dashboard() {
     );
   }
 
-  // Wait for subscription data to load before checking
-  if (loadingSubscription) {
+  // Wait for seller and subscription data to load
+  if (loadingSeller || loadingSubscription) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <Loader2 className="w-8 h-8 animate-spin text-[#ed477c]" />
@@ -322,8 +321,10 @@ export default function Dashboard() {
     );
   }
 
-  // Admin bypass OR valid subscription required
-  if (user?.role !== 'admin' && !activeSubscription) {
+  // Check access: admin OR (subscription active) OR (seller.is_subscribed)
+  const hasAccess = user?.role === 'admin' || activeSubscription || seller?.is_subscribed;
+  
+  if (!hasAccess) {
     window.location.href = '/SubscriptionExpired';
     return null;
   }
