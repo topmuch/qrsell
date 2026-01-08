@@ -26,6 +26,7 @@ import FloatingWhatsAppButton from '@/components/ui/FloatingWhatsAppButton';
 import { createPageUrl } from '@/utils/index';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from 'react-router-dom';
+import BannerDisplay from '@/components/dashboard/BannerDisplay';
 
 export default function Home() {
   const [showSuccess, setShowSuccess] = useState(false);
@@ -175,6 +176,9 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* Banners */}
+      <BannerDisplay position="homepage" />
 
       {/* Interactive Scan Simulator */}
       <section className="container mx-auto px-4 sm:px-6 py-12 sm:py-20 bg-white rounded-2xl sm:rounded-3xl shadow-xl my-6 sm:my-12">
@@ -390,98 +394,6 @@ export default function Home() {
               ✓ Configuration en 2 min • ✓ Annulation libre • ✓ Support inclus
             </p>
           </motion.div>
-        </div>
-      </section>
-
-      {/* Pricing Preview */}
-      <section className="container mx-auto px-4 sm:px-6 py-12 sm:py-20">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-black mb-4">
-              Nos forfaits
-            </h2>
-            <p className="text-lg text-gray-600">
-              Choisissez le forfait qui correspond à vos besoins
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <Card className="border-2 hover:shadow-xl transition-all">
-              <CardHeader className="bg-gray-50">
-                <CardTitle className="text-xl">Mini-boutique</CardTitle>
-                <div className="text-3xl font-bold mt-2">5 000 FCFA<span className="text-sm font-normal text-gray-600">/mois</span></div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="bg-blue-50 border border-blue-200 p-2 rounded-lg mb-4">
-                  <p className="text-xs font-semibold text-blue-900 text-center">Pas de TikTok ? Pas de problème</p>
-                </div>
-                <p className="text-sm text-gray-600 mb-4">Vitrine simple pour artisans et petits commerçants</p>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />20 produits max</li>
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />QR codes basiques</li>
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Catalogue PDF</li>
-                </ul>
-                <Link to={createPageUrl('Onboarding') + '?plan=mini'} className="block mt-6">
-                  <Button className="w-full bg-gray-900 hover:bg-gray-800">
-                    Choisir
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 hover:shadow-xl transition-all">
-              <CardHeader className="bg-blue-50">
-                <CardTitle className="text-xl">TikTok Starter</CardTitle>
-                <div className="text-3xl font-bold mt-2">5 000 FCFA<span className="text-sm font-normal text-gray-600">/mois</span></div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <p className="text-sm text-gray-600 mb-4">Pour nouveaux vendeurs TikTok</p>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />30 produits max</li>
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Mode Live TikTok</li>
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Promotions flash</li>
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Analytics temps réel</li>
-                </ul>
-                <Link to={createPageUrl('Onboarding') + '?plan=starter'} className="block mt-6">
-                  <Button className="w-full bg-[#2563eb] hover:bg-[#1d4ed8]">
-                    Choisir
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 border-purple-500 hover:shadow-2xl transition-all relative">
-              <div className="absolute top-0 right-0 bg-purple-600 text-white px-3 py-1 text-xs font-bold rounded-bl-lg">POPULAIRE</div>
-              <CardHeader className="bg-gradient-to-br from-purple-50 to-pink-50">
-                <CardTitle className="text-xl">TikTok Pro</CardTitle>
-                <div className="text-3xl font-bold mt-2">10 000 FCFA<span className="text-sm font-normal text-gray-600">/mois</span></div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <p className="text-sm text-gray-600 mb-4">Pour vendeurs TikTok confirmés</p>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />100 produits max</li>
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />3 boutiques</li>
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Alertes tendances</li>
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Campagnes sponsorisées</li>
-                </ul>
-                <Link to={createPageUrl('Onboarding') + '?plan=pro'} className="block mt-6">
-                  <Button className="w-full bg-gradient-to-r from-[#2563eb] to-[#3b82f6] hover:opacity-90">
-                    <TrendingUp className="w-4 h-4 mr-2" />
-                    Choisir
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="text-center mt-12">
-            <Button 
-              onClick={() => window.location.href = createPageUrl('Onboarding')}
-              className="bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] hover:opacity-90 text-white text-lg px-12 py-6"
-            >
-              Commencer maintenant
-            </Button>
-          </div>
         </div>
       </section>
 
