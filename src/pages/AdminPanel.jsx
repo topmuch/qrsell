@@ -61,6 +61,20 @@ export default function AdminPanel() {
     base44.auth.logout('/');
   };
 
+  const handleMigrateTemplate = async () => {
+    if (!confirm('Mettre à jour tous les templates existants en "Lumière" ?')) return;
+    
+    setMigratingTemplate(true);
+    try {
+      const response = await base44.functions.invoke('updateShopsDefaultTemplate');
+      alert(`✅ Migration réussie !\n${response.data.message}`);
+    } catch (error) {
+      alert(`❌ Erreur: ${error.message}`);
+    } finally {
+      setMigratingTemplate(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#4CAF50' }}>
