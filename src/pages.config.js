@@ -24,15 +24,15 @@ import ProductPage from './pages/ProductPage';
 import ProfileSetup from './pages/ProfileSetup';
 import PromotionProduct from './pages/PromotionProduct';
 import RecentActivity from './pages/RecentActivity';
+import RobotsTxt from './pages/RobotsTxt';
 import SellerCampaigns from './pages/SellerCampaigns';
 import Shop from './pages/Shop';
 import ShopPage from './pages/ShopPage';
+import Sitemap from './pages/Sitemap';
 import SubscriptionExpired from './pages/SubscriptionExpired';
 import SubscriptionRequest from './pages/SubscriptionRequest';
 import TikTokGuide from './pages/TikTokGuide';
 import TikTokGuidePublic from './pages/TikTokGuidePublic';
-import Sitemap from './pages/Sitemap';
-import RobotsTxt from './pages/RobotsTxt';
 import __Layout from './Layout.jsx';
 
 
@@ -63,15 +63,15 @@ export const PAGES = {
     "ProfileSetup": ProfileSetup,
     "PromotionProduct": PromotionProduct,
     "RecentActivity": RecentActivity,
+    "RobotsTxt": RobotsTxt,
     "SellerCampaigns": SellerCampaigns,
     "Shop": Shop,
     "ShopPage": ShopPage,
+    "Sitemap": Sitemap,
     "SubscriptionExpired": SubscriptionExpired,
     "SubscriptionRequest": SubscriptionRequest,
     "TikTokGuide": TikTokGuide,
     "TikTokGuidePublic": TikTokGuidePublic,
-    "Sitemap": Sitemap,
-    "RobotsTxt": RobotsTxt,
 }
 
 export const pagesConfig = {

@@ -1,24 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { 
-  Share2, 
   MessageCircle, 
   Loader2,
   AlertCircle,
-  QrCode
+  Download,
+  Truck,
+  MapPin,
+  CreditCard,
+  Clock,
+  CheckCircle
 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import FloatingWhatsAppButton from '@/components/ui/FloatingWhatsAppButton';
+import EnhancedQRCode from '@/components/ui/EnhancedQRCode';
+import { motion } from 'framer-motion';
 import QRCode from 'qrcode';
 
 export default function ProductPage() {
   const params = new URLSearchParams(window.location.search);
   const publicId = params.get('id');
   const isLiveScan = params.get('live') === 'true';
-  const [showShareModal, setShowShareModal] = useState(false);
+  const [imageZoom, setImageZoom] = useState(false);
+  const qrRef = useRef(null);
 
   console.log('🔍 ProductPage - Public ID from URL:', publicId);
 
@@ -65,6 +71,20 @@ export default function ProductPage() {
   const isFlashOfferActive = liveSession?.flash_offer_active && 
     liveSession?.flash_offer_ends_at && 
     new Date(liveSession.flash_offer_ends_at) > new Date();
+
+  // Fetch similar products (same category, different product)
+  const { data: similarProducts = [] } = useQuery({
+    queryKey: ['similar-products', product?.category, product?.id],
+    queryFn: async () => {
+      if (!product?.category) return [];
+      const allProducts = await base44.entities.Product.filter({ 
+        category: product.category,
+        is_active: true 
+      });
+      return allProducts.filter(p => p.id !== product.id).slice(0, 3);
+    },
+    enabled: !!product?.category
+  });
 
   // Track scan and product view
   useEffect(() => {
@@ -117,21 +137,22 @@ export default function ProductPage() {
   };
 
   const generateProfessionalWhatsAppMessage = () => {
-    const finalPrice = calculateDiscountedPrice();
-    const priceText = isFlashOfferActive 
-      ? `Prix : ${formatPrice(finalPrice)} FCFA 🔥 (Offre flash active !)` 
-      : `Prix : ${formatPrice(product.price)} FCFA`;
-    
-    return `Merci d'avoir scanné le QR Code pour le produit ${product.name} ! 😊
+    return `Bonjour, je viens de votre QR Code et je souhaite commander ${product.name}.`;
+  };
 
-Voici un petit résumé du produit :
-
-Nom du produit : ${product.name}
-${priceText}
-${product.description ? `Description rapide : ${product.description}` : ''}
-${product.image_url ? `\nPhoto : ${product.image_url}` : ''}
-
-Si vous souhaitez procéder à l'achat, il vous suffit de répondre avec "Oui, je veux l'acheter" ou poser toutes vos questions ! Je suis là pour vous aider à finaliser votre commande.`;
+  const downloadQRCode = async () => {
+    try {
+      const canvas = qrRef.current?.querySelector('canvas');
+      if (canvas) {
+        const url = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `qr-${product.name.toLowerCase().replace(/\s+/g, '-')}.png`;
+        link.click();
+      }
+    } catch (error) {
+      console.error('Error downloading QR code:', error);
+    }
   };
 
   const handleWhatsAppClick = () => {
@@ -158,30 +179,7 @@ Si vous souhaitez procéder à l'achat, il vous suffit de répondre avec "Oui, j
     window.open(whatsappUrl, '_blank');
   };
 
-  const handleShare = async () => {
-    const shareUrl = window.location.href;
-    const shareText = `Découvrez ${product.name} à ${formatPrice(product.price)} FCFA sur QRSell`;
 
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: product.name,
-          text: shareText,
-          url: shareUrl
-        });
-      } catch (error) {
-        if (error.name !== 'AbortError') {
-          setShowShareModal(true);
-        }
-      }
-    } else {
-      setShowShareModal(true);
-    }
-  };
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-  };
 
   if (!publicId) {
     return (
@@ -237,163 +235,263 @@ Si vous souhaitez procéder à l'achat, il vous suffit de répondre avec "Oui, j
     );
   }
 
-  return (
-    <div 
-      className="min-h-screen py-8 px-4"
-      style={{
-        background: `linear-gradient(135deg, ${seller.primary_color || '#ed477c'}15 0%, ${seller.secondary_color || '#ff6b9d'}15 100%)`
-      }}
-    >
-      <div className="max-w-2xl mx-auto">
-        {/* Product Card */}
-        <Card className="overflow-hidden">
-          {/* Product Image */}
-          <div className="relative h-80 bg-gray-100">
-            {product.image_url ? (
-              <img 
-                src={product.image_url} 
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-4xl">📦</span>
-                  </div>
-                  <p className="text-gray-500">Aucune image</p>
-                </div>
-              </div>
-            )}
-            
-            {/* Share & QR buttons */}
-            <div className="absolute top-4 right-4 flex gap-2">
-              <Button
-                size="icon"
-                variant="secondary"
-                className="rounded-full bg-white/90 hover:bg-white"
-                onClick={handleShare}
-              >
-                <Share2 className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
+  const finalPrice = calculateDiscountedPrice();
 
-          {/* Product Info */}
-          <CardContent className="p-6 space-y-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">{product.name}</h1>
-              {isFlashOfferActive ? (
-                <div className="space-y-1 mb-4">
-                  <p className="text-lg text-gray-400 line-through">{formatPrice(product.price)} FCFA</p>
-                  <div className="flex items-center gap-3">
-                    <p 
-                      className="text-3xl font-bold"
-                      style={{ color: seller.primary_color || '#ed477c' }}
-                    >
-                      {formatPrice(calculateDiscountedPrice())} FCFA
-                    </p>
-                    <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full animate-pulse">
-                      🔥 OFFRE FLASH
-                    </span>
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="max-w-5xl mx-auto px-4 py-8 md:py-12">
+        
+        {/* Main Product Section */}
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 mb-16">
+          
+          {/* Left: Product Image */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="relative"
+          >
+            <div 
+              className={`relative bg-gray-50 rounded-3xl overflow-hidden ${imageZoom ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
+              onMouseEnter={() => setImageZoom(true)}
+              onMouseLeave={() => setImageZoom(false)}
+            >
+              {product.image_url ? (
+                <img 
+                  src={product.image_url} 
+                  alt={product.name}
+                  className={`w-full aspect-square object-cover transition-transform duration-500 ${imageZoom ? 'scale-110' : 'scale-100'}`}
+                />
+              ) : (
+                <div className="w-full aspect-square flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
+                      <span className="text-4xl">📦</span>
+                    </div>
+                    <p className="text-gray-500">Aucune image</p>
                   </div>
+                </div>
+              )}
+              
+              {/* Badges */}
+              <div className="absolute top-4 left-4 flex flex-col gap-2">
+                {product.is_new && (
+                  <Badge className="bg-[#FF6B9D] text-white border-0 shadow-lg">
+                    ✨ Nouveauté
+                  </Badge>
+                )}
+                {isFlashOfferActive && (
+                  <Badge className="bg-red-500 text-white border-0 shadow-lg animate-pulse">
+                    🔥 Promo
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Right: Product Info */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex flex-col"
+          >
+            <div className="flex-1">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#6C4AB6] mb-4 leading-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                {product.name}
+              </h1>
+              
+              {isFlashOfferActive ? (
+                <div className="mb-6">
+                  <p className="text-2xl text-gray-400 line-through mb-2">{formatPrice(product.price)} FCFA</p>
+                  <p className="text-4xl md:text-5xl font-black text-[#FF6B9D] mb-2">
+                    {formatPrice(finalPrice)} FCFA
+                  </p>
                   {liveSession?.flash_offer_type === 'percentage' && (
-                    <p className="text-green-600 font-semibold text-sm">
+                    <p className="text-lg text-green-600 font-bold">
                       -{liveSession.flash_offer_value}% de réduction !
                     </p>
                   )}
                 </div>
               ) : (
-                <p 
-                  className="text-3xl font-bold mb-4"
-                  style={{ color: seller.primary_color || '#ed477c' }}
-                >
+                <p className="text-4xl md:text-5xl font-black text-[#FF6B9D] mb-6">
                   {formatPrice(product.price)} FCFA
                 </p>
               )}
+              
               {product.description && (
-                <p className="text-gray-600 leading-relaxed">{product.description}</p>
+                <p className="text-lg text-gray-700 leading-relaxed mb-8" style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 300 }}>
+                  {product.description}
+                </p>
               )}
             </div>
 
-            {/* Seller Info */}
-            <div className="border-t pt-4">
-              <p className="text-sm text-gray-500 mb-1">Vendu par</p>
-              <div className="flex items-center gap-3">
-                {seller.logo_url && (
-                  <img 
-                    src={seller.logo_url} 
-                    alt={seller.shop_name}
-                    className="w-10 h-10 rounded-full object-cover"
+            {/* QR Code Section */}
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-6 mb-6">
+              <div className="flex items-start gap-4">
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-[#6C4AB6] mb-2">Scannez pour commander</h3>
+                  <p className="text-sm text-gray-600 mb-4">Montrez ce QR code à vos amis ou sauvegardez-le</p>
+                  <Button
+                    onClick={downloadQRCode}
+                    variant="outline"
+                    className="border-2 border-[#6C4AB6] text-[#6C4AB6] hover:bg-[#6C4AB6] hover:text-white"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Télécharger le QR
+                  </Button>
+                </div>
+                <div 
+                  ref={qrRef}
+                  className="border-4 border-dashed border-[#6C4AB6] rounded-2xl p-3 bg-white"
+                >
+                  <EnhancedQRCode
+                    url={window.location.href}
+                    size={120}
+                    color="#6C4AB6"
+                    showText={false}
                   />
-                )}
-                <div>
-                  <p className="font-semibold text-gray-900">{seller.shop_name || seller.full_name}</p>
-                  {seller.is_verified && (
-                    <span className="text-xs text-green-600">✓ Vendeur vérifié</span>
-                  )}
+                  <p className="text-xs text-center font-bold text-[#6C4AB6] mt-2">
+                    Scannez-moi !
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* WhatsApp CTA */}
-            <Button
-              onClick={handleWhatsAppClick}
-              className="w-full h-14 text-lg font-semibold"
-              style={{
-                background: `linear-gradient(135deg, ${seller.primary_color || '#ed477c'} 0%, ${seller.secondary_color || '#ff6b9d'} 100%)`
-              }}
-            >
-              <MessageCircle className="w-6 h-6 mr-2" />
-              Commander sur WhatsApp
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Share Modal */}
-      {showShareModal && (
-        <ShareModal
-          url={window.location.href}
-          title={product.name}
-          onClose={() => setShowShareModal(false)}
-        />
-      )}
-
-      {/* Floating WhatsApp Button */}
-      <FloatingWhatsAppButton 
-        onClick={handleWhatsAppClick}
-        text="Je veux ce produit"
-      />
-    </div>
-  );
-}
-
-// Share Modal Component
-function ShareModal({ url, title, onClose }) {
-  const [copied, setCopied] = React.useState(false);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Partager ce produit</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600 break-all">{url}</p>
-          </div>
-          <Button onClick={handleCopy} className="w-full">
-            {copied ? 'Lien copié !' : 'Copier le lien'}
-          </Button>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                onClick={handleWhatsAppClick}
+                className="w-full h-16 text-xl font-black rounded-full shadow-2xl bg-[#FF6B9D] hover:bg-[#FF6B9D]/90 text-white"
+                style={{ fontFamily: 'Poppins, sans-serif' }}
+              >
+                <MessageCircle className="w-6 h-6 mr-3" />
+                💬 Commander sur WhatsApp
+              </Button>
+            </motion.div>
+            
+            <p className="text-center text-sm text-gray-600 mt-3">
+              <CheckCircle className="w-4 h-4 inline mr-1 text-green-500" />
+              Vendeur disponible 24h/7 — Réponse en moins de 5 min
+            </p>
+          </motion.div>
         </div>
-      </DialogContent>
-    </Dialog>
+
+        {/* Delivery & Payment Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-8 mb-16"
+        >
+          <h2 className="text-2xl font-black text-[#6C4AB6] mb-8 text-center" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            📦 Livraison & Paiement
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Delivery */}
+            <div className="bg-white rounded-2xl p-6 text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Truck className="w-6 h-6 text-blue-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 mb-2">Livraison</h3>
+              <p className="text-sm text-gray-600">
+                {seller.city && seller.city === 'Dakar' ? (
+                  <>
+                    <span className="font-semibold">Médina : 500 FCFA</span><br />
+                    <span className="text-xs">Autres quartiers : 1000 FCFA</span>
+                  </>
+                ) : (
+                  'À venir chercher en magasin'
+                )}
+              </p>
+            </div>
+
+            {/* Payment */}
+            <div className="bg-white rounded-2xl p-6 text-center">
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CreditCard className="w-6 h-6 text-green-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 mb-2">Paiement</h3>
+              <div className="flex justify-center gap-2 mt-2">
+                {seller.payment_methods && seller.payment_methods.length > 0 ? (
+                  seller.payment_methods.map((method, idx) => (
+                    <img key={idx} src={method} alt="Payment" className="h-6 object-contain" />
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-600">Wave • Orange Money • Cash</p>
+                )}
+              </div>
+            </div>
+
+            {/* Location */}
+            <div className="bg-white rounded-2xl p-6 text-center">
+              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MapPin className="w-6 h-6 text-purple-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 mb-2">Localisation</h3>
+              <p className="text-sm text-gray-600">
+                {seller.city || 'Nous contacter'}
+                {seller.address && (
+                  <><br /><span className="text-xs">{seller.address}</span></>
+                )}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Similar Products Section */}
+        {similarProducts.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl font-black text-[#6C4AB6] mb-8 text-center" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              ✨ Vous aimerez aussi…
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {similarProducts.map((prod) => (
+                <motion.div
+                  key={prod.id}
+                  whileHover={{ y: -8 }}
+                  className="bg-white rounded-2xl overflow-hidden border-2 border-gray-100 hover:border-[#6C4AB6] transition-all shadow-lg hover:shadow-2xl"
+                >
+                  <div className="relative aspect-square bg-gray-50">
+                    {prod.image_url ? (
+                      <img 
+                        src={prod.image_url} 
+                        alt={prod.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-4xl">📦</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-bold text-gray-900 mb-2 line-clamp-1">{prod.name}</h3>
+                    <p className="text-2xl font-black text-[#FF6B9D] mb-4">
+                      {formatPrice(prod.price)} FCFA
+                    </p>
+                    <div className="border-2 border-dashed border-[#6C4AB6] rounded-xl p-2 bg-purple-50">
+                      <EnhancedQRCode
+                        url={`${window.location.origin}/ProductPage?id=${prod.public_id}`}
+                        size={80}
+                        color="#6C4AB6"
+                        showText={false}
+                      />
+                      <p className="text-xs text-center font-bold text-[#6C4AB6] mt-1">
+                        Scannez-moi !
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </div>
   );
 }
