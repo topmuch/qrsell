@@ -11,8 +11,12 @@ import LazyImage from '@/components/seo/LazyImage';
 import SEOHead, { generateShopSchema, generateLocalizedKeywords } from '@/components/seo/SEOHead';
 
 export default function Shop() {
+  // Support both /@slug and /Shop?slug=slug formats
+  const pathname = window.location.pathname;
   const urlParams = new URLSearchParams(window.location.search);
-  const slug = urlParams.get('slug');
+  const slug = pathname.startsWith('/@') 
+    ? pathname.substring(2) // Remove /@ prefix
+    : urlParams.get('slug');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -200,10 +204,21 @@ export default function Shop() {
 
   if (!shop) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4">
-        <Store className="w-16 h-16 text-gray-300 mb-4" />
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Boutique introuvable</h1>
-        <p className="text-gray-500">Cette boutique n'existe pas ou a été désactivée.</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 px-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
+          <div className="w-20 h-20 bg-gradient-to-br from-[#6C4AB6] to-[#FF6B9D] rounded-full flex items-center justify-center mx-auto mb-6">
+            <Store className="w-10 h-10 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-3">Cette boutique est en cours de création</h1>
+          <p className="text-gray-600 mb-6">
+            Le vendeur est en train de configurer sa boutique. Revenez bientôt !
+          </p>
+          <a href="/" className="inline-block">
+            <Button className="bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] hover:opacity-90 text-white">
+              Retour à l'accueil
+            </Button>
+          </a>
+        </div>
       </div>
     );
   }

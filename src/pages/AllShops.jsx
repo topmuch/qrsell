@@ -219,7 +219,7 @@ export default function AllShops() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredShops.map((shop, idx) => {
               const productCount = getProductCount(shop.shop_slug);
-              const shopUrl = `/Shop?slug=${shop.shop_slug}`;
+              const shopUrl = `/@${shop.shop_slug}`;
               const style = getCategoryStyle(shop.category);
               const isNew = isNewShop(shop.created_date);
               
