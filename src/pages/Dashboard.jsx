@@ -63,6 +63,8 @@ export default function Dashboard() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentShop, setCurrentShop] = useState(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showLogs, setShowLogs] = useState(false);
+  const [errorLogs, setErrorLogs] = useState([]);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -71,7 +73,9 @@ export default function Dashboard() {
         await new Promise(resolve => setTimeout(resolve, 500));
         const currentUser = await base44.auth.me();
         setUser(currentUser);
+        setErrorLogs(prev => [...prev, { time: new Date().toISOString(), type: 'success', message: 'User loaded successfully' }]);
       } catch (error) {
+        setErrorLogs(prev => [...prev, { time: new Date().toISOString(), type: 'error', message: `User load error: ${error.message}` }]);
         if (retryCount < 3) {
           setTimeout(() => loadUser(retryCount + 1), 1000);
         } else {
@@ -80,6 +84,17 @@ export default function Dashboard() {
       }
     };
     loadUser();
+
+    // Capture console errors
+    const originalError = console.error;
+    console.error = (...args) => {
+      setErrorLogs(prev => [...prev, { time: new Date().toISOString(), type: 'error', message: args.join(' ') }]);
+      originalError(...args);
+    };
+
+    return () => {
+      console.error = originalError;
+    };
   }, []);
 
   // Get seller profile FIRST
@@ -397,8 +412,17 @@ export default function Dashboard() {
                 {user?.email}
               </div>
             </div>
-          </div>
-        </div>
+            </div>
+
+            {/* Debug Logs Button */}
+            <button
+            onClick={() => setShowLogs(true)}
+            className="mt-4 w-full flex items-center justify-center px-3 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors text-xs"
+            title="Voir les logs d'erreur"
+            >
+            🐛 Debug Logs ({errorLogs.length})
+            </button>
+            </div>
 
         {/* Navigation */}
         <nav className="flex-1 py-4">
@@ -1175,6 +1199,58 @@ export default function Dashboard() {
         open={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
       />
+
+      {/* Debug Logs Modal */}
+      {showLogs && (
+        <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[80vh] flex flex-col">
+            <div className="p-6 border-b flex items-center justify-between">
+              <h2 className="text-2xl font-bold">🐛 Debug Logs</h2>
+              <Button variant="ghost" onClick={() => setShowLogs(false)}>
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 space-y-2">
+              {errorLogs.length === 0 ? (
+                <p className="text-gray-500 text-center py-8">Aucun log enregistré</p>
+              ) : (
+                errorLogs.map((log, idx) => (
+                  <div 
+                    key={idx}
+                    className={`p-3 rounded-lg font-mono text-xs ${
+                      log.type === 'error' ? 'bg-red-50 text-red-900' : 'bg-green-50 text-green-900'
+                    }`}
+                  >
+                    <div className="text-gray-500 text-xs mb-1">
+                      {new Date(log.time).toLocaleTimeString()}
+                    </div>
+                    <div>{log.message}</div>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="p-4 border-t flex gap-3">
+              <Button 
+                onClick={() => setErrorLogs([])}
+                variant="outline"
+                className="flex-1"
+              >
+                Effacer les logs
+              </Button>
+              <Button 
+                onClick={() => {
+                  const logText = errorLogs.map(l => `[${l.time}] ${l.type.toUpperCase()}: ${l.message}`).join('\n');
+                  navigator.clipboard.writeText(logText);
+                  alert('Logs copiés dans le presse-papier');
+                }}
+                className="flex-1 bg-blue-600 hover:bg-blue-700"
+              >
+                Copier les logs
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
       );
       }
