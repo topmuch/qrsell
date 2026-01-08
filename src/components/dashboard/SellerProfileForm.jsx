@@ -229,6 +229,47 @@ export default function SellerProfileForm({ user, onProfileComplete }) {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="category" className="flex items-center gap-2">
+                <Store className="w-4 h-4 text-gray-500" />
+                Catégorie de votre boutique
+              </Label>
+              <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
+                <SelectTrigger id="category" className="h-12">
+                  <SelectValue placeholder="Sélectionnez une catégorie" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="template" className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-purple-500" />
+                Style de votre boutique
+              </Label>
+              <Select value={formData.template} onValueChange={(value) => setFormData(prev => ({ ...prev, template: value }))}>
+                <SelectTrigger id="template" className="h-12">
+                  <SelectValue placeholder="Choisissez un style" />
+                </SelectTrigger>
+                <SelectContent>
+                  {templates.map((tmpl) => (
+                    <SelectItem key={tmpl.id} value={tmpl.id}>
+                      <span>{tmpl.name}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {formData.template && (
+                <p className="text-xs text-gray-500">
+                  {templates.find(t => t.id === formData.template)?.description}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="shop_slug">URL de votre vitrine</Label>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500 whitespace-nowrap">tiktocqr.com/shop/</span>
