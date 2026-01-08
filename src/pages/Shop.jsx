@@ -111,16 +111,19 @@ export default function Shop() {
     };
   }, [shop, products.length]);
 
-  // Track shop view
+  // Track shop view (anonymous - no auth required)
   React.useEffect(() => {
-    if (shop) {
+    if (shop?.seller_id) {
+      // Use try-catch to silently fail if analytics creation fails
       base44.entities.Analytics.create({
         seller_id: shop.seller_id,
         event_type: 'view_shop',
         user_agent: navigator.userAgent
-      }).catch(() => {});
+      }).catch(() => {
+        // Silently ignore - analytics not critical for public view
+      });
     }
-  }, [shop?.id]);
+  }, [shop?.seller_id]);
 
   // Get products
   const { data: products = [], isLoading: loadingProducts } = useQuery({
@@ -137,13 +140,18 @@ export default function Shop() {
   });
 
   const handleWhatsAppClick = (product) => {
-    base44.entities.Analytics.create({
-      product_id: product.id,
-      seller_id: shop.seller_id,
-      product_public_id: product.public_id,
-      event_type: 'whatsapp_click',
-      user_agent: navigator.userAgent
-    }).catch(() => {});
+    // Track analytics anonymously (no auth required)
+    if (shop?.seller_id && product?.id) {
+      base44.entities.Analytics.create({
+        product_id: product.id,
+        seller_id: shop.seller_id,
+        product_public_id: product.public_id,
+        event_type: 'whatsapp_click',
+        user_agent: navigator.userAgent
+      }).catch(() => {
+        // Silently ignore - analytics not critical for public view
+      });
+    }
   };
 
   // Get available categories
