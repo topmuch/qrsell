@@ -410,7 +410,24 @@ export default function AdminPanel() {
           <div className="p-6">
             {activeTab === 'sellers' && (
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Gestion des vendeurs</h2>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Gestion des vendeurs</h2>
+                  <Button
+                    onClick={async () => {
+                      if (!confirm('Synchroniser tous les vendeurs avec la table Shop ?')) return;
+                      try {
+                        const response = await base44.functions.invoke('migrateSellerShops');
+                        alert(`Succès ! ${response.data.details.shops_created} boutiques créées.`);
+                        window.location.reload();
+                      } catch (error) {
+                        alert(`Erreur: ${error.message}`);
+                      }
+                    }}
+                    className="bg-[#4CAF50] hover:bg-[#45a049] text-white"
+                  >
+                    🔄 Synchroniser les boutiques
+                  </Button>
+                </div>
                 <SellerManagement />
               </div>
             )}
