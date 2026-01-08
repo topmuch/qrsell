@@ -26,32 +26,45 @@ export default function DevenirVendeur() {
     );
   }
 
+  const miniPlan = plans.find(p => p.code === 'mini') || {
+    name: 'Mini-boutique',
+    code: 'mini',
+    price: 5000,
+    description: 'Une vitrine simple sans TikTok',
+    features: [
+      "Jusqu'à 20 produits actifs",
+      "Vitrine en ligne publique",
+      "QR codes produits basiques",
+      "Téléchargement catalogue PDF",
+      "Support par email"
+    ]
+  };
+
   const starterPlan = plans.find(p => p.code === 'starter') || {
     name: 'TikTok Starter',
     code: 'starter',
     price: 5000,
-    description: 'Idéal pour les nouveaux vendeurs et micro-entrepreneurs',
+    description: 'Idéal pour les nouveaux vendeurs TikTok',
     features: [
       "Jusqu'à 30 produits actifs",
-      "Vitrine en ligne personnalisée",
-      "QR codes générés automatiquement",
-      "Statistiques de ventes en temps réel",
-      "Support client par email"
+      "Mode Live TikTok",
+      "QR codes dynamiques",
+      "Promotions flash",
+      "Statistiques en temps réel"
     ]
   };
 
   const proPlan = plans.find(p => p.code === 'pro') || {
-    name: 'TikTok Business',
+    name: 'TikTok Pro',
     code: 'pro',
     price: 10000,
-    description: 'Pour les vendeurs actifs et boutiques établies',
+    description: 'Pour les vendeurs TikTok confirmés',
     features: [
       "Jusqu'à 100 produits actifs",
-      "QR codes TikTok optimisés",
-      "Personnalisation avancée de la boutique",
-      "Accès aux campagnes sponsorisées",
-      "Statistiques avancées et export CSV",
-      "Support prioritaire WhatsApp"
+      "3 boutiques",
+      "Alertes de tendances",
+      "Campagnes sponsorisées",
+      "Support prioritaire"
     ]
   };
 
@@ -68,12 +81,48 @@ export default function DevenirVendeur() {
             Choisissez votre forfait
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Démarrez votre boutique en ligne et vendez vos produits sur TikTok avec QRSell
+            Que vous vendiez sur TikTok ou non, nous avons une solution pour vous
           </p>
         </div>
 
         {/* Plans */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {/* Mini Plan */}
+          <Card className="relative overflow-hidden hover:shadow-xl transition-all duration-300 border-2 border-gray-200">
+            <CardHeader className="bg-gradient-to-br from-gray-50 to-white border-b">
+              <CardTitle className="text-2xl text-gray-900">{miniPlan.name}</CardTitle>
+              <p className="text-sm text-gray-500">Code: {miniPlan.code}</p>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-6">
+              <div>
+                <p className="text-4xl font-bold text-gray-900">
+                  {miniPlan.price?.toLocaleString('fr-FR') || '5 000'} <span className="text-xl font-normal text-gray-600">FCFA</span>
+                </p>
+                <p className="text-gray-500">par mois</p>
+              </div>
+
+              <div className="bg-blue-50 p-3 rounded-lg">
+                <p className="text-sm font-semibold text-blue-900">✓ Pas de TikTok ? Pas de problème.</p>
+              </div>
+
+              <p className="text-gray-600">{miniPlan.description}</p>
+
+              <ul className="space-y-3">
+                {(miniPlan.features || []).map((feature, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Link to={createPageUrl('Onboarding') + '?plan=mini'}>
+                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white text-lg py-6">
+                  Choisir ce forfait
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
           {/* Starter Plan */}
           <Card className="relative overflow-hidden hover:shadow-xl transition-all duration-300">
             <CardHeader className="bg-gradient-to-br from-blue-50 to-white border-b">

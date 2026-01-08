@@ -118,6 +118,7 @@ export default function Dashboard() {
   const currentPlan = plans.find(p => p.code === activeSubscription?.plan_code);
   const isPro = currentPlan?.code === 'pro';
   const hasTrendAlerts = currentPlan?.has_trend_alerts || false;
+  const isMini = currentPlan?.code === 'mini';
 
   // Get shops for this seller
   const { data: shops = [] } = useQuery({
@@ -434,63 +435,71 @@ export default function Dashboard() {
                 Produits
               </button>
             </li>
-            <li>
-              <button
-                onClick={() => {
-                  setActiveTab('promotions');
-                  setMobileMenuOpen(false);
-                }}
-                className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
-                  activeTab === 'promotions'
-                    ? 'bg-white/20 text-white'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <Zap className="w-5 h-5 mr-3" />
-                Promotions
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => {
-                  setActiveTab('live');
-                  setMobileMenuOpen(false);
-                }}
-                className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
-                  activeTab === 'live'
-                    ? 'bg-white/20 text-white'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <span className="mr-3">🔴</span>
-                Mode Live
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => window.location.href = '/PerformanceReports'}
-                className="w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors text-white/80 hover:text-white hover:bg-white/10"
-              >
-                <TrendingUp className="w-5 h-5 mr-3" />
-                Preuve de performance
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => {
-                  setActiveTab('campaigns');
-                  setMobileMenuOpen(false);
-                }}
-                className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
-                  activeTab === 'campaigns'
-                    ? 'bg-white/20 text-white'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <Sparkles className="w-5 h-5 mr-3" />
-                Campagnes
-              </button>
-            </li>
+            {!isMini && (
+              <li>
+                <button
+                  onClick={() => {
+                    setActiveTab('promotions');
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
+                    activeTab === 'promotions'
+                      ? 'bg-white/20 text-white'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <Zap className="w-5 h-5 mr-3" />
+                  Promotions
+                </button>
+              </li>
+            )}
+            {!isMini && (
+              <li>
+                <button
+                  onClick={() => {
+                    setActiveTab('live');
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
+                    activeTab === 'live'
+                      ? 'bg-white/20 text-white'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <span className="mr-3">🔴</span>
+                  Mode Live
+                </button>
+              </li>
+            )}
+            {!isMini && (
+              <li>
+                <button
+                  onClick={() => window.location.href = '/PerformanceReports'}
+                  className="w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors text-white/80 hover:text-white hover:bg-white/10"
+                >
+                  <TrendingUp className="w-5 h-5 mr-3" />
+                  Preuve de performance
+                </button>
+              </li>
+            )}
+            {!isMini && (
+              <li>
+                <button
+                  onClick={() => {
+                    setActiveTab('campaigns');
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-start px-4 py-3 rounded-lg transition-colors ${
+                    activeTab === 'campaigns'
+                      ? 'bg-white/20 text-white'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <Sparkles className="w-5 h-5 mr-3" />
+                  Campagnes
+                </button>
+              </li>
+            )}
             <li>
               <button
                 onClick={() => {

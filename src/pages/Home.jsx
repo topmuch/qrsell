@@ -144,11 +144,11 @@ export default function Home() {
               🚀 La révolution e-commerce pour l'Afrique
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 sm:mb-6 leading-tight px-2">
-              Vendez sur TikTok avec des
-              <span className="bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] bg-clip-text text-transparent"> QR codes magiques</span>
+              Votre boutique en ligne avec
+              <span className="bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] bg-clip-text text-transparent"> QR codes intelligents</span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-10 max-w-3xl mx-auto px-4">
-              Transformez vos lives TikTok en machine à vendre. Vos clients scannent, commandent sur WhatsApp — c'est immédiat.
+              Pour vendeurs TikTok ou artisans : créez votre vitrine en ligne. Vos clients scannent et commandent sur WhatsApp.
             </p>
             <div className="flex flex-col gap-3 sm:gap-4 px-4">
               <Button 
