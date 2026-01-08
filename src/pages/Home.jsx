@@ -33,6 +33,46 @@ export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showScanModal, setShowScanModal] = useState(false);
 
+  // SEO Meta Tags
+  React.useEffect(() => {
+    document.title = "ShopQR – Créez votre boutique QR en 2 minutes | WhatsApp + TikTok Commerce";
+    
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'Vendez via QR Code, WhatsApp et TikTok Live. Sans site web, sans carte bancaire. Créez votre boutique digitale dès 5 000 FCFA/mois. Disponible au Sénégal, en Côte d\'Ivoire, au Cameroun et en Europe.');
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = 'description';
+      meta.content = 'Vendez via QR Code, WhatsApp et TikTok Live. Sans site web, sans carte bancaire. Créez votre boutique digitale dès 5 000 FCFA/mois. Disponible au Sénégal, en Côte d\'Ivoire, au Cameroun et en Europe.';
+      document.head.appendChild(meta);
+    }
+
+    // Open Graph tags
+    const setOgTag = (property, content) => {
+      let tag = document.querySelector(`meta[property="${property}"]`);
+      if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute('property', property);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute('content', content);
+    };
+
+    setOgTag('og:title', 'ShopQR – Créez votre boutique QR en 2 minutes | WhatsApp + TikTok Commerce');
+    setOgTag('og:description', 'Vendez via QR Code, WhatsApp et TikTok Live. Créez votre boutique digitale dès 5 000 FCFA/mois.');
+    setOgTag('og:type', 'website');
+    setOgTag('og:url', window.location.href);
+
+    // Keywords
+    const keywords = document.querySelector('meta[name="keywords"]');
+    if (!keywords) {
+      const meta = document.createElement('meta');
+      meta.name = 'keywords';
+      meta.content = 'boutique QR, vendre sur TikTok, QR code commerce, WhatsApp commerce Afrique, e-commerce Sénégal, boutique digitale, QR code Dakar, vendre en ligne Afrique';
+      document.head.appendChild(meta);
+    }
+  }, []);
+
   // Fetch site settings for WhatsApp support number
   const { data: siteSettings } = useQuery({
     queryKey: ['site-settings'],
