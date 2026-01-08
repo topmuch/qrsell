@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils/index';
 import EnhancedQRCode from '@/components/ui/EnhancedQRCode';
 import ScanSimulator from '@/components/demo/ScanSimulator';
+import SEOHead from '@/components/seo/SEOHead';
 
 const demoProducts = [
 {
@@ -40,6 +41,14 @@ export default function Demo() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showSimulator, setShowSimulator] = useState(false);
 
+  // SEO Configuration
+  const demoSEO = {
+    title: "Démo ShopQR – Testez votre boutique QR Code gratuite | TikTok Commerce",
+    description: "Essayez ShopQR gratuitement ! Scannez des QR codes, découvrez le parcours client complet. Boutique en ligne, WhatsApp, TikTok Live. Démo interactive 100% gratuite.",
+    keywords: "démo boutique QR, essai gratuit e-commerce, test QR code commerce, démo vente TikTok, essai boutique en ligne gratuit",
+    canonicalUrl: "https://shopqr.pro/Demo"
+  };
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat('fr-FR').format(price);
   };
@@ -55,6 +64,14 @@ export default function Demo() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-pink-50">
+      {/* SEO Head */}
+      <SEOHead 
+        title={demoSEO.title}
+        description={demoSEO.description}
+        keywords={demoSEO.keywords}
+        canonicalUrl={demoSEO.canonicalUrl}
+      />
+      
       {/* Hero demo */}
       <section className="py-20 bg-gradient-to-br from-pink-50 to-white relative overflow-hidden">
         {/* Animated background circles */}
@@ -78,15 +95,14 @@ export default function Demo() {
             </motion.div>
 
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-[#222222] leading-tight">
-              Voyez votre boutique<br />
+              Démo boutique QR Code<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ed477c] to-[#ff6b9d]">
-                en 3 secondes
+                Testez gratuitement
               </span>
             </h1>
-
-            <p className="text-2xl md:text-3xl font-medium text-gray-700">
-              Scannez • Commandez • Vendez
-            </p>
+            <h2 className="text-2xl md:text-3xl font-medium text-gray-700">
+              Scannez • Commandez • Vendez sur TikTok & WhatsApp
+            </h2>
 
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Cliquez sur les <span className="font-bold text-[#ed477c]">QR codes roses</span> ci-dessous pour vivre l'expérience complète de vos clients — du scan jusqu'à la commande WhatsApp.
@@ -415,10 +431,13 @@ export default function Demo() {
         <div className="container mx-auto px-4 text-center">
           <Logo size="md" />
           <p className="text-gray-600 text-base mt-6 font-medium">
-            Transformez vos vues TikTok en ventes réelles
+            ShopQR - Transformez vos vues TikTok en ventes réelles
+          </p>
+          <p className="text-gray-500 text-sm mt-2">
+            Commerce QR Code | WhatsApp Commerce | TikTok Live Afrique & Europe
           </p>
           <p className="text-gray-400 text-sm mt-4">
-            © {new Date().getFullYear()} QRSell. Tous droits réservés.
+            © {new Date().getFullYear()} ShopQR. Tous droits réservés.
           </p>
         </div>
       </footer>
