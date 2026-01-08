@@ -23,6 +23,7 @@ import PricingPlans from './pages/PricingPlans';
 import ProductPage from './pages/ProductPage';
 import ProfileSetup from './pages/ProfileSetup';
 import PromotionProduct from './pages/PromotionProduct';
+import PublicShop from './pages/PublicShop';
 import RecentActivity from './pages/RecentActivity';
 import RobotsTxt from './pages/RobotsTxt';
 import SellerCampaigns from './pages/SellerCampaigns';
@@ -33,7 +34,6 @@ import SubscriptionExpired from './pages/SubscriptionExpired';
 import SubscriptionRequest from './pages/SubscriptionRequest';
 import TikTokGuide from './pages/TikTokGuide';
 import TikTokGuidePublic from './pages/TikTokGuidePublic';
-import PublicShop from './pages/PublicShop';
 import __Layout from './Layout.jsx';
 
 
@@ -63,6 +63,7 @@ export const PAGES = {
     "ProductPage": ProductPage,
     "ProfileSetup": ProfileSetup,
     "PromotionProduct": PromotionProduct,
+    "PublicShop": PublicShop,
     "RecentActivity": RecentActivity,
     "RobotsTxt": RobotsTxt,
     "SellerCampaigns": SellerCampaigns,
@@ -73,7 +74,6 @@ export const PAGES = {
     "SubscriptionRequest": SubscriptionRequest,
     "TikTokGuide": TikTokGuide,
     "TikTokGuidePublic": TikTokGuidePublic,
-    "PublicShop": PublicShop,
 }
 
 export const pagesConfig = {

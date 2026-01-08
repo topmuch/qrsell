@@ -85,6 +85,7 @@ export default function AdminPanel() {
     { id: 'sellers', label: 'Vendeurs', icon: Users },
     { id: 'products', label: 'Produits', icon: Package },
     { id: 'logs', label: 'Journaux', icon: Activity },
+    { id: 'debug', label: '🐛 Debug Boutiques', icon: Bug },
     { id: 'banners', label: 'Bannières', icon: Megaphone },
     { id: 'campaigns', label: 'Campagnes', icon: Package },
     { id: 'plans', label: 'Forfaits', icon: FileText },
@@ -482,9 +483,189 @@ export default function AdminPanel() {
               </div>
             )}
             {activeTab === 'settings' && <SiteSettings />}
+            {activeTab === 'debug' && (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">🐛 Debug des Boutiques Publiques</h2>
+                <DebugShopTester />
+              </div>
+            )}
             </div>
             )}
             </main>
+    </div>
+  );
+}
+
+function DebugShopTester() {
+  const [testSlug, setTestSlug] = React.useState('');
+  const [testResults, setTestResults] = React.useState(null);
+  const [testing, setTesting] = React.useState(false);
+
+  const { data: shops = [] } = useQuery({
+    queryKey: ['all-shops-debug'],
+    queryFn: () => base44.entities.Shop.list('-created_date', 100)
+  });
+
+  const runTest = async () => {
+    setTesting(true);
+    setTestResults({ logs: [] });
+
+    try {
+      const logs = [];
+      logs.push({ type: 'info', message: `🔍 Test de la boutique: ${testSlug}` });
+
+      // Test 1: Fetch shop
+      logs.push({ type: 'info', message: '📦 Test 1: Chargement de la boutique...' });
+      const shopResult = await base44.entities.Shop.filter({ shop_slug: testSlug, is_active: true });
+      if (shopResult.length === 0) {
+        logs.push({ type: 'error', message: '❌ Boutique introuvable ou inactive' });
+        setTestResults({ logs, success: false });
+        setTesting(false);
+        return;
+      }
+      logs.push({ type: 'success', message: `✅ Boutique trouvée: ${shopResult[0].shop_name}` });
+      const shop = shopResult[0];
+
+      // Test 2: Fetch products
+      logs.push({ type: 'info', message: '📦 Test 2: Chargement des produits...' });
+      const productResult = await base44.entities.Product.filter({ shop_slug: testSlug, is_active: true });
+      logs.push({ type: 'success', message: `✅ ${productResult.length} produit(s) trouvé(s)` });
+
+      // Test 3: Try analytics
+      logs.push({ type: 'info', message: '📦 Test 3: Test Analytics (création)...' });
+      try {
+        await base44.entities.Analytics.create({
+          seller_id: shop.seller_id,
+          event_type: 'view_shop',
+          user_agent: 'DEBUG_TEST'
+        });
+        logs.push({ type: 'success', message: '✅ Analytics fonctionne' });
+      } catch (error) {
+        logs.push({ type: 'warning', message: `⚠️ Analytics échoue: ${error.message}` });
+      }
+
+      // Test 4: Build public URL
+      const publicUrl = `${window.location.origin}/@${testSlug}`;
+      logs.push({ type: 'info', message: `🌐 URL publique: ${publicUrl}` });
+
+      // Test 5: Try to fetch the page
+      logs.push({ type: 'info', message: '📦 Test 4: Test de chargement de la page...' });
+      try {
+        const response = await fetch(publicUrl);
+        if (response.ok) {
+          logs.push({ type: 'success', message: `✅ Page accessible (status: ${response.status})` });
+        } else {
+          logs.push({ type: 'error', message: `❌ Page retourne erreur ${response.status}` });
+        }
+      } catch (error) {
+        logs.push({ type: 'error', message: `❌ Impossible de charger la page: ${error.message}` });
+      }
+
+      setTestResults({ logs, success: true, shop, products: productResult, publicUrl });
+    } catch (error) {
+      setTestResults({ 
+        logs: [...(testResults?.logs || []), { type: 'error', message: `❌ Erreur globale: ${error.message}` }], 
+        success: false 
+      });
+    }
+
+    setTesting(false);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Quick shop selector */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <h3 className="text-lg font-bold mb-4">Boutiques actives</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          {shops.filter(s => s.is_active).map(shop => (
+            <button
+              key={shop.id}
+              onClick={() => setTestSlug(shop.shop_slug)}
+              className={`p-3 rounded-lg border-2 transition-all text-left ${
+                testSlug === shop.shop_slug 
+                  ? 'border-green-500 bg-green-50' 
+                  : 'border-gray-200 hover:border-green-300'
+              }`}
+            >
+              <div className="font-semibold text-sm truncate">{shop.shop_name}</div>
+              <div className="text-xs text-gray-500">@{shop.shop_slug}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Test controls */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <h3 className="text-lg font-bold mb-4">Tester une boutique</h3>
+        <div className="flex gap-3">
+          <input
+            type="text"
+            value={testSlug}
+            onChange={(e) => setTestSlug(e.target.value)}
+            placeholder="Entrez le shop_slug..."
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
+          />
+          <Button
+            onClick={runTest}
+            disabled={!testSlug || testing}
+            className="bg-green-600 hover:bg-green-700 text-white"
+          >
+            {testing ? <Loader2 className="w-4 h-4 animate-spin" /> : '🔍 Tester'}
+          </Button>
+        </div>
+      </div>
+
+      {/* Test results */}
+      {testResults && (
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h3 className="text-lg font-bold mb-4">Résultats du test</h3>
+          <div className="space-y-2">
+            {testResults.logs.map((log, idx) => (
+              <div
+                key={idx}
+                className={`p-3 rounded-lg font-mono text-sm ${
+                  log.type === 'error' ? 'bg-red-50 text-red-900' :
+                  log.type === 'success' ? 'bg-green-50 text-green-900' :
+                  log.type === 'warning' ? 'bg-yellow-50 text-yellow-900' :
+                  'bg-blue-50 text-blue-900'
+                }`}
+              >
+                {log.message}
+              </div>
+            ))}
+          </div>
+
+          {testResults.publicUrl && (
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+              <div className="font-semibold mb-2">URL de test:</div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={testResults.publicUrl}
+                  readOnly
+                  className="flex-1 px-3 py-2 bg-white border rounded"
+                />
+                <Button
+                  onClick={() => window.open(testResults.publicUrl, '_blank')}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Ouvrir
+                </Button>
+                <Button
+                  onClick={() => {
+                    navigator.clipboard.writeText(testResults.publicUrl);
+                    alert('URL copiée!');
+                  }}
+                  variant="outline"
+                >
+                  Copier
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
