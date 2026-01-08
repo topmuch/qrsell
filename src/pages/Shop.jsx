@@ -17,11 +17,22 @@ export default function Shop() {
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   // Get shop by slug
-  const { data: shops = [], isLoading: loadingShop } = useQuery({
+  const { data: shops = [], isLoading: loadingShop, refetch: refetchShop } = useQuery({
     queryKey: ['shop', slug],
     queryFn: () => base44.entities.Shop.filter({ shop_slug: slug }),
-    enabled: !!slug
+    enabled: !!slug,
+    staleTime: 0, // Always fetch fresh data
+    gcTime: 1000 * 60 // Cache for 1 minute
   });
+
+  // Refetch shop data when page comes into focus
+  React.useEffect(() => {
+    const handleFocus = () => {
+      refetchShop();
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [refetchShop]);
 
   const shop = shops[0];
 
