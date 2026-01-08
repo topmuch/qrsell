@@ -7,6 +7,7 @@ import { MessageCircle, Store, Loader2, Search, Instagram, Facebook, Phone, MapP
 import BannerSlider from '@/components/shop/BannerSlider';
 import CategoryBar from '@/components/shop/CategoryBar';
 import ProductGrid from '@/components/shop/ProductGrid';
+import LazyImage from '@/components/seo/LazyImage';
 import SEOHead, { generateShopSchema, generateLocalizedKeywords } from '@/components/seo/SEOHead';
 
 export default function Shop() {

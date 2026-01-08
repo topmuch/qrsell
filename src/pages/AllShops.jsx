@@ -23,11 +23,11 @@ export default function AllShops() {
     canonicalUrl: "https://shopqr.pro/AllShops"
   };
 
-  // Fetch all active shops
+  // Fetch all active shops (unlimited)
   const { data: shops = [], isLoading: loadingShops } = useQuery({
     queryKey: ['all-shops'],
     queryFn: async () => {
-      const all = await base44.entities.Shop.list();
+      const all = await base44.entities.Shop.list('-created_date', 1000);
       return all.filter(s => s.is_active);
     }
   });
