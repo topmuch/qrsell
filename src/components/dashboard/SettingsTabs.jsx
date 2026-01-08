@@ -257,7 +257,14 @@ export default function SettingsTabs({ seller }) {
           <CardContent>
             <TemplateSelector
               currentTemplate={seller.template || 'vibrant'}
-              onSelect={(templateId) => handleFieldUpdate('template', templateId)}
+              onSelect={async (templateId) => {
+                try {
+                  await handleFieldUpdate('template', templateId);
+                  toast.success('✨ Template mis à jour !');
+                } catch (error) {
+                  toast.error('❌ Erreur : impossible d\'enregistrer le template.');
+                }
+              }}
             />
           </CardContent>
         </Card>
