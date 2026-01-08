@@ -27,8 +27,18 @@ import { createPageUrl } from '@/utils/index';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from 'react-router-dom';
 import BannerDisplay from '@/components/dashboard/BannerDisplay';
+import SEOHead, { generateWebsiteSchema, generateOrganizationSchema } from '@/components/seo/SEOHead';
 
 export default function Home() {
+  // SEO Configuration for Homepage
+  const homeSEO = {
+    title: "ShopQR – Créez votre boutique QR en 2 minutes | WhatsApp + TikTok Commerce",
+    description: "Vendez via QR Code, WhatsApp et TikTok Live. Sans site web, sans carte bancaire. Créez votre boutique digitale dès 5 000 FCFA/mois. Disponible au Sénégal, en Côte d'Ivoire, au Cameroun et en Europe.",
+    keywords: "boutique QR, vendre sur TikTok, QR code commerce, WhatsApp commerce Afrique, boutique en ligne Sénégal, vente TikTok Live, commerce mobile Afrique, QR code Dakar, boutique digitale, e-commerce Afrique, vendre sans site web",
+    canonicalUrl: "https://shopqr.pro",
+    ogImage: "https://shopqr.pro/og-image.jpg",
+    schema: [generateWebsiteSchema(), generateOrganizationSchema()]
+  };
   const [showSuccess, setShowSuccess] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showScanModal, setShowScanModal] = useState(false);
@@ -157,6 +167,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: '#FAF9FC' }}>
+      {/* SEO Head */}
+      <SEOHead 
+        title={homeSEO.title}
+        description={homeSEO.description}
+        keywords={homeSEO.keywords}
+        canonicalUrl={homeSEO.canonicalUrl}
+        ogImage={homeSEO.ogImage}
+        schema={homeSEO.schema[0]}
+      />
       {/* Success Banner */}
       {showSuccess && (
         <div className="fixed top-20 left-4 right-4 sm:left-1/2 sm:right-auto sm:transform sm:-translate-x-1/2 z-50 max-w-2xl mx-auto">
@@ -188,9 +207,11 @@ export default function Home() {
               🚀 La révolution e-commerce pour l'Afrique
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 sm:mb-6 leading-tight px-2">
-              Votre boutique en ligne avec
-              <span className="bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] bg-clip-text text-transparent"> QR codes intelligents</span>
-            </h1>
+                                Créez votre <span className="bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] bg-clip-text text-transparent">boutique QR</span> et vendez sur TikTok
+                              </h1>
+                              <h2 className="text-xl sm:text-2xl font-semibold text-gray-700 mb-4">
+                                QR code commerce + WhatsApp commerce Afrique
+                              </h2>
             <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-10 max-w-3xl mx-auto px-4">
               Pour vendeurs TikTok ou artisans : créez votre vitrine en ligne. Vos clients scannent et commandent sur WhatsApp.
             </p>
