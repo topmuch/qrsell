@@ -49,6 +49,11 @@ export default function TemplateSelector({ currentTemplate, onSelect }) {
   const [selectedTemplate, setSelectedTemplate] = useState(currentTemplate || 'vibrant');
   const [isSaving, setIsSaving] = useState(false);
 
+  // Synchroniser avec le template actuel de la base de données
+  React.useEffect(() => {
+    setSelectedTemplate(currentTemplate || 'vibrant');
+  }, [currentTemplate]);
+
   const handleSelect = (templateId) => {
     setSelectedTemplate(templateId);
   };
