@@ -101,6 +101,54 @@ export default function Shop() {
         fontWeight: '300',
         headerShadow: 'shadow-sm',
         cardBg: '#FAFAFA'
+      },
+      lumiere: {
+        bgColor: '#FFFFFF',
+        textColor: '#0F0F0F',
+        headerBg: '#FFFFFF',
+        buttonBg: '#ed477c',
+        buttonText: '#FFFFFF',
+        accentColor: '#ed477c',
+        fontFamily: 'Poppins, sans-serif',
+        fontWeight: '500',
+        headerShadow: 'shadow-md',
+        cardBg: '#FFFFFF'
+      },
+      etiquette: {
+        bgColor: '#FFFFFF',
+        textColor: '#3D3D3D',
+        headerBg: '#FFFFFF',
+        buttonBg: '#8B6B4D',
+        buttonText: '#FFFFFF',
+        accentColor: '#D4AF37',
+        fontFamily: 'Georgia, serif',
+        fontWeight: '400',
+        headerShadow: 'shadow-sm',
+        cardBg: '#FFFBF0'
+      },
+      ecran: {
+        bgColor: '#FFFFFF',
+        textColor: '#000000',
+        headerBg: '#F5F5F5',
+        buttonBg: '#007AFF',
+        buttonText: '#FFFFFF',
+        accentColor: '#007AFF',
+        fontFamily: 'Inter, sans-serif',
+        fontWeight: '500',
+        headerShadow: 'shadow-md',
+        cardBg: '#FFFFFF'
+      },
+      vitrine: {
+        bgColor: '#FFFFFF',
+        textColor: '#0F0F0F',
+        headerBg: '#FFFFFF',
+        buttonBg: '#0F0F0F',
+        buttonText: '#FFFFFF',
+        accentColor: '#D4AF37',
+        fontFamily: 'Poppins, sans-serif',
+        fontWeight: '300',
+        headerShadow: 'shadow-sm',
+        cardBg: '#FFFFFF'
       }
     };
     return configs[templateId] || configs.vibrant;
