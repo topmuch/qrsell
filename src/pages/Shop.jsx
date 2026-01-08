@@ -29,44 +29,52 @@ export default function Shop() {
   const getTemplateConfig = (templateId) => {
     const configs = {
       luxe: {
-        bgColor: '#FFFFFF',
-        textColor: '#6C4AB6',
-        secondaryColor: '#666666',
-        fontFamily: 'Poppins',
+        bgColor: '#F8F6F3',
+        textColor: '#2C2C2C',
+        headerBg: '#FFFFFF',
+        buttonBg: '#6C4AB6',
+        buttonText: '#FFFFFF',
+        accentColor: '#D4AF37',
+        fontFamily: 'Poppins, serif',
         fontWeight: '300',
-        buttonStyle: 'minimal',
-        qrVisible: false,
-        layout: 'centered'
+        headerShadow: 'shadow-lg',
+        cardBg: '#FFFFFF'
       },
       vibrant: {
         bgColor: 'linear-gradient(135deg, #FF6B9D 0%, #6C4AB6 100%)',
         textColor: '#FFFFFF',
-        secondaryColor: '#FFD700',
+        headerBg: '#FFFFFF',
+        buttonBg: '#FF6B9D',
+        buttonText: '#FFFFFF',
+        accentColor: '#FFD700',
         fontFamily: 'Poppins',
         fontWeight: '700',
-        buttonStyle: 'bold',
-        qrVisible: true,
-        layout: 'grid'
+        headerShadow: 'shadow-xl',
+        cardBg: 'rgba(255,255,255,0.95)'
       },
       marche_local: {
-        bgColor: '#F5F0E8',
-        textColor: '#8B6B4D',
-        secondaryColor: '#2E8B57',
-        fontFamily: 'Inter',
+        bgColor: '#FEFDF7',
+        textColor: '#3D3D3D',
+        headerBg: '#E8D4B8',
+        buttonBg: '#2E8B57',
+        buttonText: '#FFFFFF',
+        accentColor: '#8B4513',
+        fontFamily: 'Georgia, serif',
         fontWeight: '500',
-        buttonStyle: 'rustic',
-        qrVisible: true,
-        layout: 'simple'
+        headerShadow: 'shadow-md',
+        cardBg: '#FFFBF0'
       },
       minimal: {
         bgColor: '#FFFFFF',
-        textColor: '#333333',
-        secondaryColor: '#999999',
-        fontFamily: 'Poppins',
-        fontWeight: '100',
-        buttonStyle: 'ghost',
-        qrVisible: false,
-        layout: 'centered'
+        textColor: '#1A1A1A',
+        headerBg: '#F5F5F5',
+        buttonBg: '#000000',
+        buttonText: '#FFFFFF',
+        accentColor: '#CCCCCC',
+        fontFamily: 'Inter, sans-serif',
+        fontWeight: '300',
+        headerShadow: 'shadow-sm',
+        cardBg: '#FAFAFA'
       }
     };
     return configs[templateId] || configs.vibrant;
@@ -263,11 +271,12 @@ export default function Shop() {
 
   return (
     <div 
-      className="min-h-screen" 
+      className="min-h-screen"
       style={{ 
         background: templateConfig.bgColor,
         fontFamily: templateConfig.fontFamily,
-        fontWeight: templateConfig.fontWeight
+        fontWeight: templateConfig.fontWeight,
+        color: templateConfig.textColor
       }}
     >
       {/* SEO Head */}
@@ -283,7 +292,13 @@ export default function Shop() {
       )}
       
       {/* Header */}
-      <header className="bg-white sticky top-0 z-50 shadow-sm">
+      <header 
+        className={`sticky top-0 z-50 ${templateConfig.headerShadow}`}
+        style={{ 
+          backgroundColor: templateConfig.headerBg,
+          borderBottom: `2px solid ${templateConfig.accentColor}`
+        }}
+      >
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
@@ -298,7 +313,7 @@ export default function Shop() {
                 <div 
                   className="w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-white font-bold text-xl md:text-2xl shadow-lg"
                   style={{
-                    background: `linear-gradient(135deg, ${shop.primary_color || '#6C4AB6'} 0%, ${shop.secondary_color || '#FF6B9D'} 100%)`
+                    background: templateConfig.buttonBg
                   }}
                 >
                   {shop.shop_name?.[0]?.toUpperCase() || 'B'}
@@ -369,9 +384,7 @@ export default function Shop() {
             className="text-4xl md:text-5xl font-black mb-4" 
             itemProp="name"
             style={{ 
-              color: templateConfig.textColor,
-              fontFamily: templateConfig.fontFamily,
-              fontWeight: templateConfig.fontWeight === '700' ? 'bold' : templateConfig.fontWeight === '300' ? '300' : '400'
+              color: templateConfig.textColor
             }}
           >
             {shop.shop_name}
