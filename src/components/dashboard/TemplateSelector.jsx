@@ -41,9 +41,66 @@ const templates = [
     colors: { bg: '#FFFFFF', text: '#333333', secondary: '#999999' },
     preview: 'linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%)',
     idealFor: 'Coiffeurs, esthéticiennes, services, formations',
-    features: ['Police Poppins Thin', 'Design épuré', 'Texte centré', 'Focus sur le service']
+    features: ['Police Poppins Thin', 'Design épuré', 'Texte centré', 'Focus sur le service'],
+    isNew: false
+  },
+  {
+    id: 'lumiere',
+    name: 'Lumière ✨',
+    description: 'Effet de lumière douce',
+    colors: { bg: '#FFFFFF', text: '#0F0F0F', secondary: '#ed477c' },
+    preview: '#FFFFFF',
+    idealFor: 'Mode, beauté, bijoux',
+    features: ['Halo lumineux', 'Fond blanc pur', 'Prix animé', 'Effet de profondeur'],
+    isNew: true
+  },
+  {
+    id: 'etiquette',
+    name: 'Étiquette 🏷️',
+    description: 'Luxe artisanal',
+    colors: { bg: '#FFFFFF', text: '#3D3D3D', secondary: '#D4AF37' },
+    preview: '#FFFFFF',
+    idealFor: 'Artisanat, produits locaux, cadeaux',
+    features: ['Cadre ovale', 'Étiquette style Hermès', 'Texture papier', 'Typographie manuscrite'],
+    isNew: true
+  },
+  {
+    id: 'ecran',
+    name: 'Écran 📱',
+    description: 'Design tech high-tech',
+    colors: { bg: '#FFFFFF', text: '#000000', secondary: '#007AFF' },
+    preview: '#FFFFFF',
+    idealFor: 'Électronique, tech, gadgets',
+    features: ['Cadre smartphone', 'Barre d\'état', 'Animations fluides', 'Langage tech'],
+    isNew: true
+  },
+  {
+    id: 'vitrine',
+    name: 'Vitrine 🪟',
+    description: 'Minimalisme élégant',
+    colors: { bg: '#FFFFFF', text: '#0F0F0F', secondary: '#D4AF37' },
+    preview: '#FFFFFF',
+    idealFor: 'Tous les secteurs – version ultra-minimaliste',
+    features: ['Cadre doré fin', 'Produit flottant', 'Reflet vitrine', 'Luxe discret'],
+    isNew: true
   }
 ];
+
+/**
+ * Attribution intelligente de template par catégorie
+ */
+export const getDefaultTemplateByCategory = (category) => {
+  const categoryMap = {
+    'Mode': 'lumiere',
+    'Beauté': 'lumiere',
+    'Électronique': 'ecran',
+    'Tech': 'ecran',
+    'Artisanat': 'etiquette',
+    'Alimentation': 'etiquette',
+    'Services': 'vitrine'
+  };
+  return categoryMap[category] || 'vibrant';
+};
 
 export default function TemplateSelector({ currentTemplate, onSelect }) {
   const [selectedTemplate, setSelectedTemplate] = useState(currentTemplate || 'vibrant');
