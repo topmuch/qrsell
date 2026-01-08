@@ -118,7 +118,20 @@ export default function SellerProfileForm({ user, onProfileComplete }) {
         profile_completed: true
       };
 
-      await base44.entities.Seller.create(sellerData);
+      const newSeller = await base44.entities.Seller.create(sellerData);
+
+      // Automatically create default shop
+      await base44.entities.Shop.create({
+        seller_id: newSeller.id,
+        shop_name: formData.shop_name,
+        shop_slug: formData.shop_slug,
+        primary_color: '#4CAF50',
+        secondary_color: '#45a049',
+        category: 'Autre',
+        whatsapp_number: formData.whatsapp_number,
+        is_active: true
+      });
+
       onProfileComplete();
     } catch (error) {
       setError('Erreur lors de la création du profil');
