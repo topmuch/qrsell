@@ -13,7 +13,8 @@ import {
   QrCode,
   ShoppingBag,
   Clock,
-  Gift
+  Gift,
+  Check
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
@@ -23,6 +24,8 @@ import MiniShop from '@/components/landing/MiniShop';
 import Footer from '@/components/landing/Footer';
 import FloatingWhatsAppButton from '@/components/ui/FloatingWhatsAppButton';
 import { createPageUrl } from '@/utils/index';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from 'react-router-dom';
 
 export default function Home() {
   const [showSuccess, setShowSuccess] = useState(false);
@@ -389,11 +392,6 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-
-      <TestimonialSection />
-      <MiniShop />
-      <Footer />
-
 
       {/* Pricing Preview */}
       <section className="container mx-auto px-4 sm:px-6 py-12 sm:py-20">
