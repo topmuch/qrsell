@@ -154,7 +154,9 @@ export default function Shop() {
     return configs[templateId] || configs.vibrant;
   };
 
-  const templateConfig = shop ? getTemplateConfig(shop.template || 'vibrant') : getTemplateConfig('vibrant');
+  // Déterminer le template à utiliser
+  const effectiveTemplate = shop?.template && shop.template.trim() ? shop.template : 'vibrant';
+  const templateConfig = shop ? getTemplateConfig(effectiveTemplate) : getTemplateConfig('vibrant');
 
   // Get products
   const { data: products = [], isLoading: loadingProducts } = useQuery({
