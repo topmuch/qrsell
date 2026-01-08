@@ -15,6 +15,7 @@ import { toast } from "sonner";
 export default function PlanManagement() {
   const [editingPlan, setEditingPlan] = useState(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: plans = [] } = useQuery({
@@ -29,6 +30,16 @@ export default function PlanManagement() {
       setShowEditDialog(false);
       setEditingPlan(null);
       toast.success('Forfait mis à jour avec succès');
+    }
+  });
+
+  const createPlanMutation = useMutation({
+    mutationFn: (data) => base44.entities.Plan.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['all-plans']);
+      setShowCreateDialog(false);
+      setEditingPlan(null);
+      toast.success('Forfait créé avec succès');
     }
   });
 
@@ -48,6 +59,31 @@ export default function PlanManagement() {
     setShowEditDialog(true);
   };
 
+  const handleCreate = () => {
+    setEditingPlan({
+      name: '',
+      code: '',
+      price: 5000,
+      description: '',
+      max_shops: 1,
+      max_products: 20,
+      has_multi_shops: false,
+      has_trend_alerts: false,
+      is_active: true,
+      features: [],
+      durations_available: [1],
+      feature_options: {
+        qr_codes_tiktok: true,
+        analytics_realtime: true,
+        campaigns_access: false,
+        verified_badge: false,
+        team_management: false,
+        priority_support: false
+      }
+    });
+    setShowCreateDialog(true);
+  };
+
   const handleSave = () => {
     if (!editingPlan) return;
 
@@ -59,6 +95,11 @@ export default function PlanManagement() {
     });
   };
 
+  const handleCreateSave = () => {
+    if (!editingPlan) return;
+    createPlanMutation.mutate(editingPlan);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -66,6 +107,13 @@ export default function PlanManagement() {
           <h2 className="text-2xl font-bold text-gray-900">Gestion des forfaits</h2>
           <p className="text-gray-500">Configurez les limites et fonctionnalités de chaque forfait</p>
         </div>
+        <Button
+          onClick={handleCreate}
+          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white"
+        >
+          <Package className="w-4 h-4 mr-2" />
+          Créer un forfait
+        </Button>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -341,6 +389,121 @@ export default function PlanManagement() {
                   className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90"
                 >
                   {updatePlanMutation.isPending ? 'Enregistrement...' : 'Sauvegarder'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Créer un nouveau forfait</DialogTitle>
+          </DialogHeader>
+
+          {editingPlan && (
+            <div className="space-y-6">
+              {/* Basic Info */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Nom du forfait</Label>
+                    <Input
+                      value={editingPlan.name}
+                      onChange={(e) => setEditingPlan({ ...editingPlan, name: e.target.value })}
+                      placeholder="Mini-boutique"
+                    />
+                  </div>
+                  <div>
+                    <Label>Code unique</Label>
+                    <Input
+                      value={editingPlan.code}
+                      onChange={(e) => setEditingPlan({ ...editingPlan, code: e.target.value })}
+                      placeholder="mini"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Prix mensuel (FCFA)</Label>
+                    <Input
+                      type="number"
+                      value={editingPlan.price}
+                      onChange={(e) => setEditingPlan({ ...editingPlan, price: parseInt(e.target.value) })}
+                    />
+                  </div>
+                  <div>
+                    <Label>Produits max</Label>
+                    <Input
+                      type="number"
+                      value={editingPlan.max_products}
+                      onChange={(e) => setEditingPlan({ ...editingPlan, max_products: parseInt(e.target.value) })}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label>Description</Label>
+                  <Textarea
+                    value={editingPlan.description || ''}
+                    onChange={(e) => setEditingPlan({ ...editingPlan, description: e.target.value })}
+                    placeholder="Description du forfait..."
+                    rows={2}
+                  />
+                </div>
+              </div>
+
+              {/* Main Features */}
+              <div className="space-y-4 p-4 bg-purple-50 rounded-lg">
+                <h3 className="font-semibold text-gray-900">Fonctionnalités principales</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="create-multi-shops" className="cursor-pointer">
+                      Gestion multi-boutiques
+                    </Label>
+                    <Switch
+                      id="create-multi-shops"
+                      checked={editingPlan.has_multi_shops}
+                      onCheckedChange={(checked) => setEditingPlan({ 
+                        ...editingPlan, 
+                        has_multi_shops: checked 
+                      })}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="create-trend-alerts" className="cursor-pointer">
+                      Alertes de tendances
+                    </Label>
+                    <Switch
+                      id="create-trend-alerts"
+                      checked={editingPlan.has_trend_alerts}
+                      onCheckedChange={(checked) => setEditingPlan({ 
+                        ...editingPlan, 
+                        has_trend_alerts: checked 
+                      })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-2 pt-4 border-t">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCreateDialog(false)}
+                  className="flex-1"
+                >
+                  Annuler
+                </Button>
+                <Button
+                  onClick={handleCreateSave}
+                  disabled={createPlanMutation.isPending || !editingPlan.name || !editingPlan.code}
+                  className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90"
+                >
+                  {createPlanMutation.isPending ? 'Création...' : 'Créer le forfait'}
                 </Button>
               </div>
             </div>
