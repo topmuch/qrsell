@@ -19,6 +19,7 @@ import LiveReports from './pages/LiveReports';
 import Onboarding from './pages/Onboarding';
 import OnboardingSuccess from './pages/OnboardingSuccess';
 import PerformanceReports from './pages/PerformanceReports';
+import PricingPlans from './pages/PricingPlans';
 import ProductPage from './pages/ProductPage';
 import ProfileSetup from './pages/ProfileSetup';
 import PromotionProduct from './pages/PromotionProduct';
@@ -30,7 +31,6 @@ import SubscriptionExpired from './pages/SubscriptionExpired';
 import SubscriptionRequest from './pages/SubscriptionRequest';
 import TikTokGuide from './pages/TikTokGuide';
 import TikTokGuidePublic from './pages/TikTokGuidePublic';
-import PricingPlans from './pages/PricingPlans';
 import __Layout from './Layout.jsx';
 
 
@@ -56,6 +56,7 @@ export const PAGES = {
     "Onboarding": Onboarding,
     "OnboardingSuccess": OnboardingSuccess,
     "PerformanceReports": PerformanceReports,
+    "PricingPlans": PricingPlans,
     "ProductPage": ProductPage,
     "ProfileSetup": ProfileSetup,
     "PromotionProduct": PromotionProduct,
@@ -67,7 +68,6 @@ export const PAGES = {
     "SubscriptionRequest": SubscriptionRequest,
     "TikTokGuide": TikTokGuide,
     "TikTokGuidePublic": TikTokGuidePublic,
-    "PricingPlans": PricingPlans,
 }
 
 export const pagesConfig = {
