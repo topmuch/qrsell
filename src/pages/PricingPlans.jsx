@@ -7,8 +7,16 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils/index';
 import { Check, Sparkles, Loader2, X, Store } from 'lucide-react';
+import SEOHead from '@/components/seo/SEOHead';
 
 export default function PricingPlans() {
+  // SEO Configuration
+  const pricingSEO = {
+    title: "Forfaits ShopQR – Boutique QR dès 5 000 FCFA/mois | TikTok Commerce",
+    description: "Comparez nos forfaits : Mini-boutique à 5 000 FCFA, TikTok Pro à 7 500 FCFA. Créez votre boutique QR code, vendez sur WhatsApp et TikTok Live. Sans engagement.",
+    keywords: "forfait boutique QR, prix QR code commerce, abonnement vente TikTok, tarif e-commerce Afrique, mini-boutique prix, vendre sur WhatsApp tarif",
+    canonicalUrl: "https://shopqr.pro/PricingPlans"
+  };
   const { data: plans = [], isLoading } = useQuery({
     queryKey: ['plans-public'],
     queryFn: async () => {
@@ -27,19 +35,27 @@ export default function PricingPlans() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-16 px-4">
+      {/* SEO Head */}
+      <SEOHead 
+        title={pricingSEO.title}
+        description={pricingSEO.description}
+        keywords={pricingSEO.keywords}
+        canonicalUrl={pricingSEO.canonicalUrl}
+      />
+      
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
+        <header className="text-center mb-16">
           <Badge className="bg-[#6C4AB6] mb-4">
             <Sparkles className="w-3 h-3 mr-1" />
             FORFAITS
           </Badge>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Choisissez votre forfait
+            Forfaits boutique QR – Tarifs e-commerce Afrique
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Que vous vendiez sur TikTok ou non, nous avons une solution pour vous
-          </p>
-        </div>
+          <h2 className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Que vous vendiez sur TikTok ou non, nous avons une solution pour vous. Dès 5 000 FCFA/mois.
+          </h2>
+        </header>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {plans.map((plan) => {

@@ -6,8 +6,16 @@ import { createPageUrl } from '@/utils/index';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Store, Package, CheckCircle2, MapPin } from 'lucide-react';
+import SEOHead from '@/components/seo/SEOHead';
 
 export default function AllShops() {
+  // SEO Configuration
+  const shopsSEO = {
+    title: "Toutes les boutiques ShopQR – Commerce QR Code Afrique & Europe",
+    description: "Découvrez les boutiques actives sur ShopQR. Mode, beauté, électronique à Dakar, Abidjan, Paris. Commandez via WhatsApp, scannez les QR codes.",
+    keywords: "boutiques QR code, magasins en ligne Afrique, commerce WhatsApp Sénégal, boutiques Dakar, e-commerce Abidjan, vente en ligne Cameroun",
+    canonicalUrl: "https://shopqr.pro/AllShops"
+  };
   // Fetch all active sellers
   const { data: sellers = [], isLoading: loadingSellers } = useQuery({
     queryKey: ['all-sellers'],
@@ -37,19 +45,27 @@ export default function AllShops() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
+      {/* SEO Head */}
+      <SEOHead 
+        title={shopsSEO.title}
+        description={shopsSEO.description}
+        keywords={shopsSEO.keywords}
+        canonicalUrl={shopsSEO.canonicalUrl}
+      />
+      
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
+        <header className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] rounded-full mb-4">
             <Store className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Toutes les boutiques
+            Boutiques QR Code – Commerce en ligne Afrique & Europe
           </h1>
-          <p className="text-xl text-gray-600">
-            Découvrez {sellers.length} boutique{sellers.length > 1 ? 's' : ''} active{sellers.length > 1 ? 's' : ''} sur QRSell
-          </p>
-        </div>
+          <h2 className="text-xl text-gray-600">
+            Découvrez {sellers.length} boutique{sellers.length > 1 ? 's' : ''} active{sellers.length > 1 ? 's' : ''} sur ShopQR
+          </h2>
+        </header>
 
         {sellers.length === 0 ? (
           <div className="text-center py-12">
@@ -57,7 +73,7 @@ export default function AllShops() {
             <p className="text-xl text-gray-600">Aucune boutique active pour le moment</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" aria-label="Liste des boutiques">
             {sellers.map(seller => {
               const productCount = getProductCount(seller.id);
               const shopUrl = createPageUrl('Shop') + `?slug=${seller.shop_slug}`;
@@ -134,8 +150,22 @@ export default function AllShops() {
                 </Link>
               );
             })}
-          </div>
+          </section>
         )}
+        
+        {/* SEO Footer Content */}
+        <footer className="mt-16 text-center">
+          <div className="bg-white rounded-xl p-8 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Trouvez votre boutique préférée sur ShopQR
+            </h3>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              ShopQR est la plateforme de commerce QR Code leader en Afrique et en Europe. 
+              Découvrez des boutiques de mode, beauté, électronique et plus encore. 
+              Commandez facilement via WhatsApp ou scannez les QR codes.
+            </p>
+          </div>
+        </footer>
       </div>
     </div>
   );
