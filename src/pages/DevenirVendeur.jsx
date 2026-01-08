@@ -7,8 +7,16 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils/index';
 import { Check, Sparkles, TrendingUp, Loader2, ArrowRight } from 'lucide-react';
+import SEOHead from '@/components/seo/SEOHead';
 
 export default function DevenirVendeur() {
+  // SEO Configuration
+  const vendeurSEO = {
+    title: "Devenir vendeur ShopQR – Créez votre boutique QR Code dès 5 000 FCFA",
+    description: "Inscrivez-vous comme vendeur ShopQR. Créez votre boutique en ligne avec QR codes, vendez sur TikTok Live et WhatsApp. Sans site web, sans compétences techniques.",
+    keywords: "devenir vendeur QR code, créer boutique en ligne Afrique, vendre sur TikTok, inscription vendeur ShopQR, commerce WhatsApp Sénégal, boutique digitale",
+    canonicalUrl: "https://shopqr.pro/DevenirVendeur"
+  };
   // Get available plans
   const { data: plans = [], isLoading } = useQuery({
     queryKey: ['plans-public'],
@@ -70,20 +78,28 @@ export default function DevenirVendeur() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-16 px-4">
+      {/* SEO Head */}
+      <SEOHead 
+        title={vendeurSEO.title}
+        description={vendeurSEO.description}
+        keywords={vendeurSEO.keywords}
+        canonicalUrl={vendeurSEO.canonicalUrl}
+      />
+      
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
+        <header className="text-center mb-16">
           <Badge className="bg-[#2563eb] mb-4">
             <Sparkles className="w-3 h-3 mr-1" />
-            FORFAITS
+            DEVENIR VENDEUR
           </Badge>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Choisissez votre forfait
+            Créez votre boutique QR Code
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Que vous vendiez sur TikTok ou non, nous avons une solution pour vous
-          </p>
-        </div>
+          <h2 className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Vendez sur TikTok Live et WhatsApp dès 5 000 FCFA/mois. Sans site web, sans compétences techniques.
+          </h2>
+        </header>
 
         {/* Redirect to full pricing page */}
         <div className="text-center">
