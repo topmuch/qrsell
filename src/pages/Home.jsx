@@ -13,10 +13,8 @@ import {
   QrCode,
   ShoppingBag,
   Clock,
-  Gift,
-  Check
+  Gift
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
@@ -392,6 +390,11 @@ export default function Home() {
         </div>
       </section>
 
+      <TestimonialSection />
+      <MiniShop />
+      <Footer />
+
+
       {/* Pricing Preview */}
       <section className="container mx-auto px-4 sm:px-6 py-12 sm:py-20">
         <div className="max-w-6xl mx-auto">
@@ -420,6 +423,11 @@ export default function Home() {
                   <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />QR codes basiques</li>
                   <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Catalogue PDF</li>
                 </ul>
+                <Link to={createPageUrl('Onboarding') + '?plan=mini'} className="block mt-6">
+                  <Button className="w-full bg-gray-900 hover:bg-gray-800">
+                    Choisir
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 
@@ -436,6 +444,11 @@ export default function Home() {
                   <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Promotions flash</li>
                   <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Analytics temps réel</li>
                 </ul>
+                <Link to={createPageUrl('Onboarding') + '?plan=starter'} className="block mt-6">
+                  <Button className="w-full bg-[#2563eb] hover:bg-[#1d4ed8]">
+                    Choisir
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 
@@ -453,6 +466,12 @@ export default function Home() {
                   <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Alertes tendances</li>
                   <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Campagnes sponsorisées</li>
                 </ul>
+                <Link to={createPageUrl('Onboarding') + '?plan=pro'} className="block mt-6">
+                  <Button className="w-full bg-gradient-to-r from-[#2563eb] to-[#3b82f6] hover:opacity-90">
+                    <TrendingUp className="w-4 h-4 mr-2" />
+                    Choisir
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>
