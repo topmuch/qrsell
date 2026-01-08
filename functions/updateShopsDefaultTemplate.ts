@@ -10,22 +10,27 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Admin access required' }, { status: 403 });
     }
 
-    // Get all shops
+    // Get all shops using service role
     const shops = await base44.asServiceRole.entities.Shop.list();
     
     let updated = 0;
     let skipped = 0;
+    const errors = [];
 
     // Update each shop
     for (const shop of shops) {
-      // Only update shops without a template or with old templates
-      if (!shop.template || ['luxe', 'vibrant', 'marche_local', 'minimal'].includes(shop.template)) {
-        await base44.asServiceRole.entities.Shop.update(shop.id, {
-          template: 'lumiere'
-        });
-        updated++;
-      } else {
-        skipped++;
+      try {
+        // Only update shops without a template or with old templates
+        if (!shop.template || ['luxe', 'vibrant', 'marche_local', 'minimal'].includes(shop.template)) {
+          await base44.asServiceRole.entities.Shop.update(shop.id, {
+            template: 'lumiere'
+          });
+          updated++;
+        } else {
+          skipped++;
+        }
+      } catch (error) {
+        errors.push({ shop_id: shop.id, shop_name: shop.shop_name, error: error.message });
       }
     }
 
@@ -34,10 +39,14 @@ Deno.serve(async (req) => {
       message: `Migration terminée: ${updated} boutiques mises à jour, ${skipped} conservées`,
       updated,
       skipped,
-      total: shops.length
+      total: shops.length,
+      errors: errors.length > 0 ? errors : undefined
     });
   } catch (error) {
-    console.error('Error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    console.error('Migration error:', error);
+    return Response.json({ 
+      error: error.message,
+      details: error.toString()
+    }, { status: 500 });
   }
 });
