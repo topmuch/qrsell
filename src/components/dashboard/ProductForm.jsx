@@ -7,8 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { base44 } from '@/api/base44Client';
-import { Loader2, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Loader2, Upload, X, Image as ImageIcon, MapPin, Truck } from 'lucide-react';
 import { toast } from 'sonner';
+import ColorSelector from './ColorSelector';
+import SizeSelector from './SizeSelector';
 
 export default function ProductForm({ open, onClose, seller, currentShop, editProduct, onSuccess }) {
   const [formData, setFormData] = useState({
@@ -19,7 +21,13 @@ export default function ProductForm({ open, onClose, seller, currentShop, editPr
     category: editProduct?.category || 'Autre',
     is_new: editProduct?.is_new || false,
     is_on_promo: editProduct?.is_on_promo || false,
-    is_out_of_stock: editProduct?.is_out_of_stock || false
+    is_out_of_stock: editProduct?.is_out_of_stock || false,
+    shipping_fee: editProduct?.shipping_fee || '',
+    shipping_free: editProduct?.shipping_free !== false,
+    local_pickup_available: editProduct?.local_pickup_available || false,
+    local_pickup_address: editProduct?.local_pickup_address || '',
+    colors: editProduct?.colors || [],
+    sizes: editProduct?.sizes || []
   });
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -56,7 +64,11 @@ export default function ProductForm({ open, onClose, seller, currentShop, editPr
         price: parseFloat(formData.price),
         seller_id: seller.id,
         shop_slug: currentShop?.shop_slug || seller.shop_slug,
-        is_active: true
+        is_active: true,
+        shipping_fee: formData.shipping_free ? null : parseFloat(formData.shipping_fee) || 0,
+        shipping_free: formData.shipping_free || !formData.shipping_fee,
+        colors: formData.colors || [],
+        sizes: formData.sizes || []
       };
 
       if (editProduct) {
