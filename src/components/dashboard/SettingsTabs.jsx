@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import FeaturedProductSelector from './FeaturedProductSelector';
+import TemplateSelector from './TemplateSelector';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +18,8 @@ import {
   Globe,
   CreditCard,
   Users,
-  Check
+  Check,
+  Sparkles
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -171,6 +173,7 @@ export default function SettingsTabs({ seller }) {
 
   const tabs = [
     { id: 'basic', label: 'Informations', icon: Store },
+    { id: 'template', label: 'Style de vitrine', icon: Sparkles },
     { id: 'appearance', label: 'Apparence', icon: Palette },
     { id: 'social', label: 'Réseaux sociaux', icon: Globe },
     { id: 'payment', label: 'Paiement & Partenaires', icon: CreditCard },
@@ -241,6 +244,23 @@ export default function SettingsTabs({ seller }) {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {activeTab === 'template' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-[#6C4AB6]" />
+              Style de votre vitrine publique
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TemplateSelector
+              currentTemplate={seller.template || 'vibrant'}
+              onSelect={(templateId) => handleFieldUpdate('template', templateId)}
+            />
+          </CardContent>
+        </Card>
       )}
 
       {activeTab === 'appearance' && (

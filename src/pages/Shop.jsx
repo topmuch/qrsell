@@ -15,43 +15,111 @@ export default function Shop() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  // Get seller by slug
-  const { data: sellers = [], isLoading: loadingSeller } = useQuery({
-    queryKey: ['seller', slug],
-    queryFn: () => base44.entities.Seller.filter({ shop_slug: slug }),
+  // Get shop by slug
+  const { data: shops = [], isLoading: loadingShop } = useQuery({
+    queryKey: ['shop', slug],
+    queryFn: () => base44.entities.Shop.filter({ shop_slug: slug }),
     enabled: !!slug
   });
 
-  const seller = sellers[0];
+  const shop = shops[0];
+
+  // Template configurations
+  const getTemplateConfig = (templateId) => {
+    const configs = {
+      luxe: {
+        bgColor: '#FFFFFF',
+        textColor: '#6C4AB6',
+        secondaryColor: '#666666',
+        fontFamily: 'Poppins',
+        fontWeight: '300',
+        buttonStyle: 'minimal',
+        qrVisible: false,
+        layout: 'centered'
+      },
+      vibrant: {
+        bgColor: 'linear-gradient(135deg, #FF6B9D 0%, #6C4AB6 100%)',
+        textColor: '#FFFFFF',
+        secondaryColor: '#FFD700',
+        fontFamily: 'Poppins',
+        fontWeight: '700',
+        buttonStyle: 'bold',
+        qrVisible: true,
+        layout: 'grid'
+      },
+      marche_local: {
+        bgColor: '#F5F0E8',
+        textColor: '#8B6B4D',
+        secondaryColor: '#2E8B57',
+        fontFamily: 'Inter',
+        fontWeight: '500',
+        buttonStyle: 'rustic',
+        qrVisible: true,
+        layout: 'simple'
+      },
+      minimal: {
+        bgColor: '#FFFFFF',
+        textColor: '#333333',
+        secondaryColor: '#999999',
+        fontFamily: 'Poppins',
+        fontWeight: '100',
+        buttonStyle: 'ghost',
+        qrVisible: false,
+        layout: 'centered'
+      }
+    };
+    return configs[templateId] || configs.vibrant;
+  };
+
+  const templateConfig = shop ? getTemplateConfig(shop.template || 'vibrant') : getTemplateConfig('vibrant');
 
   // Generate SEO data for shop
   const shopSEO = React.useMemo(() => {
-    if (!seller) return null;
+    if (!shop) return null;
     
     const productsCount = products.length;
-    const pageTitle = `${seller.shop_name}${seller.category ? ` – ${seller.category}` : ''}${seller.city ? ` à ${seller.city}` : ''} | ShopQR`;
-    const metaDesc = `Découvrez ${seller.shop_name}${seller.city ? ` à ${seller.city}` : ''}. ${productsCount} produit${productsCount > 1 ? 's' : ''} disponible${productsCount > 1 ? 's' : ''}. Commandez via WhatsApp ou scannez le QR code.${seller.city ? ` Livraison à ${seller.city}.` : ''}`;
+    const pageTitle = `${shop.shop_name}${shop.category ? ` – ${shop.category}` : ''}${shop.city ? ` à ${shop.city}` : ''} | ShopQR`;
+    const metaDesc = `Découvrez ${shop.shop_name}${shop.city ? ` à ${shop.city}` : ''}. ${productsCount} produit${productsCount > 1 ? 's' : ''} disponible${productsCount > 1 ? 's' : ''}. Commandez via WhatsApp ou scannez le QR code.${shop.city ? ` Livraison à ${shop.city}.` : ''}`;
     
     return {
       title: pageTitle,
       description: metaDesc,
-      keywords: generateLocalizedKeywords(seller),
-      canonicalUrl: `https://shopqr.pro/@${seller.shop_slug}`,
-      ogImage: seller.logo_url || seller.banner_url,
-      schema: generateShopSchema(seller, productsCount)
+      keywords: generateLocalizedKeywords({
+        shop_name: shop.shop_name,
+        category: shop.category,
+        city: shop.city,
+        country: shop.country,
+        shop_slug: shop.shop_slug
+      }),
+      canonicalUrl: `https://shopqr.pro/@${shop.shop_slug}`,
+      ogImage: shop.logo_url || shop.banner_url,
+      schema: generateShopSchema({
+        shop_name: shop.shop_name,
+        city: shop.city,
+        country: shop.country,
+        whatsapp_number: shop.whatsapp_number,
+        email: shop.email,
+        address: shop.address,
+        logo_url: shop.logo_url,
+        banner_url: shop.banner_url,
+        instagram: shop.instagram,
+        tiktok: shop.tiktok,
+        facebook: shop.facebook,
+        shop_slug: shop.shop_slug
+      }, productsCount)
     };
-  }, [seller, products.length]);
+  }, [shop, products.length]);
 
   // Track shop view
   React.useEffect(() => {
-    if (seller) {
+    if (shop) {
       base44.entities.Analytics.create({
-        seller_id: seller.id,
+        seller_id: shop.seller_id,
         event_type: 'view_shop',
         user_agent: navigator.userAgent
       }).catch(() => {});
     }
-  }, [seller?.id]);
+  }, [shop?.id]);
 
   // Get products
   const { data: products = [], isLoading: loadingProducts } = useQuery({
@@ -62,15 +130,15 @@ export default function Shop() {
 
   // Get analytics for featured products
   const { data: analytics = [] } = useQuery({
-    queryKey: ['shop-analytics', seller?.id],
-    queryFn: () => base44.entities.Analytics.filter({ seller_id: seller?.id }),
-    enabled: !!seller?.id
+    queryKey: ['shop-analytics', shop?.seller_id],
+    queryFn: () => base44.entities.Analytics.filter({ seller_id: shop?.seller_id }),
+    enabled: !!shop?.seller_id
   });
 
   const handleWhatsAppClick = (product) => {
     base44.entities.Analytics.create({
       product_id: product.id,
-      seller_id: seller.id,
+      seller_id: shop.seller_id,
       product_public_id: product.public_id,
       event_type: 'whatsapp_click',
       user_agent: navigator.userAgent
@@ -105,8 +173,6 @@ export default function Shop() {
 
   // Get featured products (top 4 by scans or most recent)
   const featuredProducts = React.useMemo(() => {
-    if (!seller?.show_featured_products) return [];
-    
     const productScans = products.map(product => ({
       product,
       scans: analytics.filter(a => 
@@ -121,19 +187,19 @@ export default function Shop() {
       })
       .slice(0, 4)
       .map(item => item.product);
-  }, [products, analytics, seller]);
+  }, [products, analytics]);
 
-  if (loadingSeller) {
+  if (loadingShop) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="w-8 h-8 animate-spin text-[#2563eb]" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#FFFFFF' }}>
+        <Loader2 className="w-8 h-8 animate-spin text-[#6C4AB6]" />
       </div>
     );
   }
 
-  if (!seller) {
+  if (!shop) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4">
         <Store className="w-16 h-16 text-gray-300 mb-4" />
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Boutique introuvable</h1>
         <p className="text-gray-500">Cette boutique n'existe pas ou a été désactivée.</p>
@@ -142,7 +208,14 @@ export default function Shop() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div 
+      className="min-h-screen" 
+      style={{ 
+        background: templateConfig.bgColor,
+        fontFamily: templateConfig.fontFamily,
+        fontWeight: templateConfig.fontWeight
+      }}
+    >
       {/* SEO Head - Dynamic per shop */}
       {shopSEO && (
         <SEOHead 
@@ -161,29 +234,29 @@ export default function Shop() {
           <div className="flex items-center justify-between">
             {/* Logo vendeur uniquement */}
             <div className="flex items-center">
-              {seller?.logo_url ? (
+              {shop?.logo_url ? (
                 <img 
-                  src={seller.logo_url} 
-                  alt={seller.shop_name}
+                  src={shop.logo_url} 
+                  alt={shop.shop_name}
                   className="h-12 md:h-16 w-auto object-contain"
                 />
               ) : (
                 <div 
                   className="w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-white font-bold text-xl md:text-2xl shadow-lg"
                   style={{
-                    background: `linear-gradient(135deg, ${seller.primary_color || '#6C4AB6'} 0%, ${seller.secondary_color || '#FF6B9D'} 100%)`
+                    background: `linear-gradient(135deg, ${shop.primary_color || '#6C4AB6'} 0%, ${shop.secondary_color || '#FF6B9D'} 100%)`
                   }}
                 >
-                  {seller.shop_name?.[0]?.toUpperCase() || 'B'}
+                  {shop.shop_name?.[0]?.toUpperCase() || 'B'}
                 </div>
               )}
             </div>
 
             {/* Réseaux sociaux */}
             <div className="flex items-center gap-2 md:gap-3">
-              {seller.whatsapp_number && (
+              {shop.whatsapp_number && (
                 <a 
-                  href={`https://wa.me/${seller.whatsapp_number.replace(/[^0-9]/g, '')}`}
+                  href={`https://wa.me/${shop.whatsapp_number.replace(/[^0-9]/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 md:w-11 md:h-11 bg-[#10B981] rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
@@ -191,9 +264,9 @@ export default function Shop() {
                   <MessageCircle className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </a>
               )}
-              {seller.instagram && (
+              {shop.instagram && (
                 <a 
-                  href={`https://instagram.com/${seller.instagram.replace('@', '')}`}
+                  href={`https://instagram.com/${shop.instagram.replace('@', '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 md:w-11 md:h-11 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
@@ -201,9 +274,9 @@ export default function Shop() {
                   <Instagram className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </a>
               )}
-              {seller.tiktok && (
+              {shop.tiktok && (
                 <a 
-                  href={`https://tiktok.com/@${seller.tiktok.replace('@', '')}`}
+                  href={`https://tiktok.com/@${shop.tiktok.replace('@', '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 md:w-11 md:h-11 bg-gray-900 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
@@ -213,9 +286,9 @@ export default function Shop() {
                   </svg>
                 </a>
               )}
-              {seller.facebook && (
+              {shop.facebook && (
                 <a 
-                  href={seller.facebook}
+                  href={shop.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 md:w-11 md:h-11 bg-blue-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
@@ -229,77 +302,97 @@ export default function Shop() {
       </header>
 
       {/* Banner Slider */}
-      {seller.banner_images && seller.banner_images.length > 0 && (
+      {shop.banner_images && shop.banner_images.length > 0 && (
         <div className="w-full">
-          <BannerSlider images={seller.banner_images} />
+          <BannerSlider images={shop.banner_images} />
         </div>
       )}
 
       <main className="container mx-auto px-4 py-6 md:py-12">
         {/* SEO-friendly content header with semantic HTML */}
         <header className="mb-12" itemScope itemType="https://schema.org/LocalBusiness">
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4" itemProp="name">
-            {seller.shop_name}
+          <h1 
+            className="text-4xl md:text-5xl font-black mb-4" 
+            itemProp="name"
+            style={{ 
+              color: templateConfig.textColor,
+              fontFamily: templateConfig.fontFamily,
+              fontWeight: templateConfig.fontWeight === '700' ? 'bold' : templateConfig.fontWeight === '300' ? '300' : '400'
+            }}
+          >
+            {shop.shop_name}
           </h1>
-          {seller.address && (
-            <div className="flex items-center gap-2 text-gray-600 mb-2" itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
+          {shop.address && (
+            <div 
+              className="flex items-center gap-2 mb-2" 
+              itemProp="address" 
+              itemScope 
+              itemType="https://schema.org/PostalAddress"
+              style={{ color: templateConfig.textColor }}
+            >
               <MapPin className="w-5 h-5" />
               <span>
-                <span itemProp="streetAddress">{seller.address}</span>
-                {seller.city && <span itemProp="addressLocality">, {seller.city}</span>}
-                {seller.country && <meta itemProp="addressCountry" content={seller.country} />}
+                <span itemProp="streetAddress">{shop.address}</span>
+                {shop.city && <span itemProp="addressLocality">, {shop.city}</span>}
+                {shop.country && <meta itemProp="addressCountry" content={shop.country} />}
               </span>
             </div>
           )}
-          {seller.whatsapp_number && (
-            <div className="flex items-center gap-2 text-gray-600 mb-2">
+          {shop.whatsapp_number && (
+            <div className="flex items-center gap-2 mb-2" style={{ color: templateConfig.textColor }}>
               <Phone className="w-5 h-5" />
-              <span itemProp="telephone">{seller.whatsapp_number}</span>
+              <span itemProp="telephone">{shop.whatsapp_number}</span>
             </div>
           )}
-          {seller.email && (
-            <div className="flex items-center gap-2 text-gray-600 mb-4">
+          {shop.email && (
+            <div className="flex items-center gap-2 mb-4" style={{ color: templateConfig.textColor }}>
               <Mail className="w-5 h-5" />
-              <span itemProp="email">{seller.email}</span>
+              <span itemProp="email">{shop.email}</span>
             </div>
           )}
           {/* Hidden SEO content */}
-          {seller.logo_url && <meta itemProp="image" content={seller.logo_url} />}
-          <meta itemProp="url" content={`https://shopqr.pro/@${seller.shop_slug}`} />
+          {shop.logo_url && <meta itemProp="image" content={shop.logo_url} />}
+          <meta itemProp="url" content={`https://shopqr.pro/@${shop.shop_slug}`} />
         </header>
 
         {/* Featured Products - SEO optimized section */}
         {featuredProducts.length > 0 && (
           <section className="mb-16" aria-label="Produits populaires">
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-8 flex items-center gap-3">
+            <h2 
+              className="text-3xl md:text-4xl font-black mb-8 flex items-center gap-3"
+              style={{ color: templateConfig.textColor }}
+            >
               <span className="text-4xl">🔥</span>
-              <span>Produits populaires chez {seller.shop_name}</span>
+              <span>Produits populaires chez {shop.shop_name}</span>
             </h2>
             <ProductGrid 
               products={featuredProducts}
-              seller={seller}
+              seller={shop}
               onWhatsAppClick={handleWhatsAppClick}
-              showQR={true}
+              showQR={templateConfig.qrVisible}
             />
           </section>
         )}
 
         {/* All Products - SEO optimized catalogue */}
         <section aria-label="Catalogue complet">
-          <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-8">
-            Tous les produits de {seller.shop_name}{seller.city ? ` à ${seller.city}` : ''}
+          <h2 
+            className="text-3xl md:text-4xl font-black mb-8"
+            style={{ color: templateConfig.textColor }}
+          >
+            Tous les produits de {shop.shop_name}{shop.city ? ` à ${shop.city}` : ''}
           </h2>
 
           {loadingProducts ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 animate-spin text-[#FF6B9D]" />
+              <Loader2 className="w-8 h-8 animate-spin" style={{ color: templateConfig.textColor }} />
             </div>
           ) : (
             <ProductGrid 
               products={products.filter(p => p.is_active)}
-              seller={seller}
+              seller={shop}
               onWhatsAppClick={handleWhatsAppClick}
-              showQR={true}
+              showQR={templateConfig.qrVisible}
             />
           )}
           
@@ -321,11 +414,11 @@ export default function Shop() {
       <footer className="bg-gray-50 border-t mt-20 py-12">
         <div className="container mx-auto px-4">
           {/* Payment Methods */}
-          {seller.payment_methods && seller.payment_methods.length > 0 && (
+          {shop.payment_methods && shop.payment_methods.length > 0 && (
             <div className="mb-12">
               <h3 className="text-center font-bold text-gray-900 mb-8 text-xl">Méthodes de paiement acceptées</h3>
               <div className="flex flex-wrap items-center justify-center gap-12">
-                {seller.payment_methods.map((logo, index) => (
+                {shop.payment_methods.map((logo, index) => (
                   <img 
                     key={index}
                     src={logo} 
@@ -338,11 +431,11 @@ export default function Shop() {
           )}
 
           {/* Partners */}
-          {seller.partner_logos && seller.partner_logos.length > 0 && (
+          {shop.partner_logos && shop.partner_logos.length > 0 && (
             <div className="mb-12 pb-12 border-b">
               <h3 className="text-center font-bold text-gray-900 mb-8 text-xl">Nos partenaires</h3>
               <div className="flex flex-wrap items-center justify-center gap-14">
-                {seller.partner_logos.map((logo, index) => (
+                {shop.partner_logos.map((logo, index) => (
                   <img 
                     key={index}
                     src={logo} 
@@ -357,11 +450,11 @@ export default function Shop() {
           {/* Footer Info */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
-              <h3 className="font-bold text-gray-900 mb-2 text-lg">{seller.shop_name}</h3>
+              <h3 className="font-bold text-gray-900 mb-2 text-lg">{shop.shop_name}</h3>
               <div className="space-y-1 text-sm text-gray-600">
-                {seller.address && <p>{seller.address}</p>}
-                {seller.whatsapp_number && <p>{seller.whatsapp_number}</p>}
-                {seller.email && <p>{seller.email}</p>}
+                {shop.address && <p>{shop.address}</p>}
+                {shop.whatsapp_number && <p>{shop.whatsapp_number}</p>}
+                {shop.email && <p>{shop.email}</p>}
               </div>
             </div>
             
@@ -383,7 +476,7 @@ export default function Shop() {
           {/* SEO Footer Links */}
           <div className="mt-8 pt-8 border-t border-gray-200 text-center">
             <p className="text-xs text-gray-400 mb-2">
-              {seller.shop_name} - Boutique {seller.category || 'en ligne'}{seller.city ? ` à ${seller.city}` : ''}{seller.country ? `, ${seller.country}` : ''}
+              {shop.shop_name} - Boutique {shop.category || 'en ligne'}{shop.city ? ` à ${shop.city}` : ''}{shop.country ? `, ${shop.country}` : ''}
             </p>
             <p className="text-xs text-gray-400">
               Commandez facilement via WhatsApp ou scannez nos QR codes. Livraison disponible.
