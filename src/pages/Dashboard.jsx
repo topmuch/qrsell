@@ -596,11 +596,11 @@ export default function Dashboard() {
 
           {activeTab === 'overview' && (
           <div className="space-y-8">
-            {/* Trend Alerts - Always show with upgrade prompt for non-Pro */}
+            {/* Trend Alerts - Show upgrade prompt for non-Pro plans (starter or mini) */}
             {currentShop && (
               hasTrendAlerts ? (
                 <TrendAlerts seller={seller} currentShop={currentShop} />
-              ) : (
+              ) : currentPlan?.code === 'starter' ? (
                 <div 
                   onClick={() => setShowUpgradeModal(true)}
                   className="mb-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-6 text-white shadow-2xl cursor-pointer hover:shadow-3xl transition-shadow"
@@ -612,7 +612,7 @@ export default function Dashboard() {
                         🔥 Alertes de tendances (Pro)
                       </h2>
                       <p className="text-white/90 mb-3">
-                        Découvrez les produits en forte demande dans votre ville et optimisez votre catalogue pour doubler vos ventes.
+                        Passez au forfait TikTok Pro à 10 000 FCFA/mois pour débloquer les alertes de tendances et doubler vos ventes.
                       </p>
                       <div className="flex items-center gap-2 text-sm text-white/80">
                         <Check className="w-4 h-4" />
@@ -628,12 +628,12 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <Button className="bg-white text-purple-600 hover:bg-gray-100 font-bold">
-                      Débloquer maintenant
+                      Passer au Pro
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   </div>
                 </div>
-              )
+              ) : null
             )}
 
             {/* Stats Cards */}
