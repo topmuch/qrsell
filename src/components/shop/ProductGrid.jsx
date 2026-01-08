@@ -6,6 +6,7 @@ import { MessageCircle, Store } from 'lucide-react';
 import { motion } from 'framer-motion';
 import QRCode from 'qrcode';
 import LazyImage from '@/components/seo/LazyImage';
+import ProductVariants from './ProductVariants';
 
 export default function ProductGrid({ products, seller, onWhatsAppClick, showQR = false }) {
   const formatPrice = (price) => {
@@ -127,6 +128,9 @@ Si vous souhaitez procéder à l'achat, il vous suffit de répondre avec "Oui, j
                 </p>
                 <meta itemProp="availability" content={product.is_out_of_stock ? "https://schema.org/OutOfStock" : "https://schema.org/InStock"} />
               </div>
+
+              {/* Product Variants */}
+              <ProductVariants product={product} seller={seller} />
               
               <a 
                 href={getWhatsAppLink(product)}
