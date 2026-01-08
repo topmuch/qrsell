@@ -7,6 +7,7 @@ import { MessageCircle, Store, Loader2, Search, Instagram, Facebook, Phone, MapP
 import BannerSlider from '@/components/shop/BannerSlider';
 import CategoryBar from '@/components/shop/CategoryBar';
 import ProductGrid from '@/components/shop/ProductGrid';
+import SEOHead, { generateShopSchema, generateLocalizedKeywords } from '@/components/seo/SEOHead';
 
 export default function Shop() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -23,113 +24,22 @@ export default function Shop() {
 
   const seller = sellers[0];
 
-  // SEO Meta Tags & Schema.org
-  React.useEffect(() => {
-    if (seller) {
-      // Page Title
-      const pageTitle = `${seller.shop_name}${seller.category ? ` – ${seller.category}` : ''}${seller.city ? ` à ${seller.city}` : ''} | ShopQR`;
-      document.title = pageTitle;
-
-      // Meta Description
-      const productsCount = products.length;
-      const metaDesc = `Découvrez ${seller.shop_name}${seller.city ? ` à ${seller.city}` : ''}. ${productsCount} produit${productsCount > 1 ? 's' : ''} disponible${productsCount > 1 ? 's' : ''}. Commandez via WhatsApp ou scannez le QR code.${seller.city ? ` Livraison à ${seller.city}.` : ''}`;
-      
-      const metaDescription = document.querySelector('meta[name="description"]');
-      if (metaDescription) {
-        metaDescription.setAttribute('content', metaDesc);
-      } else {
-        const meta = document.createElement('meta');
-        meta.name = 'description';
-        meta.content = metaDesc;
-        document.head.appendChild(meta);
-      }
-
-      // Open Graph tags
-      const setOgTag = (property, content) => {
-        let tag = document.querySelector(`meta[property="${property}"]`);
-        if (!tag) {
-          tag = document.createElement('meta');
-          tag.setAttribute('property', property);
-          document.head.appendChild(tag);
-        }
-        tag.setAttribute('content', content);
-      };
-
-      setOgTag('og:title', pageTitle);
-      setOgTag('og:description', metaDesc);
-      setOgTag('og:type', 'website');
-      setOgTag('og:url', window.location.href);
-      if (seller.logo_url) {
-        setOgTag('og:image', seller.logo_url);
-      }
-
-      // Keywords - Localized
-      const keywordsArray = [
-        seller.shop_name,
-        seller.category,
-        seller.city,
-        seller.country,
-        'QR code',
-        'boutique en ligne',
-        'WhatsApp commerce'
-      ].filter(Boolean);
-
-      // Add country-specific keywords
-      if (seller.country === 'Sénégal') {
-        keywordsArray.push('QR code Dakar', 'vendre en ligne Sénégal', 'commerce WhatsApp Senegal');
-      } else if (seller.country === 'France') {
-        keywordsArray.push('boutique QR France', 'vendre sur TikTok Europe');
-      } else if (seller.country === 'Côte d\'Ivoire') {
-        keywordsArray.push('boutique Abidjan', 'commerce Côte d\'Ivoire');
-      }
-
-      const keywords = document.querySelector('meta[name="keywords"]');
-      if (!keywords) {
-        const meta = document.createElement('meta');
-        meta.name = 'keywords';
-        meta.content = keywordsArray.join(', ');
-        document.head.appendChild(meta);
-      } else {
-        keywords.setAttribute('content', keywordsArray.join(', '));
-      }
-
-      // Schema.org LocalBusiness structured data
-      const schemaData = {
-        "@context": "https://schema.org",
-        "@type": "LocalBusiness",
-        "name": seller.shop_name,
-        "description": metaDesc,
-        "url": window.location.href,
-        "image": seller.logo_url || seller.banner_url,
-        "telephone": seller.whatsapp_number,
-        "email": seller.email,
-        "address": seller.address ? {
-          "@type": "PostalAddress",
-          "streetAddress": seller.address,
-          "addressLocality": seller.city,
-          "addressCountry": seller.country
-        } : undefined,
-        "priceRange": "$$",
-        "sameAs": [
-          seller.instagram ? `https://instagram.com/${seller.instagram.replace('@', '')}` : null,
-          seller.tiktok ? `https://tiktok.com/@${seller.tiktok.replace('@', '')}` : null,
-          seller.facebook
-        ].filter(Boolean)
-      };
-
-      // Remove existing schema
-      const existingSchema = document.getElementById('shop-schema');
-      if (existingSchema) {
-        existingSchema.remove();
-      }
-
-      // Add new schema
-      const script = document.createElement('script');
-      script.type = 'application/ld+json';
-      script.id = 'shop-schema';
-      script.text = JSON.stringify(schemaData);
-      document.head.appendChild(script);
-    }
+  // Generate SEO data for shop
+  const shopSEO = React.useMemo(() => {
+    if (!seller) return null;
+    
+    const productsCount = products.length;
+    const pageTitle = `${seller.shop_name}${seller.category ? ` – ${seller.category}` : ''}${seller.city ? ` à ${seller.city}` : ''} | ShopQR`;
+    const metaDesc = `Découvrez ${seller.shop_name}${seller.city ? ` à ${seller.city}` : ''}. ${productsCount} produit${productsCount > 1 ? 's' : ''} disponible${productsCount > 1 ? 's' : ''}. Commandez via WhatsApp ou scannez le QR code.${seller.city ? ` Livraison à ${seller.city}.` : ''}`;
+    
+    return {
+      title: pageTitle,
+      description: metaDesc,
+      keywords: generateLocalizedKeywords(seller),
+      canonicalUrl: `https://shopqr.pro/@${seller.shop_slug}`,
+      ogImage: seller.logo_url || seller.banner_url,
+      schema: generateShopSchema(seller, productsCount)
+    };
   }, [seller, products.length]);
 
   // Track shop view
@@ -233,6 +143,18 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* SEO Head - Dynamic per shop */}
+      {shopSEO && (
+        <SEOHead 
+          title={shopSEO.title}
+          description={shopSEO.description}
+          keywords={shopSEO.keywords}
+          canonicalUrl={shopSEO.canonicalUrl}
+          ogImage={shopSEO.ogImage}
+          schema={shopSEO.schema}
+        />
+      )}
+      
       {/* Header - Logo uniquement à gauche, réseaux sociaux à droite */}
       <header className="bg-white sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4">
@@ -314,30 +236,37 @@ export default function Shop() {
       )}
 
       <main className="container mx-auto px-4 py-6 md:py-12">
-        {/* SEO-friendly content header */}
-        <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+        {/* SEO-friendly content header with semantic HTML */}
+        <header className="mb-12" itemScope itemType="https://schema.org/LocalBusiness">
+          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4" itemProp="name">
             {seller.shop_name}
           </h1>
           {seller.address && (
-            <div className="flex items-center gap-2 text-gray-600 mb-2">
+            <div className="flex items-center gap-2 text-gray-600 mb-2" itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
               <MapPin className="w-5 h-5" />
-              <span>{seller.address}{seller.city ? `, ${seller.city}` : ''}</span>
+              <span>
+                <span itemProp="streetAddress">{seller.address}</span>
+                {seller.city && <span itemProp="addressLocality">, {seller.city}</span>}
+                {seller.country && <meta itemProp="addressCountry" content={seller.country} />}
+              </span>
             </div>
           )}
           {seller.whatsapp_number && (
             <div className="flex items-center gap-2 text-gray-600 mb-2">
               <Phone className="w-5 h-5" />
-              <span>{seller.whatsapp_number}</span>
+              <span itemProp="telephone">{seller.whatsapp_number}</span>
             </div>
           )}
           {seller.email && (
             <div className="flex items-center gap-2 text-gray-600 mb-4">
               <Mail className="w-5 h-5" />
-              <span>{seller.email}</span>
+              <span itemProp="email">{seller.email}</span>
             </div>
           )}
-        </div>
+          {/* Hidden SEO content */}
+          {seller.logo_url && <meta itemProp="image" content={seller.logo_url} />}
+          <meta itemProp="url" content={`https://shopqr.pro/@${seller.shop_slug}`} />
+        </header>
 
         {/* Featured Products */}
         {featuredProducts.length > 0 && (
