@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { MessageCircle, Store } from 'lucide-react';
 import { motion } from 'framer-motion';
 import QRCode from 'qrcode';
+import LazyImage from '@/components/seo/LazyImage';
 
 export default function ProductGrid({ products, seller, onWhatsAppClick, showQR = false }) {
   const formatPrice = (price) => {
@@ -68,20 +69,23 @@ Si vous souhaitez procéder à l'achat, il vous suffit de répondre avec "Oui, j
   };
 
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8" itemScope itemType="https://schema.org/ItemList">
       {products.map((product, index) => (
         <motion.div
           key={product.id}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.05 }}
+          itemProp="itemListElement"
+          itemScope
+          itemType="https://schema.org/Product"
         >
           <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 group h-full flex flex-col border-0 shadow-md bg-white">
             <div className="aspect-square bg-gray-100 relative overflow-hidden">
               {product.image_url ? (
-                <img 
+                <LazyImage 
                   src={product.image_url} 
-                  alt={product.name}
+                  alt={`${product.name} - ${seller?.shop_name || 'ShopQR'}`}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               ) : (
@@ -89,6 +93,7 @@ Si vous souhaitez procéder à l'achat, il vous suffit de répondre avec "Oui, j
                   <Store className="w-16 h-16 text-gray-200" />
                 </div>
               )}
+              {product.image_url && <meta itemProp="image" content={product.image_url} />}
               
               {/* Badges */}
               <div className="absolute top-3 left-3 flex flex-col gap-2">
@@ -105,19 +110,23 @@ Si vous souhaitez procéder à l'achat, il vous suffit de répondre avec "Oui, j
             </div>
 
             <div className="p-6 flex flex-col flex-1">
-              <h3 className="font-bold text-xl text-gray-900 mb-2 line-clamp-2 leading-tight">
+              <h3 className="font-bold text-xl text-gray-900 mb-2 line-clamp-2 leading-tight" itemProp="name">
                 {product.name}
               </h3>
               
               {product.description && (
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+                <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed" itemProp="description">
                   {product.description}
                 </p>
               )}
               
-              <p className="text-3xl font-black text-[#10B981] mb-4">
-                {formatPrice(product.price)} <span className="text-lg">FCFA</span>
-              </p>
+              <div itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                <p className="text-3xl font-black text-[#10B981] mb-4">
+                  <span itemProp="price" content={product.price}>{formatPrice(product.price)}</span> 
+                  <span className="text-lg" itemProp="priceCurrency" content="XOF">FCFA</span>
+                </p>
+                <meta itemProp="availability" content={product.is_out_of_stock ? "https://schema.org/OutOfStock" : "https://schema.org/InStock"} />
+              </div>
               
               <a 
                 href={getWhatsAppLink(product)}
