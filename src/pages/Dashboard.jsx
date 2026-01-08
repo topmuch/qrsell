@@ -293,7 +293,7 @@ export default function Dashboard() {
     }
   };
 
-  const shopUrl = currentShop ? `${window.location.origin}/@${currentShop.shop_slug}` : '';
+  const shopUrl = currentShop ? `${window.location.origin}/Shop?slug=${currentShop.shop_slug}` : '';
 
   const copyShopLink = () => {
     navigator.clipboard.writeText(shopUrl);

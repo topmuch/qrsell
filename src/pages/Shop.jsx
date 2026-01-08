@@ -11,12 +11,8 @@ import LazyImage from '@/components/seo/LazyImage';
 import SEOHead, { generateShopSchema, generateLocalizedKeywords } from '@/components/seo/SEOHead';
 
 export default function Shop() {
-  // Support both /@slug and /Shop?slug=slug formats
-  const pathname = window.location.pathname;
   const urlParams = new URLSearchParams(window.location.search);
-  const slug = pathname.startsWith('/@') 
-    ? pathname.substring(2) // Remove /@ prefix
-    : urlParams.get('slug');
+  const slug = urlParams.get('slug');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
