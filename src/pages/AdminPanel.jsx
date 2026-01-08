@@ -13,6 +13,7 @@ import SubscriptionManagement from '@/components/admin/SubscriptionManagement';
 import ManualClientCreation from '@/components/admin/ManualClientCreation';
 import SiteSettings from '@/components/admin/SiteSettings';
 import { motion } from 'framer-motion';
+import { Sparkles } from 'lucide-react';
 
 
 export default function AdminPanel() {
