@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles } from 'lucide-react';
+import { Check, Sparkles, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 const templates = [
   {
@@ -46,10 +47,16 @@ const templates = [
 
 export default function TemplateSelector({ currentTemplate, onSelect }) {
   const [selectedTemplate, setSelectedTemplate] = useState(currentTemplate || 'vibrant');
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSelect = (templateId) => {
     setSelectedTemplate(templateId);
-    onSelect(templateId);
+  };
+
+  const handleSaveTemplate = async () => {
+    setIsSaving(true);
+    await onSelect(selectedTemplate);
+    setIsSaving(false);
   };
 
   return (
@@ -173,6 +180,41 @@ export default function TemplateSelector({ currentTemplate, onSelect }) {
           </motion.div>
         ))}
       </div>
+
+      {/* Save Button */}
+      {selectedTemplate !== currentTemplate && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed bottom-6 right-6 md:relative md:bottom-auto md:right-auto md:mt-6 flex gap-2"
+        >
+          <Button
+            variant="outline"
+            onClick={() => setSelectedTemplate(currentTemplate)}
+            disabled={isSaving}
+            className="shadow-lg"
+          >
+            Annuler
+          </Button>
+          <Button
+            onClick={handleSaveTemplate}
+            disabled={isSaving}
+            className="bg-gradient-to-r from-green-500 to-green-600 hover:opacity-90 text-white shadow-xl font-bold"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Sauvegarde...
+              </>
+            ) : (
+              <>
+                <Check className="w-4 h-4 mr-2" />
+                Sauvegarder le style
+              </>
+            )}
+          </Button>
+        </motion.div>
+      )}
     </div>
   );
 }
