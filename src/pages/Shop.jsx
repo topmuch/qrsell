@@ -219,6 +219,47 @@ export default function Shop() {
     );
   }
 
+  // If shop exists but has no products
+  if (!loadingProducts && products.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 px-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
+          <div className="w-20 h-20 bg-gradient-to-br from-[#6C4AB6] to-[#FF6B9D] rounded-full flex items-center justify-center mx-auto mb-6">
+            <Store className="w-10 h-10 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-3">
+            Boutique prête ! Produits bientôt disponibles
+          </h1>
+          <p className="text-gray-600 mb-4">
+            <strong>{shop.shop_name}</strong> prépare son catalogue de produits.
+          </p>
+          <p className="text-gray-500 text-sm mb-6">
+            Revenez dans quelques instants pour découvrir nos produits.
+          </p>
+          <div className="flex flex-col gap-3">
+            {shop.whatsapp_number && (
+              <a 
+                href={`https://wa.me/${shop.whatsapp_number.replace(/[^0-9]/g, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button className="w-full bg-[#10B981] hover:bg-[#059669] text-white">
+                  <MessageCircle className="w-5 h-5 mr-2" />
+                  Nous contacter sur WhatsApp
+                </Button>
+              </a>
+            )}
+            <a href="/" className="inline-block">
+              <Button variant="outline" className="w-full">
+                Découvrir d'autres boutiques
+              </Button>
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div 
       className="min-h-screen" 
