@@ -23,7 +23,7 @@ export default function AllShops() {
     canonicalUrl: "https://shopqr.pro/AllShops"
   };
 
-  // Fetch all active shops (unlimited)
+  // Fetch all active shops
   const { data: shops = [], isLoading: loadingShops } = useQuery({
     queryKey: ['all-shops'],
     queryFn: async () => {
@@ -35,7 +35,7 @@ export default function AllShops() {
   // Fetch all products to count per shop
   const { data: products = [] } = useQuery({
     queryKey: ['all-products-for-count'],
-    queryFn: () => base44.entities.Product.list()
+    queryFn: () => base44.entities.Product.list('-created_date', 10000)
   });
 
   const getProductCount = (shopSlug) => {
@@ -219,7 +219,7 @@ export default function AllShops() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredShops.map((shop, idx) => {
               const productCount = getProductCount(shop.shop_slug);
-              const shopUrl = createPageUrl('Shop') + `?slug=${shop.shop_slug}`;
+              const shopUrl = `/Shop?slug=${shop.shop_slug}`;
               const style = getCategoryStyle(shop.category);
               const isNew = isNewShop(shop.created_date);
               
@@ -335,12 +335,12 @@ export default function AllShops() {
                       </div>
 
                       {/* CTA Button */}
-                      <Link to={shopUrl}>
+                      <a href={shopUrl}>
                         <Button className="w-full bg-[#FF6B9D] hover:bg-[#FF6B9D]/90 text-white font-bold rounded-full h-12 shadow-lg">
                           Voir la boutique
                           <ArrowRight className="w-5 h-5 ml-2" />
                         </Button>
-                      </Link>
+                      </a>
                     </div>
                   </div>
                 </motion.div>
