@@ -166,7 +166,7 @@ export default function SubscriptionRequestForm() {
         <Card>
           <CardHeader>
             <CardTitle className="text-3xl">
-              {isEditMode ? 'Modifier mon abonnement' : 'Demande d\'abonnement QRSell'}
+              {isEditMode ? 'Modifier mon abonnement' : 'Demande d\'abonnement ShopQR'}
             </CardTitle>
             <CardDescription>
               {isEditMode 
