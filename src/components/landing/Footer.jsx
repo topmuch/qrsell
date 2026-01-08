@@ -9,7 +9,7 @@ export default function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-12">
           <div className="md:col-span-2">
-            <Logo size="md" showText={true} variant="dark" />
+            <Logo size="md" showText={false} variant="dark" />
             <p className="text-gray-400 mt-4 max-w-md">
               ShopQR - La plateforme de commerce QR Code pour l'Afrique et l'Europe. 
               Vendez via WhatsApp et TikTok Live sans site web.
