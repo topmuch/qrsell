@@ -139,14 +139,15 @@ export default function SellerProfileForm({ user, onProfileComplete }) {
 
       const newSeller = await base44.entities.Seller.create(sellerData);
 
-      // Automatically create default shop
+      // Automatically create default shop with selected template
       await base44.entities.Shop.create({
         seller_id: newSeller.id,
         shop_name: formData.shop_name,
         shop_slug: formData.shop_slug,
         primary_color: '#4CAF50',
         secondary_color: '#45a049',
-        category: 'Autre',
+        category: formData.category || 'Autre',
+        template: formData.template || 'lumiere',
         whatsapp_number: formData.whatsapp_number,
         is_active: true
       });
