@@ -14,13 +14,30 @@ export default function SellerProfileForm({ user, onProfileComplete }) {
     full_name: '',
     whatsapp_number: '',
     shop_slug: '',
-    shop_name: ''
+    shop_name: '',
+    category: 'Autre',
+    template: 'lumiere'
   });
   const [loading, setLoading] = useState(true);
   const [checkingSlug, setCheckingSlug] = useState(false);
   const [slugAvailable, setSlugAvailable] = useState(null);
   const [error, setError] = useState('');
   const [prefilledData, setPrefilledData] = useState(false);
+
+  const categories = [
+    'Mode', 'Beauté', 'Électronique', 'Artisanat', 'Alimentation', 'Accessoires', 'Services', 'Autre'
+  ];
+
+  const templates = [
+    { id: 'lumiere', name: 'Lumière ✨', description: 'Effet de lumière douce' },
+    { id: 'etiquette', name: 'Étiquette 🏷️', description: 'Luxe artisanal' },
+    { id: 'ecran', name: 'Écran 📱', description: 'Design tech high-tech' },
+    { id: 'vitrine', name: 'Vitrine 🪟', description: 'Minimalisme élégant' },
+    { id: 'vibrant', name: 'Vibrant', description: 'Dynamique et coloré' },
+    { id: 'luxe', name: 'Luxe', description: 'Élégant et raffiné' },
+    { id: 'minimal', name: 'Minimal', description: 'Sobre et professionnel' },
+    { id: 'marche_local', name: 'Marché Local', description: 'Authentique et chaleureux' }
+  ];
 
   // Load subscription request data on mount
   useEffect(() => {
