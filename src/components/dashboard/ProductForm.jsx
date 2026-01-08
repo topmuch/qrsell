@@ -235,6 +235,81 @@ export default function ProductForm({ open, onClose, seller, currentShop, editPr
             </div>
           </div>
 
+          {/* Shipping Section */}
+          <div className="space-y-4 pt-2 border-t">
+            <div className="flex items-center gap-2">
+              <Truck className="w-5 h-5 text-orange-600" />
+              <Label className="text-base font-semibold">Frais de livraison</Label>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="shipping_free"
+                checked={formData.shipping_free}
+                onChange={(e) => setFormData(prev => ({...prev, shipping_free: e.target.checked, shipping_fee: ''}))}
+                className="w-4 h-4 cursor-pointer"
+              />
+              <Label htmlFor="shipping_free" className="cursor-pointer text-sm">Livraison gratuite</Label>
+            </div>
+
+            {!formData.shipping_free && (
+              <div>
+                <Label htmlFor="shipping_fee" className="text-sm">Frais de livraison (FCFA)</Label>
+                <Input
+                  id="shipping_fee"
+                  type="number"
+                  value={formData.shipping_fee}
+                  onChange={(e) => setFormData(prev => ({...prev, shipping_fee: e.target.value}))}
+                  placeholder="2000"
+                  className="h-10 mt-1"
+                />
+              </div>
+            )}
+
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="local_pickup"
+                checked={formData.local_pickup_available}
+                onChange={(e) => setFormData(prev => ({...prev, local_pickup_available: e.target.checked}))}
+                className="w-4 h-4 cursor-pointer"
+              />
+              <Label htmlFor="local_pickup" className="cursor-pointer text-sm flex items-center gap-1">
+                <MapPin className="w-4 h-4" />
+                Retrait sur place disponible
+              </Label>
+            </div>
+
+            {formData.local_pickup_available && (
+              <div>
+                <Label htmlFor="pickup_address" className="text-sm">Adresse de retrait</Label>
+                <Input
+                  id="pickup_address"
+                  value={formData.local_pickup_address}
+                  onChange={(e) => setFormData(prev => ({...prev, local_pickup_address: e.target.value}))}
+                  placeholder="13 Cité Alia, Yoff, Dakar"
+                  className="h-10 mt-1"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Variants Section */}
+          <div className="space-y-4 pt-2 border-t">
+            <ColorSelector 
+              colors={formData.colors}
+              onChange={(colors) => setFormData(prev => ({...prev, colors}))}
+            />
+          </div>
+
+          <div className="space-y-4">
+            <SizeSelector 
+              sizes={formData.sizes}
+              onChange={(sizes) => setFormData(prev => ({...prev, sizes}))}
+            />
+          </div>
+
           <div className="flex gap-3 pt-4 border-t sticky bottom-0 bg-white pb-2">
             <Button 
               type="button" 
