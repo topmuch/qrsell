@@ -268,12 +268,12 @@ export default function Shop() {
           <meta itemProp="url" content={`https://shopqr.pro/@${seller.shop_slug}`} />
         </header>
 
-        {/* Featured Products */}
+        {/* Featured Products - SEO optimized section */}
         {featuredProducts.length > 0 && (
-          <div className="mb-16">
+          <section className="mb-16" aria-label="Produits populaires">
             <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-8 flex items-center gap-3">
               <span className="text-4xl">🔥</span>
-              <span>Produits populaires</span>
+              <span>Produits populaires chez {seller.shop_name}</span>
             </h2>
             <ProductGrid 
               products={featuredProducts}
@@ -281,12 +281,14 @@ export default function Shop() {
               onWhatsAppClick={handleWhatsAppClick}
               showQR={true}
             />
-          </div>
+          </section>
         )}
 
-        {/* All Products */}
-        <div>
-          <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-8">Tous nos produits</h2>
+        {/* All Products - SEO optimized catalogue */}
+        <section aria-label="Catalogue complet">
+          <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-8">
+            Tous les produits de {seller.shop_name}{seller.city ? ` à ${seller.city}` : ''}
+          </h2>
 
           {loadingProducts ? (
             <div className="flex items-center justify-center py-20">
@@ -300,7 +302,19 @@ export default function Shop() {
               showQR={true}
             />
           )}
-        </div>
+          
+          {/* SEO-friendly product list for crawlers */}
+          <div className="sr-only" aria-hidden="true">
+            <h3>Liste des produits disponibles :</h3>
+            <ul>
+              {products.filter(p => p.is_active).map(product => (
+                <li key={product.id}>
+                  {product.name} - {product.price} FCFA - {product.category || 'Divers'}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
       </main>
 
       {/* Footer */}
@@ -354,16 +368,26 @@ export default function Shop() {
             <div className="text-center md:text-right">
               <p className="text-xs text-gray-400 mb-1">Boutique propulsée par</p>
               <a 
-                href="https://qrsell.app" 
+                href="https://shopqr.pro" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="inline-block opacity-30 hover:opacity-50 transition-opacity"
               >
                 <span className="text-xs font-semibold bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] bg-clip-text text-transparent">
-                  QRSell
+                  ShopQR
                 </span>
               </a>
             </div>
+          </div>
+          
+          {/* SEO Footer Links */}
+          <div className="mt-8 pt-8 border-t border-gray-200 text-center">
+            <p className="text-xs text-gray-400 mb-2">
+              {seller.shop_name} - Boutique {seller.category || 'en ligne'}{seller.city ? ` à ${seller.city}` : ''}{seller.country ? `, ${seller.country}` : ''}
+            </p>
+            <p className="text-xs text-gray-400">
+              Commandez facilement via WhatsApp ou scannez nos QR codes. Livraison disponible.
+            </p>
           </div>
         </div>
       </footer>
