@@ -13,8 +13,10 @@ import {
   QrCode,
   ShoppingBag,
   Clock,
-  Gift
+  Gift,
+  Check
 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
@@ -464,10 +466,11 @@ export default function Home() {
             </Button>
           </div>
         </div>
-      </div>
-    );
-}
+      </section>
 
+      <TestimonialSection />
+      <MiniShop />
+      <Footer />
 
       {/* WhatsApp Floating Button */}
       {siteSettings?.whatsapp_support && (
