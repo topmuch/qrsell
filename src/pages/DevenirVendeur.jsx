@@ -85,44 +85,19 @@ export default function DevenirVendeur() {
           </p>
         </div>
 
-        {/* Plans */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {/* Mini Plan */}
-          <Card className="relative overflow-hidden hover:shadow-xl transition-all duration-300 border-2 border-gray-200">
-            <CardHeader className="bg-gradient-to-br from-gray-50 to-white border-b">
-              <CardTitle className="text-2xl text-gray-900">{miniPlan.name}</CardTitle>
-              <p className="text-sm text-gray-500">Code: {miniPlan.code}</p>
-            </CardHeader>
-            <CardContent className="pt-6 space-y-6">
-              <div>
-                <p className="text-4xl font-bold text-gray-900">
-                  {miniPlan.price?.toLocaleString('fr-FR') || '5 000'} <span className="text-xl font-normal text-gray-600">FCFA</span>
-                </p>
-                <p className="text-gray-500">par mois</p>
-              </div>
+        {/* Redirect to full pricing page */}
+        <div className="text-center">
+          <Button 
+            onClick={() => window.location.href = createPageUrl('PricingPlans')}
+            className="bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] hover:opacity-90 text-white text-lg px-8 py-6"
+          >
+            Voir tous les forfaits
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
+        </div>
 
-              <div className="bg-blue-50 p-3 rounded-lg">
-                <p className="text-sm font-semibold text-blue-900">✓ Pas de TikTok ? Pas de problème.</p>
-              </div>
-
-              <p className="text-gray-600">{miniPlan.description}</p>
-
-              <ul className="space-y-3">
-                {(miniPlan.features || []).map((feature, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link to={createPageUrl('Onboarding') + '?plan=mini'}>
-                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white text-lg py-6">
-                  Choisir ce forfait
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+        {/* Quick overview */}
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mt-12">
           {/* Starter Plan */}
           <Card className="relative overflow-hidden hover:shadow-xl transition-all duration-300">
             <CardHeader className="bg-gradient-to-br from-blue-50 to-white border-b">

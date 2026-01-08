@@ -76,6 +76,14 @@ export default function Layout({ children, currentPageName }) {
               >
                 Campagnes
               </Link>
+              <Link 
+                to={createPageUrl('PricingPlans')} 
+                className={`font-medium transition-colors ${
+                  isActive('PricingPlans') ? 'text-[#6C4AB6]' : 'text-gray-700 hover:text-[#6C4AB6]'
+                }`}
+              >
+                Forfaits
+              </Link>
             </div>
 
             {/* Auth Buttons */}
@@ -155,6 +163,15 @@ export default function Layout({ children, currentPageName }) {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Démo
+              </Link>
+              <Link 
+                to={createPageUrl('PricingPlans')} 
+                className={`block py-2 font-medium ${
+                isActive('PricingPlans') ? 'text-[#6C4AB6]' : 'text-gray-700'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Forfaits
               </Link>
               <Link 
                 to={createPageUrl('Campagnes')} 
