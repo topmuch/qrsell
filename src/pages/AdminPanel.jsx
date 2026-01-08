@@ -21,6 +21,7 @@ export default function AdminPanel() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [migratingTemplate, setMigratingTemplate] = useState(false);
 
   useEffect(() => {
     const checkAdmin = async () => {
