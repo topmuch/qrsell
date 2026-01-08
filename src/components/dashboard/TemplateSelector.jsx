@@ -196,9 +196,16 @@ export default function TemplateSelector({ currentTemplate, onSelect }) {
                 {/* Info */}
                 <div className="space-y-3">
                   <div>
-                    <h3 className="font-black text-xl text-[#6C4AB6] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                      {template.name}
-                    </h3>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-black text-xl text-[#6C4AB6]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                        {template.name}
+                      </h3>
+                      {template.isNew && (
+                        <Badge className="bg-gradient-to-r from-orange-400 to-red-500 text-white text-xs font-bold animate-pulse">
+                          NEW
+                        </Badge>
+                      )}
+                    </div>
                     <p className="text-sm text-gray-600">{template.description}</p>
                   </div>
 
