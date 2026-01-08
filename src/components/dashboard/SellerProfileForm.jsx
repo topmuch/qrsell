@@ -3,9 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { base44 } from '@/api/base44Client';
-import { Loader2, Check, AlertCircle, Store, Phone, User } from 'lucide-react';
+import { Loader2, Check, AlertCircle, Store, Phone, User, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { getDefaultTemplateByCategory } from './TemplateSelector';
 
 export default function SellerProfileForm({ user, onProfileComplete }) {
   const [formData, setFormData] = useState({
