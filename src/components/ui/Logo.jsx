@@ -2,9 +2,9 @@ import React from 'react';
 
 export default function Logo({ size = 'md', showText = false, variant = 'light' }) {
   const sizes = {
-    sm: '32px',
-    md: '40px',
-    lg: '56px'
+    sm: '40px',
+    md: '52px',
+    lg: '68px'
   };
 
   return (
