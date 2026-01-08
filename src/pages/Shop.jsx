@@ -74,13 +74,97 @@ export default function Shop() {
 
   const templateConfig = shop ? getTemplateConfig(shop.template || 'vibrant') : getTemplateConfig('vibrant');
 
-  // Generate SEO data for shop
+  // Get products
+  const { data: products = [], isLoading: loadingProducts } = useQuery({
+    queryKey: ['shop-products', slug],
+    queryFn: () => base44.entities.Product.filter({ shop_slug: slug, is_active: true }),
+    enabled: !!slug
+  });
+
+  // Get analytics for featured products
+  const { data: analytics = [] } = useQuery({
+    queryKey: ['shop-analytics', shop?.seller_id],
+    queryFn: () => base44.entities.Analytics.filter({ seller_id: shop?.seller_id }),
+    enabled: !!shop?.seller_id
+  });
+
+  // Track shop view (anonymous - no auth required)
+  React.useEffect(() => {
+    if (shop?.seller_id) {
+      base44.entities.Analytics.create({
+        seller_id: shop.seller_id,
+        event_type: 'view_shop',
+        user_agent: navigator.userAgent
+      }).catch(() => {
+        // Silently ignore - analytics not critical for public view
+      });
+    }
+  }, [shop?.seller_id]);
+
+  const handleWhatsAppClick = (product) => {
+    // Track analytics anonymously (no auth required)
+    if (shop?.seller_id && product?.id) {
+      base44.entities.Analytics.create({
+        product_id: product.id,
+        seller_id: shop.seller_id,
+        product_public_id: product.public_id,
+        event_type: 'whatsapp_click',
+        user_agent: navigator.userAgent
+      }).catch(() => {
+        // Silently ignore
+      });
+    }
+  };
+
+  // Get available categories
+  const availableCategories = React.useMemo(() => {
+    return [...new Set(products.map(p => p.category).filter(Boolean))];
+  }, [products]);
+
+  // Filter products
+  const filteredProducts = React.useMemo(() => {
+    let filtered = products;
+
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(p => p.category === selectedCategory);
+    }
+
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(p => 
+        p.name.toLowerCase().includes(query) ||
+        p.description?.toLowerCase().includes(query)
+      );
+    }
+
+    return filtered;
+  }, [products, selectedCategory, searchQuery]);
+
+  // Get featured products
+  const featuredProducts = React.useMemo(() => {
+    const productScans = products.map(product => ({
+      product,
+      scans: analytics.filter(a => 
+        a.product_id === product.id && a.event_type === 'scan'
+      ).length
+    }));
+
+    return productScans
+      .sort((a, b) => {
+        if (b.scans !== a.scans) return b.scans - a.scans;
+        return new Date(b.product.created_date) - new Date(a.product.created_date);
+      })
+      .slice(0, 4)
+      .map(item => item.product);
+  }, [products, analytics]);
+
+  // Generate SEO data
   const shopSEO = React.useMemo(() => {
     if (!shop) return null;
     
     const productsCount = products.length;
     const pageTitle = `${shop.shop_name}${shop.category ? ` – ${shop.category}` : ''}${shop.city ? ` à ${shop.city}` : ''} | ShopQR`;
-    const metaDesc = `Découvrez ${shop.shop_name}${shop.city ? ` à ${shop.city}` : ''}. ${productsCount} produit${productsCount > 1 ? 's' : ''} disponible${productsCount > 1 ? 's' : ''}. Commandez via WhatsApp ou scannez le QR code.${shop.city ? ` Livraison à ${shop.city}.` : ''}`;
+    const metaDesc = `Découvrez ${shop.shop_name}${shop.city ? ` à ${shop.city}` : ''}. ${productsCount} produit${productsCount > 1 ? 's' : ''} disponible${productsCount > 1 ? 's' : ''}. Commandez via WhatsApp.`;
     
     return {
       title: pageTitle,
@@ -111,93 +195,6 @@ export default function Shop() {
     };
   }, [shop, products.length]);
 
-  // Track shop view (anonymous - no auth required)
-  React.useEffect(() => {
-    if (shop?.seller_id) {
-      // Use try-catch to silently fail if analytics creation fails
-      base44.entities.Analytics.create({
-        seller_id: shop.seller_id,
-        event_type: 'view_shop',
-        user_agent: navigator.userAgent
-      }).catch(() => {
-        // Silently ignore - analytics not critical for public view
-      });
-    }
-  }, [shop?.seller_id]);
-
-  // Get products
-  const { data: products = [], isLoading: loadingProducts } = useQuery({
-    queryKey: ['shop-products', slug],
-    queryFn: () => base44.entities.Product.filter({ shop_slug: slug, is_active: true }),
-    enabled: !!slug
-  });
-
-  // Get analytics for featured products
-  const { data: analytics = [] } = useQuery({
-    queryKey: ['shop-analytics', shop?.seller_id],
-    queryFn: () => base44.entities.Analytics.filter({ seller_id: shop?.seller_id }),
-    enabled: !!shop?.seller_id
-  });
-
-  const handleWhatsAppClick = (product) => {
-    // Track analytics anonymously (no auth required)
-    if (shop?.seller_id && product?.id) {
-      base44.entities.Analytics.create({
-        product_id: product.id,
-        seller_id: shop.seller_id,
-        product_public_id: product.public_id,
-        event_type: 'whatsapp_click',
-        user_agent: navigator.userAgent
-      }).catch(() => {
-        // Silently ignore - analytics not critical for public view
-      });
-    }
-  };
-
-  // Get available categories
-  const availableCategories = React.useMemo(() => {
-    return [...new Set(products.map(p => p.category).filter(Boolean))];
-  }, [products]);
-
-  // Filter products
-  const filteredProducts = React.useMemo(() => {
-    let filtered = products;
-
-    // Filter by category
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(p => p.category === selectedCategory);
-    }
-
-    // Filter by search
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(p => 
-        p.name.toLowerCase().includes(query) ||
-        p.description?.toLowerCase().includes(query)
-      );
-    }
-
-    return filtered;
-  }, [products, selectedCategory, searchQuery]);
-
-  // Get featured products (top 4 by scans or most recent)
-  const featuredProducts = React.useMemo(() => {
-    const productScans = products.map(product => ({
-      product,
-      scans: analytics.filter(a => 
-        a.product_id === product.id && a.event_type === 'scan'
-      ).length
-    }));
-
-    return productScans
-      .sort((a, b) => {
-        if (b.scans !== a.scans) return b.scans - a.scans;
-        return new Date(b.product.created_date) - new Date(a.product.created_date);
-      })
-      .slice(0, 4)
-      .map(item => item.product);
-  }, [products, analytics]);
-
   if (loadingShop) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#FFFFFF' }}>
@@ -213,9 +210,9 @@ export default function Shop() {
           <div className="w-20 h-20 bg-gradient-to-br from-[#6C4AB6] to-[#FF6B9D] rounded-full flex items-center justify-center mx-auto mb-6">
             <Store className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-3">Cette boutique est en cours de création</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-3">Boutique non trouvée</h1>
           <p className="text-gray-600 mb-6">
-            Le vendeur est en train de configurer sa boutique. Revenez bientôt !
+            Cette boutique n'existe pas ou a été supprimée.
           </p>
           <a href="/" className="inline-block">
             <Button className="bg-gradient-to-r from-[#6C4AB6] to-[#FF6B9D] hover:opacity-90 text-white">
@@ -227,7 +224,6 @@ export default function Shop() {
     );
   }
 
-  // If shop exists but has no products
   if (!loadingProducts && products.length === 0) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 px-4">
@@ -240,9 +236,6 @@ export default function Shop() {
           </h1>
           <p className="text-gray-600 mb-4">
             <strong>{shop.shop_name}</strong> prépare son catalogue de produits.
-          </p>
-          <p className="text-gray-500 text-sm mb-6">
-            Revenez dans quelques instants pour découvrir nos produits.
           </p>
           <div className="flex flex-col gap-3">
             {shop.whatsapp_number && (
@@ -257,7 +250,7 @@ export default function Shop() {
                 </Button>
               </a>
             )}
-            <a href="/" className="inline-block">
+            <a href="/" className="inline-block w-full">
               <Button variant="outline" className="w-full">
                 Découvrir d'autres boutiques
               </Button>
@@ -277,7 +270,7 @@ export default function Shop() {
         fontWeight: templateConfig.fontWeight
       }}
     >
-      {/* SEO Head - Dynamic per shop */}
+      {/* SEO Head */}
       {shopSEO && (
         <SEOHead 
           title={shopSEO.title}
@@ -289,11 +282,11 @@ export default function Shop() {
         />
       )}
       
-      {/* Header - Logo uniquement à gauche, réseaux sociaux à droite */}
+      {/* Header */}
       <header className="bg-white sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo vendeur uniquement */}
+            {/* Logo */}
             <div className="flex items-center">
               {shop?.logo_url ? (
                 <img 
@@ -313,7 +306,7 @@ export default function Shop() {
               )}
             </div>
 
-            {/* Réseaux sociaux */}
+            {/* Social icons */}
             <div className="flex items-center gap-2 md:gap-3">
               {shop.whatsapp_number && (
                 <a 
@@ -370,7 +363,7 @@ export default function Shop() {
       )}
 
       <main className="container mx-auto px-4 py-6 md:py-12">
-        {/* SEO-friendly content header with semantic HTML */}
+        {/* Header */}
         <header className="mb-12" itemScope itemType="https://schema.org/LocalBusiness">
           <h1 
             className="text-4xl md:text-5xl font-black mb-4" 
@@ -395,7 +388,6 @@ export default function Shop() {
               <span>
                 <span itemProp="streetAddress">{shop.address}</span>
                 {shop.city && <span itemProp="addressLocality">, {shop.city}</span>}
-                {shop.country && <meta itemProp="addressCountry" content={shop.country} />}
               </span>
             </div>
           )}
@@ -405,18 +397,9 @@ export default function Shop() {
               <span itemProp="telephone">{shop.whatsapp_number}</span>
             </div>
           )}
-          {shop.email && (
-            <div className="flex items-center gap-2 mb-4" style={{ color: templateConfig.textColor }}>
-              <Mail className="w-5 h-5" />
-              <span itemProp="email">{shop.email}</span>
-            </div>
-          )}
-          {/* Hidden SEO content */}
-          {shop.logo_url && <meta itemProp="image" content={shop.logo_url} />}
-          <meta itemProp="url" content={`https://shopqr.pro/@${shop.shop_slug}`} />
         </header>
 
-        {/* Featured Products - SEO optimized section */}
+        {/* Featured Products */}
         {featuredProducts.length > 0 && (
           <section className="mb-16" aria-label="Produits populaires">
             <h2 
@@ -424,7 +407,7 @@ export default function Shop() {
               style={{ color: templateConfig.textColor }}
             >
               <span className="text-4xl">🔥</span>
-              <span>Produits populaires chez {shop.shop_name}</span>
+              <span>Produits populaires</span>
             </h2>
             <ProductGrid 
               products={featuredProducts}
@@ -435,13 +418,13 @@ export default function Shop() {
           </section>
         )}
 
-        {/* All Products - SEO optimized catalogue */}
+        {/* All Products */}
         <section aria-label="Catalogue complet">
           <h2 
             className="text-3xl md:text-4xl font-black mb-8"
             style={{ color: templateConfig.textColor }}
           >
-            Tous les produits de {shop.shop_name}{shop.city ? ` à ${shop.city}` : ''}
+            Tous les produits
           </h2>
 
           {loadingProducts ? (
@@ -456,71 +439,39 @@ export default function Shop() {
               showQR={templateConfig.qrVisible}
             />
           )}
-          
-          {/* SEO-friendly product list for crawlers */}
-          <div className="sr-only" aria-hidden="true">
-            <h3>Liste des produits disponibles :</h3>
-            <ul>
-              {products.filter(p => p.is_active).map(product => (
-                <li key={product.id}>
-                  {product.name} - {product.price} FCFA - {product.category || 'Divers'}
-                </li>
-              ))}
-            </ul>
-          </div>
         </section>
       </main>
 
       {/* Footer */}
       <footer className="bg-gray-50 border-t mt-20 py-12">
         <div className="container mx-auto px-4">
-          {/* Payment Methods */}
           {shop.payment_methods && shop.payment_methods.length > 0 && (
             <div className="mb-12">
-              <h3 className="text-center font-bold text-gray-900 mb-8 text-xl">Méthodes de paiement acceptées</h3>
+              <h3 className="text-center font-bold text-gray-900 mb-8 text-xl">Méthodes de paiement</h3>
               <div className="flex flex-wrap items-center justify-center gap-12">
                 {shop.payment_methods.map((logo, index) => (
                   <img 
                     key={index}
                     src={logo} 
                     alt={`Paiement ${index + 1}`}
-                    className="h-12 object-contain hover:scale-110 transition-transform filter grayscale hover:grayscale-0"
+                    className="h-12 object-contain filter grayscale hover:grayscale-0"
                   />
                 ))}
               </div>
             </div>
           )}
 
-          {/* Partners */}
-          {shop.partner_logos && shop.partner_logos.length > 0 && (
-            <div className="mb-12 pb-12 border-b">
-              <h3 className="text-center font-bold text-gray-900 mb-8 text-xl">Nos partenaires</h3>
-              <div className="flex flex-wrap items-center justify-center gap-14">
-                {shop.partner_logos.map((logo, index) => (
-                  <img 
-                    key={index}
-                    src={logo} 
-                    alt={`Partenaire ${index + 1}`}
-                    className="h-16 object-contain hover:scale-110 transition-transform filter grayscale hover:grayscale-0"
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Footer Info */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
               <h3 className="font-bold text-gray-900 mb-2 text-lg">{shop.shop_name}</h3>
               <div className="space-y-1 text-sm text-gray-600">
                 {shop.address && <p>{shop.address}</p>}
                 {shop.whatsapp_number && <p>{shop.whatsapp_number}</p>}
-                {shop.email && <p>{shop.email}</p>}
               </div>
             </div>
             
             <div className="text-center md:text-right">
-              <p className="text-xs text-gray-400 mb-1">Boutique propulsée par</p>
+              <p className="text-xs text-gray-400 mb-1">Propulsé par</p>
               <a 
                 href="https://shopqr.pro" 
                 target="_blank" 
@@ -532,16 +483,6 @@ export default function Shop() {
                 </span>
               </a>
             </div>
-          </div>
-          
-          {/* SEO Footer Links */}
-          <div className="mt-8 pt-8 border-t border-gray-200 text-center">
-            <p className="text-xs text-gray-400 mb-2">
-              {shop.shop_name} - Boutique {shop.category || 'en ligne'}{shop.city ? ` à ${shop.city}` : ''}{shop.country ? `, ${shop.country}` : ''}
-            </p>
-            <p className="text-xs text-gray-400">
-              Commandez facilement via WhatsApp ou scannez nos QR codes. Livraison disponible.
-            </p>
           </div>
         </div>
       </footer>
