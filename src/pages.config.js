@@ -31,6 +31,8 @@ import SubscriptionExpired from './pages/SubscriptionExpired';
 import SubscriptionRequest from './pages/SubscriptionRequest';
 import TikTokGuide from './pages/TikTokGuide';
 import TikTokGuidePublic from './pages/TikTokGuidePublic';
+import Sitemap from './pages/Sitemap';
+import RobotsTxt from './pages/RobotsTxt';
 import __Layout from './Layout.jsx';
 
 
@@ -68,6 +70,8 @@ export const PAGES = {
     "SubscriptionRequest": SubscriptionRequest,
     "TikTokGuide": TikTokGuide,
     "TikTokGuidePublic": TikTokGuidePublic,
+    "Sitemap": Sitemap,
+    "RobotsTxt": RobotsTxt,
 }
 
 export const pagesConfig = {
