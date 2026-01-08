@@ -596,43 +596,85 @@ export default function Dashboard() {
 
           {activeTab === 'overview' && (
           <div className="space-y-8">
-            {/* Trend Alerts - Show upgrade prompt for non-Pro plans (starter or mini) */}
+            {/* Trend Alerts - Show upgrade prompt for Starter plan, full alerts for Pro */}
             {currentShop && (
               hasTrendAlerts ? (
                 <TrendAlerts seller={seller} currentShop={currentShop} />
               ) : currentPlan?.code === 'starter' ? (
-                <div 
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   onClick={() => setShowUpgradeModal(true)}
-                  className="mb-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-6 text-white shadow-2xl cursor-pointer hover:shadow-3xl transition-shadow"
+                  className="mb-8 bg-gradient-to-br from-[#8B5CF6] via-[#A855F7] to-[#EC4899] rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-white shadow-2xl cursor-pointer hover:shadow-3xl transition-all hover:scale-[1.02]"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-                        <TrendingUp className="w-6 h-6" />
-                        🔥 Alertes de tendances (Pro)
-                      </h2>
-                      <p className="text-white/90 mb-3">
-                        Passez au forfait TikTok Pro à 10 000 FCFA/mois pour débloquer les alertes de tendances et doubler vos ventes.
+                  <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                    <div className="flex-1 space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                          <span className="text-3xl">🔥</span>
+                        </div>
+                        <div>
+                          <h2 className="text-2xl sm:text-3xl font-black flex items-center gap-2">
+                            Alertes de tendances
+                            <span className="text-lg sm:text-xl font-bold bg-white/20 px-3 py-1 rounded-full">Pro</span>
+                          </h2>
+                          <div className="flex items-center gap-1 text-white/80 text-sm mt-1">
+                            <TrendingUp className="w-4 h-4" />
+                            <span>Forfait à 10 000 FCFA/mois</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <p className="text-base sm:text-lg text-white/95 leading-relaxed">
+                        Découvrez les produits en forte demande dans votre ville et optimisez votre catalogue pour doubler vos ventes.
                       </p>
-                      <div className="flex items-center gap-2 text-sm text-white/80">
-                        <Check className="w-4 h-4" />
-                        <span>Tendances localisées par ville et catégorie</span>
+
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-3">
+                          <div className="w-5 h-5 bg-white/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                          <span className="text-sm sm:text-base text-white/95">
+                            Tendances localisées par ville et catégorie
+                          </span>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <div className="w-5 h-5 bg-white/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                          <span className="text-sm sm:text-base text-white/95">
+                            Suggestions de produits basées sur 68% des vendeurs
+                          </span>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <div className="w-5 h-5 bg-white/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                          <span className="text-sm sm:text-base text-white/95">
+                            Comparaisons de performance avec la moyenne
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-white/80">
-                        <Check className="w-4 h-4" />
-                        <span>Suggestions de produits basées sur 68% des vendeurs</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-white/80">
-                        <Check className="w-4 h-4" />
-                        <span>Comparaisons de performance avec la moyenne</span>
+
+                      <Button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowUpgradeModal(true);
+                        }}
+                        className="w-full sm:w-auto bg-white text-[#8B5CF6] hover:bg-gray-100 font-bold text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                      >
+                        Débloquer maintenant
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </Button>
+                    </div>
+
+                    <div className="hidden md:block">
+                      <div className="w-24 h-24 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                        <TrendingUp className="w-12 h-12 text-white" />
                       </div>
                     </div>
-                    <Button className="bg-white text-purple-600 hover:bg-gray-100 font-bold">
-                      Passer au Pro
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
                   </div>
-                </div>
+                </motion.div>
               ) : null
             )}
 
