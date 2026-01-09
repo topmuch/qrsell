@@ -9,6 +9,9 @@ import CategoryBar from '@/components/shop/CategoryBar';
 import ProductGrid from '@/components/shop/ProductGrid';
 import LazyImage from '@/components/seo/LazyImage';
 import SEOHead, { generateShopSchema, generateLocalizedKeywords } from '@/components/seo/SEOHead';
+import TechGadgetsBanner from '@/components/shop/templates/TechGadgetsBanner';
+import FraisNatureBanner from '@/components/shop/templates/FraisNatureBanner';
+import ParfumsBeauteBanner from '@/components/shop/templates/ParfumsBeauteBanner';
 
 export default function Shop() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -149,6 +152,45 @@ export default function Shop() {
         fontWeight: '300',
         headerShadow: 'shadow-sm',
         cardBg: '#FFFFFF'
+      },
+      tech_gadgets: {
+        bgColor: '#FFFFFF',
+        textColor: '#0F0F0F',
+        headerBg: '#FFFFFF',
+        buttonBg: '#2563EB',
+        buttonText: '#FFFFFF',
+        accentColor: '#3B82F6',
+        fontFamily: 'Inter, sans-serif',
+        fontWeight: '600',
+        headerShadow: 'shadow-md',
+        cardBg: '#FFFFFF',
+        hasCustomBanner: true
+      },
+      frais_nature: {
+        bgColor: '#FAF8F5',
+        textColor: '#1F2937',
+        headerBg: '#FFFFFF',
+        buttonBg: '#10B981',
+        buttonText: '#FFFFFF',
+        accentColor: '#059669',
+        fontFamily: 'Poppins, sans-serif',
+        fontWeight: '500',
+        headerShadow: 'shadow-md',
+        cardBg: '#FFFFFF',
+        hasCustomBanner: true
+      },
+      parfums_beaute: {
+        bgColor: '#FFFFFF',
+        textColor: '#111827',
+        headerBg: '#FFFFFF',
+        buttonBg: '#EC4899',
+        buttonText: '#FFFFFF',
+        accentColor: '#DB2777',
+        fontFamily: 'Playfair Display, serif',
+        fontWeight: '400',
+        headerShadow: 'shadow-lg',
+        cardBg: '#FFFFFF',
+        hasCustomBanner: true
       }
     };
     return configs[templateId] || configs.vibrant;
@@ -446,47 +488,57 @@ export default function Shop() {
         </div>
       </header>
 
-      {/* Banner Slider */}
-      {shop.banner_images && shop.banner_images.length > 0 && (
-        <div className="w-full">
-          <BannerSlider images={shop.banner_images} />
-        </div>
+      {/* Custom Banner or Banner Slider */}
+      {templateConfig.hasCustomBanner ? (
+        <>
+          {effectiveTemplate === 'tech_gadgets' && <TechGadgetsBanner shop={shop} onWhatsAppClick={() => {}} />}
+          {effectiveTemplate === 'frais_nature' && <FraisNatureBanner shop={shop} onWhatsAppClick={() => {}} />}
+          {effectiveTemplate === 'parfums_beaute' && <ParfumsBeauteBanner shop={shop} onWhatsAppClick={() => {}} />}
+        </>
+      ) : (
+        shop.banner_images && shop.banner_images.length > 0 && (
+          <div className="w-full">
+            <BannerSlider images={shop.banner_images} />
+          </div>
+        )
       )}
 
       <main className="container mx-auto px-4 py-6 md:py-12">
-        {/* Header */}
-        <header className="mb-12" itemScope itemType="https://schema.org/LocalBusiness">
-          <h1 
-            className="text-4xl md:text-5xl font-black mb-4" 
-            itemProp="name"
-            style={{ 
-              color: templateConfig.textColor
-            }}
-          >
-            {shop.shop_name}
-          </h1>
-          {shop.address && (
-            <div 
-              className="flex items-center gap-2 mb-2" 
-              itemProp="address" 
-              itemScope 
-              itemType="https://schema.org/PostalAddress"
-              style={{ color: templateConfig.textColor }}
+        {/* Header - Hide for custom banner templates */}
+        {!templateConfig.hasCustomBanner && (
+          <header className="mb-12" itemScope itemType="https://schema.org/LocalBusiness">
+            <h1 
+              className="text-4xl md:text-5xl font-black mb-4" 
+              itemProp="name"
+              style={{ 
+                color: templateConfig.textColor
+              }}
             >
-              <MapPin className="w-5 h-5" />
-              <span>
-                <span itemProp="streetAddress">{shop.address}</span>
-                {shop.city && <span itemProp="addressLocality">, {shop.city}</span>}
-              </span>
-            </div>
-          )}
-          {shop.whatsapp_number && (
-            <div className="flex items-center gap-2 mb-2" style={{ color: templateConfig.textColor }}>
-              <Phone className="w-5 h-5" />
-              <span itemProp="telephone">{shop.whatsapp_number}</span>
-            </div>
-          )}
-        </header>
+              {shop.shop_name}
+            </h1>
+            {shop.address && (
+              <div 
+                className="flex items-center gap-2 mb-2" 
+                itemProp="address" 
+                itemScope 
+                itemType="https://schema.org/PostalAddress"
+                style={{ color: templateConfig.textColor }}
+              >
+                <MapPin className="w-5 h-5" />
+                <span>
+                  <span itemProp="streetAddress">{shop.address}</span>
+                  {shop.city && <span itemProp="addressLocality">, {shop.city}</span>}
+                </span>
+              </div>
+            )}
+            {shop.whatsapp_number && (
+              <div className="flex items-center gap-2 mb-2" style={{ color: templateConfig.textColor }}>
+                <Phone className="w-5 h-5" />
+                <span itemProp="telephone">{shop.whatsapp_number}</span>
+              </div>
+            )}
+          </header>
+        )}
 
         {/* Featured Products */}
         {featuredProducts.length > 0 && (
@@ -495,15 +547,71 @@ export default function Shop() {
               className="text-3xl md:text-4xl font-black mb-8 flex items-center gap-3"
               style={{ color: templateConfig.textColor }}
             >
-              <span className="text-4xl">🔥</span>
-              <span>Produits populaires</span>
+              <span className="text-4xl">
+                {effectiveTemplate === 'tech_gadgets' ? '⚡' : 
+                 effectiveTemplate === 'frais_nature' ? '🥗' :
+                 effectiveTemplate === 'parfums_beaute' ? '✨' : '🔥'}
+              </span>
+              <span>
+                {effectiveTemplate === 'tech_gadgets' ? 'Produits tendance' : 
+                 effectiveTemplate === 'frais_nature' ? 'Produits du jour' :
+                 effectiveTemplate === 'parfums_beaute' ? 'Nos coups de cœur' : 'Produits populaires'}
+              </span>
             </h2>
             <ProductGrid 
               products={featuredProducts}
               seller={shop}
               onWhatsAppClick={handleWhatsAppClick}
-              showQR={templateConfig.qrVisible}
+              showQR={true}
             />
+          </section>
+        )}
+
+        {/* Promo Section for Frais Nature */}
+        {effectiveTemplate === 'frais_nature' && products.filter(p => p.is_on_promo && p.is_active).length > 0 && (
+          <section className="mb-16" aria-label="Promos du moment">
+            <h2 
+              className="text-3xl md:text-4xl font-black mb-8 flex items-center gap-3"
+              style={{ color: templateConfig.textColor }}
+            >
+              <span className="text-4xl">🔥</span>
+              <span>Promos du moment</span>
+            </h2>
+            <ProductGrid 
+              products={products.filter(p => p.is_on_promo && p.is_active).slice(0, 4)}
+              seller={shop}
+              onWhatsAppClick={handleWhatsAppClick}
+              showQR={true}
+            />
+          </section>
+        )}
+
+        {/* Incontournables Section for Parfums */}
+        {effectiveTemplate === 'parfums_beaute' && (
+          <section className="mb-16">
+            <div className="relative bg-gradient-to-r from-pink-100 to-purple-100 rounded-2xl overflow-hidden p-8 md:p-12">
+              <div className="relative z-10 max-w-2xl">
+                <h2 className="text-3xl md:text-4xl font-black mb-4 text-gray-900">
+                  Incontournables
+                </h2>
+                <p className="text-lg text-gray-700 mb-6">
+                  Découvrez notre sélection exclusive de parfums les plus demandés
+                </p>
+                <Button
+                  onClick={() => document.querySelector('[aria-label="Catalogue complet"]').scrollIntoView({ behavior: 'smooth' })}
+                  className="bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90 text-white"
+                >
+                  Voir la sélection
+                </Button>
+              </div>
+              <div className="absolute right-0 top-0 bottom-0 w-1/2 opacity-20">
+                <img
+                  src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=800&q=80"
+                  alt="Parfums"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
           </section>
         )}
 
@@ -525,7 +633,7 @@ export default function Shop() {
               products={products.filter(p => p.is_active)}
               seller={shop}
               onWhatsAppClick={handleWhatsAppClick}
-              showQR={templateConfig.qrVisible}
+              showQR={true}
             />
           )}
         </section>
@@ -534,23 +642,45 @@ export default function Shop() {
       {/* Footer */}
       <footer className="bg-gray-50 border-t mt-20 py-12">
         <div className="container mx-auto px-4">
+          {/* Newsletter for Tech & Parfums */}
+          {(effectiveTemplate === 'tech_gadgets' || effectiveTemplate === 'parfums_beaute') && (
+            <div className="max-w-2xl mx-auto mb-12 text-center">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                Restez informé de nos nouveautés
+              </h3>
+              <div className="flex gap-2 max-w-md mx-auto">
+                <Input
+                  type="email"
+                  placeholder="Entrez votre email"
+                  className="flex-1"
+                />
+                <Button
+                  style={{ backgroundColor: templateConfig.buttonBg }}
+                  className="text-white"
+                >
+                  S'abonner
+                </Button>
+              </div>
+            </div>
+          )}
+
           {shop.payment_methods && shop.payment_methods.length > 0 && (
             <div className="mb-12">
               <h3 className="text-center font-bold text-gray-900 mb-8 text-xl">Méthodes de paiement</h3>
-              <div className="flex flex-wrap items-center justify-center gap-12">
+              <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
                 {shop.payment_methods.map((logo, index) => (
                   <img 
                     key={index}
                     src={logo} 
                     alt={`Paiement ${index + 1}`}
-                    className="h-12 object-contain filter grayscale hover:grayscale-0"
+                    className="h-10 md:h-12 object-contain filter grayscale hover:grayscale-0 transition-all"
                   />
                 ))}
               </div>
             </div>
           )}
 
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div className="text-center md:text-left">
               <h3 className="font-bold text-gray-900 mb-2 text-lg">{shop.shop_name}</h3>
               <div className="space-y-1 text-sm text-gray-600">
@@ -559,6 +689,15 @@ export default function Shop() {
               </div>
             </div>
             
+            <div className="text-center">
+              <h4 className="font-bold text-gray-900 mb-2">Liens rapides</h4>
+              <div className="space-y-1 text-sm text-gray-600">
+                <p><a href="/" className="hover:text-gray-900">Accueil</a></p>
+                <p><a href="#" className="hover:text-gray-900">À propos</a></p>
+                <p><a href="#" className="hover:text-gray-900">Contact</a></p>
+              </div>
+            </div>
+
             <div className="text-center md:text-right">
               <p className="text-xs text-gray-400 mb-1">Propulsé par</p>
               <a 
